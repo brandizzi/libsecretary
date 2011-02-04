@@ -3,31 +3,31 @@
 
 void test_secretary_create(CuTest *test) {
     Secretary *secretary = secretary_new();
-    CuAssertIntEquals(test, 0, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_project_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_area_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_area_count(secretary));
 }
 
 void test_secretary_create_task(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_appoint(secretary, "Test task creation");
     
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_project_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_area_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_inbox_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_area_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
 
-    CuAssertIntEquals(test, 1, task_number(task));
-    CuAssertStrEquals(test, "Test task creation", task_description(task));
-    CuAssertPtrEquals(test, NULL, task_project(task));
+    CuAssertIntEquals(test, 1, task_get_number(task));
+    CuAssertStrEquals(test, "Test task creation", task_get_description(task));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
 
 }
 
 void test_secretary_get_task(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_appoint(secretary, "Test task creation");
-    CuAssertIntEquals(test, 1, task_number(task));
+    CuAssertIntEquals(test, 1, task_get_number(task));
 
     Task *task2 = secretary_get_task(secretary, 1);
     CuAssertPtrEquals(test, task, task2);
@@ -47,19 +47,19 @@ void test_secretary_create_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Project *project = secretary_start(secretary, "libsecretary");
     
-    CuAssertIntEquals(test, 0, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_area_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_area_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
 
-    CuAssertStrEquals(test, "libsecretary", project_name(project));
-    CuAssertIntEquals(test, 0, project_task_count(project));
+    CuAssertStrEquals(test, "libsecretary", project_get_name(project));
+    CuAssertIntEquals(test, 0, project_get_task_count(project));
 }
 
 void test_secretary_get_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Project *project = secretary_start(secretary, "libsecretary");
-    CuAssertStrEquals(test, "libsecretary", project_name(project));
+    CuAssertStrEquals(test, "libsecretary", project_get_name(project));
 
     Project *project2 = secretary_get_project(secretary, "libsecretary");
     CuAssertPtrEquals(test, project, project2);
@@ -74,21 +74,21 @@ void test_secretary_move_task_to_project(CuTest *test) {
     Task *task = secretary_appoint(secretary, "Test task transference");
     Project *project = secretary_start(secretary, "libsecretary");
     
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_inbox_count(secretary));
-    CuAssertIntEquals(test, 0, project_task_count(project));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, project_get_task_count(project));
 
     secretary_move(secretary, task, project);
 
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
     // No more in inbox
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
     // Now in project
-    CuAssertIntEquals(test, 1, project_task_count(project));
+    CuAssertIntEquals(test, 1, project_get_task_count(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
-    CuAssertPtrEquals(test, project, task_project(task));
+    CuAssertPtrEquals(test, project, task_get_project(task));
 }
 
 void test_secretary_move_task_from_project(CuTest *test) {
@@ -98,17 +98,17 @@ void test_secretary_move_task_from_project(CuTest *test) {
     
     secretary_move(secretary, task, project);
 
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
-    CuAssertIntEquals(test, 1, project_task_count(project));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
+    CuAssertIntEquals(test, 1, project_get_task_count(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
 
     secretary_move_to_inbox(secretary, task);
 
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_inbox_count(secretary));
-    CuAssertIntEquals(test, 0, project_task_count(project));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, project_get_task_count(project));
     CuAssertPtrEquals(test, NULL, project_get_task(project, 1));
 
 }
@@ -117,15 +117,15 @@ void test_secretary_remove_task(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_appoint(secretary, "Test task transference");
 
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_inbox_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
     CuAssertPtrEquals(test, task, secretary_get_task(secretary, 1));
     CuAssertPtrEquals(test, task, secretary_get_inbox_task(secretary, 1));
 
     secretary_delete_task(secretary, task);
 
-    CuAssertIntEquals(test, 0, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_task(secretary, 1));
     CuAssertPtrEquals(test, NULL, secretary_get_inbox_task(secretary, 1));
 }
@@ -137,17 +137,17 @@ void test_secretary_remove_project_task(CuTest *test) {
 
     secretary_move(secretary, task, project);
     
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
     CuAssertPtrEquals(test, task, secretary_get_task(secretary, 1));
-    CuAssertIntEquals(test, 1, project_task_count(project));
+    CuAssertIntEquals(test, 1, project_get_task_count(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
-    CuAssertPtrEquals(test, project, task_project(task));
+    CuAssertPtrEquals(test, project, task_get_project(task));
 
     secretary_delete_task(secretary, task);
 
-    CuAssertIntEquals(test, 0, secretary_task_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_task_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_task(secretary, 1));
-    CuAssertIntEquals(test, 0, project_task_count(project));
+    CuAssertIntEquals(test, 0, project_get_task_count(project));
     CuAssertPtrEquals(test, NULL, project_get_task(project, 1));
 }
 
@@ -155,12 +155,12 @@ void test_secretary_remove_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Project *project = secretary_start(secretary, "libsecretary");
 
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
     CuAssertPtrEquals(test, project, secretary_get_project(secretary, "libsecretary"));
 
     secretary_delete_project(secretary, project);
 
-    CuAssertIntEquals(test, 0, secretary_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_project(secretary, "libsecretary"));
 
 }
@@ -172,20 +172,20 @@ void test_secretary_remove_project_with_task(CuTest *test) {
 
     secretary_move(secretary, task, project);
     
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 0, secretary_inbox_count(secretary));
-    CuAssertIntEquals(test, 1, project_task_count(project));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
+    CuAssertIntEquals(test, 1, project_get_task_count(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
-    CuAssertPtrEquals(test, project, task_project(task));
-    CuAssertIntEquals(test, 1, secretary_project_count(secretary));
+    CuAssertPtrEquals(test, project, task_get_project(task));
+    CuAssertIntEquals(test, 1, secretary_get_project_count(secretary));
 
     secretary_delete_project(secretary, project);
 
-    CuAssertIntEquals(test, 0, secretary_project_count(secretary));
+    CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_project(secretary, "libsecretary"));
-    CuAssertIntEquals(test, 1, secretary_task_count(secretary));
-    CuAssertIntEquals(test, 1, secretary_inbox_count(secretary));
-    CuAssertPtrEquals(test, NULL, task_project(task));
+    CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
 
 }
 

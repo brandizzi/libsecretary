@@ -13,9 +13,9 @@ typedef struct {
 
 Task *task_new(int number, const char *description);
 
-#define task_number(task) (task->number)
-#define task_description(task) (task->description)
-#define task_project(task) (task->project)
+#define task_get_number(task) (task->number)
+#define task_get_description(task) (task->description)
+#define task_get_project(task) (task->project)
 #define task_free(task) (free(task))
 
 #endif

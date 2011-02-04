@@ -35,7 +35,7 @@ Project *secretary_start(Secretary *secretary, const char* name) {
 Project *secretary_get_project(Secretary *secretary, const char *name) {
     for (int i = 0; i < secretary->project_count; i++) {
         Project *project = secretary->projects[i];
-        if (strcmp(name, project_name(project)) == 0) {
+        if (strcmp(name, project_get_name(project)) == 0) {
             return project;
         }
     }
@@ -49,13 +49,13 @@ void secretary_move(Secretary *secretary, Task *task, Project *project) {
 }
 
 void secretary_move_to_inbox(Secretary *secretary, Task *task) {
-    Project *project = task_project(task);
+    Project *project = task_get_project(task);
     project_remove(project, task);
     secretary->inbox[secretary->inbox_count++] = task;
 }
 
 void secretary_delete_task(Secretary *secretary, Task *task) {
-    Project *project = task_project(task);
+    Project *project = task_get_project(task);
     if (project) {
         project_remove(project, task);
     } else {
@@ -66,7 +66,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    int tn = project_task_count(project);
+    int tn = project_get_task_count(project);
     for (int i = 0; i < tn; i++) {
         secretary_move_to_inbox(secretary, project_get_nth_task(project, i));
     }
