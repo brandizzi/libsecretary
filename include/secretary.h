@@ -2,22 +2,34 @@
 # define _SECRETARY_H
 
 #include <task.h>
+#include <project.h>
+
+#define ARRAY_SIZE 1024
 
 typedef struct {
-    Task *tasks[1024];
+    Task *tasks[ARRAY_SIZE];
     int task_count;
 
-    Task *inbox[1024];
+    Task *inbox[ARRAY_SIZE];
     int inbox_count;
+
+    Project *projects[ARRAY_SIZE];
+    int project_count;
     
 } Secretary;
 
 Secretary *secretary_new();
-#define secretary_task_count(secretary) (secretary->task_count)
-#define secretary_project_count(secretary) 0
-#define secretary_inbox_count(secretary) (secretary->inbox_count)
-#define secretary_area_count(secretary) 0
-
 Task *secretary_appoint(Secretary *secretary, const char* description);
+Project *secretary_start(Secretary *secretary, const char* name);
+Project *secretary_get_project(Secretary *secretary, const char *name);
+
+/* Accessors */
+#define secretary_task_count(secretary) ((secretary)->task_count)
+#define secretary_project_count(secretary) ((secretary)->project_count)
+#define secretary_inbox_count(secretary) ((secretary)->inbox_count)
+#define secretary_area_count(secretary) 0
+#define secretary_get_task(secretary, number) (((secretary)->task_count>=(number))? (secretary)->tasks[(number)-1] : NULL )
+#define secretary_get_inbox_task(secretary, number) (((secretary)->inbox_count>=(number))? (secretary)->inbox[(number)-1] : NULL )
+
 
 #endif
