@@ -1,16 +1,18 @@
 #ifndef _TASK_H
 # define _TASK_H
 
-#include <task.h>
+struct Project;
 
 typedef struct {
     int number;
-    const char *description;    
+    const char *description;
+    struct Project *project;  
 } Task;
 
 Task *task_new(int number, const char *description);
 
 #define task_number(task) (task->number)
 #define task_description(task) (task->description)
+#define task_project(task) (task->project)
 
 #endif

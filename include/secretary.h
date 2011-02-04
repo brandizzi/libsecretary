@@ -22,6 +22,9 @@ Secretary *secretary_new();
 Task *secretary_appoint(Secretary *secretary, const char* description);
 Project *secretary_start(Secretary *secretary, const char* name);
 Project *secretary_get_project(Secretary *secretary, const char *name);
+void secretary_move(Secretary *secretary, Task *task, Project *project);
+void secretary_move_to_inbox(Secretary *secretary, Task *task);
+void secretary_delete_task(Secretary *secretary, Task *task);
 
 /* Accessors */
 #define secretary_task_count(secretary) ((secretary)->task_count)

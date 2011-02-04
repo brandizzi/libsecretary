@@ -6,6 +6,7 @@ Task *task_new(int number, const char *description) {
     Task *task = malloc(sizeof(Task));
     task->number = number;
     task->description = description;
+    task->project = NULL;
     return task;
 }
 
