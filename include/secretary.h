@@ -25,6 +25,7 @@ Project *secretary_get_project(Secretary *secretary, const char *name);
 void secretary_move(Secretary *secretary, Task *task, Project *project);
 void secretary_move_to_inbox(Secretary *secretary, Task *task);
 void secretary_delete_task(Secretary *secretary, Task *task);
+void secretary_delete_project(Secretary *secretary, Project *project);
 
 /* Accessors */
 #define secretary_task_count(secretary) ((secretary)->task_count)

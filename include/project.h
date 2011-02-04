@@ -3,6 +3,8 @@
 
 #include <task.h>
 
+#include <stdlib.h>
+
 #define PROJECT_ARRAY_SIZE 128
 
 typedef struct Project {
@@ -19,5 +21,7 @@ Task *project_get_task(Project *project, int number);
 
 #define project_name(project) ((project)->name)
 #define project_task_count(project) ((project)->task_count)
+#define project_get_nth_task(project, n) ((project)->tasks[(n)])
+#define project_free(project) (free(project))
 
 #endif
