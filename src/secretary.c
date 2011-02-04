@@ -62,5 +62,6 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
         _secretary_delete_task(task, secretary->inbox, &(secretary->inbox_count));
     }
     _secretary_delete_task(task, secretary->tasks, &(secretary->task_count));
+    task_free(task)
 }
 
