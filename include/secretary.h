@@ -27,6 +27,8 @@ Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
 Project *secretary_start(Secretary *secretary, const char* name);
 #define secretary_count_project(secretary) ((secretary)->project_count)
 Project *secretary_get_project(Secretary *secretary, const char *name);
+#define secretary_get_nth_project(secretary, n) \
+        (((secretary)->project_count > (n))? ((secretary)->projects[n]) : NULL)
 
 void secretary_move(Secretary *secretary, Task *task, Project *project);
 void secretary_move_to_inbox(Secretary *secretary, Task *task);

@@ -63,15 +63,33 @@ void test_secretary_create_project(CuTest *test) {
 
 void test_secretary_get_project(CuTest *test) {
     Secretary *secretary = secretary_new();
-    Project *project = secretary_start(secretary, "libsecretary");
-    CuAssertStrEquals(test, "libsecretary", project_get_name(project));
+    Project *project1 = secretary_start(secretary, "libsecretary"),
+            *project2 = secretary_start(secretary, "secretary-cocoa");
 
-    Project *project2 = secretary_get_project(secretary, "libsecretary");
-    CuAssertPtrEquals(test, project, project2);
+    Project *p = secretary_get_project(secretary, "libsecretary");
+    CuAssertPtrEquals(test, project1, p);
+    p = secretary_get_project(secretary, "secretary-cocoa");
+    CuAssertPtrEquals(test, project2, p);
 
     // OTOH, if no project with given name is found, return null
-    project2 = secretary_get_project(secretary, "libiexistent!!");
-    CuAssertPtrEquals(test, NULL, project2);
+    p = secretary_get_project(secretary, "libiexistent!!");
+    CuAssertPtrEquals(test, NULL, p);
+    secretary_free(secretary);
+}
+
+void test_secretary_get_nth_project(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Project *project1 = secretary_start(secretary, "libsecretary"),
+            *project2 = secretary_start(secretary, "secretary-cocoa");
+
+    Project *p = secretary_get_nth_project(secretary, 0);
+    CuAssertPtrEquals(test, project1, p);
+    p = secretary_get_nth_project(secretary, 1);
+    CuAssertPtrEquals(test, project2, p);
+
+    // OTOH, if no project with given name is found, return null
+    p = secretary_get_nth_project(secretary, 3);
+    CuAssertPtrEquals(test, NULL, p);
     secretary_free(secretary);
 }
 
@@ -353,6 +371,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_get_task);
     SUITE_ADD_TEST(suite, test_secretary_create_project);
     SUITE_ADD_TEST(suite, test_secretary_get_project);
+    SUITE_ADD_TEST(suite, test_secretary_get_nth_project);
     SUITE_ADD_TEST(suite, test_secretary_move_task_to_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_task);
     SUITE_ADD_TEST(suite, test_secretary_remove_project);
