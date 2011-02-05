@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 static void _secretary_delete(void *todelete, void **array, int *count);
 
