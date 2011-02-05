@@ -106,14 +106,14 @@ void secretary_free(Secretary *secretary) {
 
 void secretary_schedule(Secretary *secretary, Task *task, struct tm date) {
     task_schedule(task, date);
-    task->state = SCHEDULED;
 }
 
 int secretary_count_scheduled_for(Secretary *secretary, struct tm date) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_scheduled_for(secretary->tasks[i], date))
+        if (task_is_scheduled_for(secretary->tasks[i], date)) {
            counter++;
+        }
     }
     return counter;
 }
@@ -134,6 +134,10 @@ Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int 
 Task *secretary_get_nth_scheduled_for_today(Secretary *secretary, int n) {
     time_t now = time(NULL);
     return secretary_get_nth_scheduled_for(secretary, *localtime(&now), n);
+}
+
+void secretary_unschedule(Secretary *secretary, Task *task) {
+    task_unschedule(task);
 }
 
 

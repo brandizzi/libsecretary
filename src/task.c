@@ -11,3 +11,12 @@ Task *task_new(int number, const char *description) {
     return task;
 }
 
+void task_schedule(Task *task, struct tm date) {
+    task->state = SCHEDULED;
+    task->scheduled_for = date;
+}
+
+void task_unschedule(Task *task) {
+    task->state = task->project? PROJECT : INBOX;
+}
+

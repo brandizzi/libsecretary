@@ -204,7 +204,7 @@ void test_secretary_remove_project_with_task(CuTest *test) {
 void test_secretary_remove_task_with_others(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_appoint(secretary, "Create first task"),
-         *task2 = secretary_appoint(secretary, "Create second task"),
+         *task2 = secretary_appoint(secretary, "Create snd task"),
          *task3 = secretary_appoint(secretary, "Create thrid task");
 
     CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
@@ -236,13 +236,13 @@ void test_secretary_remove_task_with_others(CuTest *test) {
 void test_secretary_remove_project_with_others(CuTest *test) {
     Secretary *secretary = secretary_new();
     Project *project1 = secretary_start(secretary, "Create first project"),
-         *project2 = secretary_start(secretary, "Create second project"),
+         *project2 = secretary_start(secretary, "Create snd project"),
          *project3 = secretary_start(secretary, "Create third project");
 
     CuAssertIntEquals(test, 3, secretary_get_project_count(secretary));
 
     Project *f1 = secretary_get_project(secretary, "Create first project"),
-         *f2 = secretary_get_project(secretary, "Create second project"),
+         *f2 = secretary_get_project(secretary, "Create snd project"),
          *f3 = secretary_get_project(secretary, "Create third project");
     
     CuAssertPtrEquals(test, project1, f1);
@@ -254,7 +254,7 @@ void test_secretary_remove_project_with_others(CuTest *test) {
     CuAssertIntEquals(test, 2, secretary_get_project_count(secretary));
 
     f1 = secretary_get_project(secretary, "Create first project"),
-    f2 = secretary_get_project(secretary, "Create second project"),
+    f2 = secretary_get_project(secretary, "Create snd project"),
     f3 = secretary_get_project(secretary, "Create third project");
 
     CuAssertPtrEquals(test, project1, f1);
@@ -266,7 +266,7 @@ void test_secretary_remove_project_with_others(CuTest *test) {
 void test_secretary_schedule(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_appoint(secretary, "Create first task"),
-         *task2 = secretary_appoint(secretary, "Create second task");
+         *task2 = secretary_appoint(secretary, "Create snd task");
     secretary_appoint(secretary, "Create thrid task");
          
     CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
@@ -276,7 +276,7 @@ void test_secretary_schedule(CuTest *test) {
     date.tm_hour = 0;
     date.tm_mday = 30;
     date.tm_mon = 4;
-    date.tm_year = 2002;
+    date.tm_year = 2002-1900;
     secretary_schedule(secretary, task1, date);
 
     time_t now = time(NULL);
@@ -300,9 +300,10 @@ void test_secretary_schedule(CuTest *test) {
 void test_secretary_unschedule(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_appoint(secretary, "Create first task"),
-         *task2 = secretary_appoint(secretary, "Create second task");
+         *task2 = secretary_appoint(secretary, "Create snd task");
     secretary_appoint(secretary, "Create thrid task");
-         
+    Project *project = secretary_start(secretary, "libsecretary");
+    
     CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
     CuAssertIntEquals(test, 3, secretary_get_inbox_count(secretary));
 
@@ -310,23 +311,37 @@ void test_secretary_unschedule(CuTest *test) {
     date.tm_hour = 0;
     date.tm_mday = 30;
     date.tm_mon = 4;
-    date.tm_year = 2002;
+    date.tm_year = 2002-1900;
     secretary_schedule(secretary, task1, date);
+
+    // One less in inbox
+    CuAssertIntEquals(test, 2, secretary_get_inbox_count(secretary));
 
     time_t now = time(NULL);
     secretary_schedule(secretary, task2, *localtime(&now));
+    // The SCHEDULE state should be preserved!
+    secretary_move(secretary, task2, project);
 
-    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
     CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
 
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
 
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
     CuAssertPtrEquals(test, task1, task);
     
     task = secretary_get_nth_scheduled_for_today(secretary, 0);
     CuAssertPtrEquals(test, task2, task);
+
+    secretary_unschedule(secretary, task1);
+    // One more in inbox, since it returns
+    CuAssertIntEquals(test, 2, secretary_get_inbox_count(secretary));    
+    CuAssertIntEquals(test, 0, secretary_count_scheduled_for(secretary, date));   
+
+    secretary_unschedule(secretary, task2);
+    // No one more, since the task2 was in a project
+    CuAssertIntEquals(test, 2, secretary_get_inbox_count(secretary)); 
+    CuAssertIntEquals(test, 0, secretary_count_scheduled_for_today(secretary));   
 
     secretary_free(secretary);
 }
@@ -345,6 +360,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_remove_task_with_others);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_with_others);
     SUITE_ADD_TEST(suite, test_secretary_schedule);
+    SUITE_ADD_TEST(suite, test_secretary_unschedule);
     return suite;
 }
 

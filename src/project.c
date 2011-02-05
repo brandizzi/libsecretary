@@ -13,7 +13,8 @@ Project *project_new(const char *name) {
 void project_add(Project *project, Task *task) {
     project->tasks[project->task_count++] = task;
     task->project = project;
-    task->state = PROJECT;
+    if (task->state == INBOX)
+        task->state = PROJECT;
 }
 
 Task *project_get_task(Project *project, int number) {
