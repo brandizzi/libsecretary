@@ -7,6 +7,7 @@ Task *task_new(int number, const char *description) {
     task->number = number;
     task->description = description;
     task->project = NULL;
+    task->state = INBOX;
     return task;
 }
 

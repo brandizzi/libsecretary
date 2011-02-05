@@ -6,12 +6,14 @@
 Project *project_new(const char *name) {
     Project *project = malloc(sizeof(Project));
     project->name = name;
+    project->task_count = 0;
     return project;
 }
 
 void project_add(Project *project, Task *task) {
     project->tasks[project->task_count++] = task;
     task->project = project;
+    task->state = PROJECT;
 }
 
 Task *project_get_task(Project *project, int number) {
@@ -32,4 +34,12 @@ void project_remove(Project *project, Task *task) {
             project->task_count--;
         }
     }
+    task->state = INBOX;
+}
+
+void project_free(Project *project) {
+   for (int i = 0; i < project->task_count; i++) {
+       project->tasks[i]->project = NULL;
+   }
+   free(project);
 }

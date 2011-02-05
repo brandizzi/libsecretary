@@ -1,7 +1,7 @@
 vpath %.h include cutest
 vpath %.c src cutest
 
-CFLAGS=-Wall -std=c99
+CFLAGS=${_CFLAGS} -Wall -std=c99
 CPPFLAGS=-Iinclude -Icutest
 LIBOBJS=secretary.o project.o task.o
 LIBNAME=libsecretary.dylib

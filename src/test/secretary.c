@@ -7,6 +7,8 @@ void test_secretary_create(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
     CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
     CuAssertIntEquals(test, 0, secretary_get_area_count(secretary));
+
+    secretary_free(secretary);
 }
 
 void test_secretary_create_task(CuTest *test) {
@@ -22,6 +24,7 @@ void test_secretary_create_task(CuTest *test) {
     CuAssertStrEquals(test, "Test task creation", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
+    secretary_free(secretary);
 }
 
 void test_secretary_get_task(CuTest *test) {
@@ -32,15 +35,16 @@ void test_secretary_get_task(CuTest *test) {
     Task *task2 = secretary_get_task(secretary, 1);
     CuAssertPtrEquals(test, task, task2);
 
-    // Should be stored in inbox
-    Task *task3 = secretary_get_inbox_task(secretary, 1);
+    // Get first task
+    Task *task3 = secretary_get_nth_inbox_task(secretary, 0);
     CuAssertPtrEquals(test, task, task3);
 
     // OTOH, should return NULL if no task with given number
     task2 = secretary_get_task(secretary, 32);
     CuAssertPtrEquals(test, NULL, task2);
-    task2 = secretary_get_inbox_task(secretary, 32);
+    task2 = secretary_get_nth_inbox_task(secretary, 2);
     CuAssertPtrEquals(test, NULL, task2);
+    secretary_free(secretary);
 }
 
 void test_secretary_create_project(CuTest *test) {
@@ -54,6 +58,7 @@ void test_secretary_create_project(CuTest *test) {
 
     CuAssertStrEquals(test, "libsecretary", project_get_name(project));
     CuAssertIntEquals(test, 0, project_get_task_count(project));
+    secretary_free(secretary);
 }
 
 void test_secretary_get_project(CuTest *test) {
@@ -67,6 +72,7 @@ void test_secretary_get_project(CuTest *test) {
     // OTOH, if no project with given name is found, return null
     project2 = secretary_get_project(secretary, "libiexistent!!");
     CuAssertPtrEquals(test, NULL, project2);
+    secretary_free(secretary);
 }
 
 void test_secretary_move_task_to_project(CuTest *test) {
@@ -89,6 +95,7 @@ void test_secretary_move_task_to_project(CuTest *test) {
     CuAssertIntEquals(test, 1, project_get_task_count(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
     CuAssertPtrEquals(test, project, task_get_project(task));
+    secretary_free(secretary);
 }
 
 void test_secretary_move_task_from_project(CuTest *test) {
@@ -111,6 +118,7 @@ void test_secretary_move_task_from_project(CuTest *test) {
     CuAssertIntEquals(test, 0, project_get_task_count(project));
     CuAssertPtrEquals(test, NULL, project_get_task(project, 1));
 
+    secretary_free(secretary);
 }
 
 void test_secretary_remove_task(CuTest *test) {
@@ -120,14 +128,15 @@ void test_secretary_remove_task(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_get_task_count(secretary));
     CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
     CuAssertPtrEquals(test, task, secretary_get_task(secretary, 1));
-    CuAssertPtrEquals(test, task, secretary_get_inbox_task(secretary, 1));
+    CuAssertPtrEquals(test, task, secretary_get_nth_inbox_task(secretary, 0));
 
     secretary_delete_task(secretary, task);
 
     CuAssertIntEquals(test, 0, secretary_get_task_count(secretary));
     CuAssertIntEquals(test, 0, secretary_get_inbox_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_task(secretary, 1));
-    CuAssertPtrEquals(test, NULL, secretary_get_inbox_task(secretary, 1));
+    CuAssertPtrEquals(test, NULL, secretary_get_nth_inbox_task(secretary, 0));
+    secretary_free(secretary);
 }
 
 void test_secretary_remove_project_task(CuTest *test) {
@@ -149,6 +158,7 @@ void test_secretary_remove_project_task(CuTest *test) {
     CuAssertPtrEquals(test, NULL, secretary_get_task(secretary, 1));
     CuAssertIntEquals(test, 0, project_get_task_count(project));
     CuAssertPtrEquals(test, NULL, project_get_task(project, 1));
+    secretary_free(secretary);
 }
 
 void test_secretary_remove_project(CuTest *test) {
@@ -163,6 +173,7 @@ void test_secretary_remove_project(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_get_project_count(secretary));
     CuAssertPtrEquals(test, NULL, secretary_get_project(secretary, "libsecretary"));
 
+    secretary_free(secretary);
 }
 
 void test_secretary_remove_project_with_task(CuTest *test) {
@@ -187,6 +198,137 @@ void test_secretary_remove_project_with_task(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
+    secretary_free(secretary);
+}
+
+void test_secretary_remove_task_with_others(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_appoint(secretary, "Create first task"),
+         *task2 = secretary_appoint(secretary, "Create second task"),
+         *task3 = secretary_appoint(secretary, "Create thrid task");
+
+    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 3, secretary_get_inbox_count(secretary));
+
+    Task *f1 = secretary_get_task(secretary, 1),
+         *f2 = secretary_get_task(secretary, 2),
+         *f3 = secretary_get_task(secretary, 3);
+    
+    CuAssertPtrEquals(test, task1, f1);
+    CuAssertPtrEquals(test, task2, f2);
+    CuAssertPtrEquals(test, task3, f3);
+
+    secretary_delete_task(secretary, task2);
+
+    CuAssertIntEquals(test, 2, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 2, secretary_get_inbox_count(secretary));
+
+    f1 = secretary_get_task(secretary, 1);
+    f2 = secretary_get_task(secretary, 2);
+    f3 = secretary_get_task(secretary, 3);
+
+    CuAssertPtrEquals(test, task1, f1);
+    CuAssertPtrEquals(test, NULL, f2);
+    CuAssertPtrEquals(test, task3, f3);
+    secretary_free(secretary);
+}
+
+void test_secretary_remove_project_with_others(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Project *project1 = secretary_start(secretary, "Create first project"),
+         *project2 = secretary_start(secretary, "Create second project"),
+         *project3 = secretary_start(secretary, "Create third project");
+
+    CuAssertIntEquals(test, 3, secretary_get_project_count(secretary));
+
+    Project *f1 = secretary_get_project(secretary, "Create first project"),
+         *f2 = secretary_get_project(secretary, "Create second project"),
+         *f3 = secretary_get_project(secretary, "Create third project");
+    
+    CuAssertPtrEquals(test, project1, f1);
+    CuAssertPtrEquals(test, project2, f2);
+    CuAssertPtrEquals(test, project3, f3);
+
+    secretary_delete_project(secretary, project2);
+
+    CuAssertIntEquals(test, 2, secretary_get_project_count(secretary));
+
+    f1 = secretary_get_project(secretary, "Create first project"),
+    f2 = secretary_get_project(secretary, "Create second project"),
+    f3 = secretary_get_project(secretary, "Create third project");
+
+    CuAssertPtrEquals(test, project1, f1);
+    CuAssertPtrEquals(test, NULL, f2);
+    CuAssertPtrEquals(test, project3, f3);
+    secretary_free(secretary);
+}
+
+void test_secretary_schedule(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_appoint(secretary, "Create first task"),
+         *task2 = secretary_appoint(secretary, "Create second task");
+    secretary_appoint(secretary, "Create thrid task");
+         
+    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 3, secretary_get_inbox_count(secretary));
+
+    struct tm date;
+    date.tm_hour = 0;
+    date.tm_mday = 30;
+    date.tm_mon = 4;
+    date.tm_year = 2002;
+    secretary_schedule(secretary, task1, date);
+
+    time_t now = time(NULL);
+    secretary_schedule(secretary, task2, *localtime(&now));
+
+    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
+
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+
+    Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
+    CuAssertPtrEquals(test, task1, task);
+    
+    task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertPtrEquals(test, task2, task);
+
+    secretary_free(secretary);
+}
+
+void test_secretary_unschedule(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_appoint(secretary, "Create first task"),
+         *task2 = secretary_appoint(secretary, "Create second task");
+    secretary_appoint(secretary, "Create thrid task");
+         
+    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 3, secretary_get_inbox_count(secretary));
+
+    struct tm date;
+    date.tm_hour = 0;
+    date.tm_mday = 30;
+    date.tm_mon = 4;
+    date.tm_year = 2002;
+    secretary_schedule(secretary, task1, date);
+
+    time_t now = time(NULL);
+    secretary_schedule(secretary, task2, *localtime(&now));
+
+    CuAssertIntEquals(test, 3, secretary_get_task_count(secretary));
+    CuAssertIntEquals(test, 1, secretary_get_inbox_count(secretary));
+
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+
+    Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
+    CuAssertPtrEquals(test, task1, task);
+    
+    task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertPtrEquals(test, task2, task);
+
+    secretary_free(secretary);
 }
 
 CuSuite *test_secretary_suite() {
@@ -198,8 +340,12 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_get_project);
     SUITE_ADD_TEST(suite, test_secretary_move_task_to_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_task);
-    SUITE_ADD_TEST(suite, test_secretary_remove_project_task);
     SUITE_ADD_TEST(suite, test_secretary_remove_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_task);
+    SUITE_ADD_TEST(suite, test_secretary_remove_task_with_others);
+    SUITE_ADD_TEST(suite, test_secretary_remove_project_with_others);
+    SUITE_ADD_TEST(suite, test_secretary_schedule);
     return suite;
 }
+
+

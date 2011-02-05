@@ -18,10 +18,10 @@ Project *project_new(const char *name);
 void project_add(Project *project, Task *task);
 void project_remove(Project *project, Task *task);
 Task *project_get_task(Project *project, int number);
+void project_free(Project *project);
 
 #define project_get_name(project) ((project)->name)
 #define project_get_task_count(project) ((project)->task_count)
 #define project_get_nth_task(project, n) ((project)->tasks[(n)])
-#define project_free(project) (free(project))
 
 #endif

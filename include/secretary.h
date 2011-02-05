@@ -3,15 +3,13 @@
 
 #include <task.h>
 #include <project.h>
+#include <time.h>
 
 #define ARRAY_SIZE 1024
 
 typedef struct {
     Task *tasks[ARRAY_SIZE];
     int task_count;
-
-    Task *inbox[ARRAY_SIZE];
-    int inbox_count;
 
     Project *projects[ARRAY_SIZE];
     int project_count;
@@ -26,14 +24,20 @@ void secretary_move(Secretary *secretary, Task *task, Project *project);
 void secretary_move_to_inbox(Secretary *secretary, Task *task);
 void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);
+int secretary_get_inbox_count(Secretary *secretary);
+Task *secretary_get_task(Secretary *secretary, int number);
+Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
 
+void secretary_schedule(Secretary *secretary, Task *task, struct tm date);
+int secretary_count_scheduled_for(Secretary *secretary, struct tm date);
+int secretary_count_scheduled_for_today(Secretary *secretary);
+Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int n);
+Task *secretary_get_nth_scheduled_for_today(Secretary *secretary, int n);
+
+void secretary_free(Secretary *secretary);
 /* Accessors */
 #define secretary_get_task_count(secretary) ((secretary)->task_count)
 #define secretary_get_project_count(secretary) ((secretary)->project_count)
-#define secretary_get_inbox_count(secretary) ((secretary)->inbox_count)
 #define secretary_get_area_count(secretary) 0
-#define secretary_get_task(secretary, number) (((secretary)->task_count>=(number))? (secretary)->tasks[(number)-1] : NULL )
-#define secretary_get_inbox_task(secretary, number) (((secretary)->inbox_count>=(number))? (secretary)->inbox[(number)-1] : NULL )
-
 
 #endif
