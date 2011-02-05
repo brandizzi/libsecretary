@@ -1,8 +1,8 @@
 #ifndef _SECRETARY_H
 # define _SECRETARY_H
 
-#include <task.h>
-#include <project.h>
+#include <secretary/task.h>
+#include <secretary/project.h>
 #include <time.h>
 
 #define ARRAY_SIZE 1024

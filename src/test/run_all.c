@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <test/secretary.h>
+#include <secretary/test/secretary.h>
 
-#include "CuTest.h"
+#include <CuTest.h>
 
 
 void RunAllTests(void) 

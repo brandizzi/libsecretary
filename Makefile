@@ -1,4 +1,4 @@
-vpath %.h include cutest
+vpath %.h include/secretary cutest
 vpath %.c src cutest
 
 CFLAGS=${_CFLAGS} -Wall -std=c99

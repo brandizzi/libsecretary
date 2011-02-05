@@ -2,7 +2,7 @@
 # define _SECRETARY_TEST_H
 
 #include <CuTest.h>
-#include <secretary.h>
+#include <secretary/secretary.h>
 
 CuSuite *test_secretary_suite();
 

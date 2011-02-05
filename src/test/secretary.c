@@ -1,4 +1,4 @@
-#include <test/secretary.h>
+#include <secretary/test/secretary.h>
 #include <stdlib.h>
 
 void test_secretary_create(CuTest *test) {

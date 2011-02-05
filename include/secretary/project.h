@@ -1,7 +1,7 @@
 #ifndef _PROJECT_H
 # define _PROJECT_H
 
-#include <task.h>
+#include <secretary/task.h>
 
 #include <stdlib.h>
 

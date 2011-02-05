@@ -1,4 +1,4 @@
-#include <secretary.h>
+#include <secretary/secretary.h>
 
 #include <stdlib.h>
 #include <string.h>
