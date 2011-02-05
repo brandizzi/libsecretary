@@ -18,14 +18,14 @@ typedef struct {
 
 Secretary *secretary_new();
 Task *secretary_appoint(Secretary *secretary, const char* description);
-#define secretary_get_task_count(secretary) ((secretary)->task_count)
+#define secretary_count_task(secretary) ((secretary)->task_count)
 Task *secretary_get_task(Secretary *secretary, int number);
 
-int secretary_get_inbox_count(Secretary *secretary);
+int secretary_count_inbox(Secretary *secretary);
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
 
 Project *secretary_start(Secretary *secretary, const char* name);
-#define secretary_get_project_count(secretary) ((secretary)->project_count)
+#define secretary_count_project(secretary) ((secretary)->project_count)
 Project *secretary_get_project(Secretary *secretary, const char *name);
 
 void secretary_move(Secretary *secretary, Task *task, Project *project);
@@ -43,6 +43,6 @@ void secretary_unschedule(Secretary *secretary, Task *task);
 
 void secretary_free(Secretary *secretary);
 
-#define secretary_get_area_count(secretary) 0
+#define secretary_count_area(secretary) 0
 
 #endif

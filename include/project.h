@@ -21,7 +21,7 @@ Task *project_get_task(Project *project, int number);
 void project_free(Project *project);
 
 #define project_get_name(project) ((project)->name)
-#define project_get_task_count(project) ((project)->task_count)
+#define project_count_task(project) ((project)->task_count)
 #define project_get_nth_task(project, n) ((project)->tasks[(n)])
 
 #endif

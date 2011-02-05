@@ -60,7 +60,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    int tn = project_get_task_count(project);
+    int tn = project_count_task(project);
     for (int i = 0; i < tn; i++) {
         secretary_move_to_inbox(secretary, project_get_nth_task(project, i));
     }
@@ -68,7 +68,7 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
     project_free(project);
 }
 
-int secretary_get_inbox_count(Secretary *secretary) {
+int secretary_count_inbox(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_get_state(secretary->tasks[i]) == INBOX) counter++;
