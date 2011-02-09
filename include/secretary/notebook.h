@@ -4,10 +4,15 @@
 #include <secretary/secretary.h>
 
 typedef struct {
+    const char *filename;
+    int major_version;
+    int minor_version;
+    Secretary *secretary;
 } Notebook;
 
 Notebook *notebook_new(const char *filename);
-Secretary *notebook_get_secretary(Notebook *notebook);
+#define notebook_get_secretary(notebook) ((notebook)->secretary)
+void notebook_save(Notebook *notebook);
 void notebook_free(Notebook *notebook);
 
 #endif
