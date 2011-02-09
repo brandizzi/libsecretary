@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <secretary/test/secretary.h>
+#include <secretary/test/notebook.h>
 
 #include <CuTest.h>
 
@@ -13,7 +14,7 @@ void RunAllTests(void)
     CuSuite* suite = CuSuiteNew();
 
     CuSuiteAddSuite(suite, test_secretary_suite());
-    
+    CuSuiteAddSuite(suite, test_notebook_suite());    
 
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);
