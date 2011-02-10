@@ -27,8 +27,9 @@ Task *task_new(int number, const char *description);
 
 void task_schedule(Task *task, struct tm date);
 void task_unschedule(Task *task);
+#define task_is_scheduled(task) ((task)->state == SCHEDULED)
 #define task_is_scheduled_for(task, date) (\
-    ((task)->state == SCHEDULED) && \
+    task_is_scheduled(task) && \
     ((task)->scheduled_for.tm_mday == (date).tm_mday) && \
     ((task)->scheduled_for.tm_mon == (date).tm_mon) && \
     ((task)->scheduled_for.tm_year == (date).tm_year))
