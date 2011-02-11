@@ -13,8 +13,6 @@ Project *project_new(const char *name) {
 void project_add(Project *project, Task *task) {
     project->tasks[project->task_count++] = task;
     task->project = project;
-    if (task->state == INBOX)
-        task->state = PROJECT;
 }
 
 Task *project_get_task(Project *project, int number) {
@@ -35,7 +33,7 @@ void project_remove(Project *project, Task *task) {
             project->task_count--;
         }
     }
-    task->state = INBOX;
+    task->project = NULL;
 }
 
 void project_free(Project *project) {

@@ -7,16 +7,20 @@ Task *task_new(int number, const char *description) {
     task->number = number;
     task->description = description;
     task->project = NULL;
-    task->state = INBOX;
+    task->scheduled = false;
     return task;
 }
 
+bool task_is_in_inbox(Task *task) {
+    return task->project == NULL && !task->scheduled;
+}
+
 void task_schedule(Task *task, struct tm date) {
-    task->state = SCHEDULED;
+    task->scheduled = true;
     task->scheduled_for = date;
 }
 
 void task_unschedule(Task *task) {
-    task->state = task->project? PROJECT : INBOX;
+    task->scheduled = false;
 }
 

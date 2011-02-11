@@ -45,8 +45,6 @@ void secretary_move_to_inbox(Secretary *secretary, Task *task) {
     if (project) {
         project_remove(project, task);
     }
-    task->state = INBOX;
-    
 }
 
 void secretary_delete_task(Secretary *secretary, Task *task) {
@@ -70,14 +68,14 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 int secretary_count_inbox(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_get_state(secretary->tasks[i]) == INBOX) counter++;
+        if (task_is_in_inbox(secretary->tasks[i])) counter++;
     }
     return counter;
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n) {
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_get_state(secretary->tasks[i]) == INBOX) {
+        if (task_is_in_inbox(secretary->tasks[i])) {
             if (n-- == 0) return secretary->tasks[i];
         }
     }
@@ -110,7 +108,7 @@ void secretary_schedule(Secretary *secretary, Task *task, struct tm date) {
 int secretary_count_scheduled(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_get_state(secretary->tasks[i]) == SCHEDULED) counter++;
+        if (task_is_scheduled(secretary->tasks[i])) counter++;
     }
     return counter;
 }
@@ -132,7 +130,7 @@ int secretary_count_scheduled_for_today(Secretary *secretary) {
 
 Task *secretary_get_nth_scheduled(Secretary *secretary, int n) {
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_get_state(secretary->tasks[i]) == SCHEDULED) {
+        if (task_is_scheduled(secretary->tasks[i])) {
             if (n-- == 0) return secretary->tasks[i];
         }
     }
