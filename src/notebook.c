@@ -1,4 +1,5 @@
 #include <secretary/notebook.h>
+#include <secretary/util.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,9 +9,6 @@
 #define BUFFER_SIZE 2048
 #define TASK_HAS_PROJECT 0x1
 #define TASK_IS_SCHEDULED 0x2
-
-static const char *_notebook_read_string(FILE *file);
-static void _notebook_write_string(FILE *file, const char *string);
 
 Notebook *notebook_new(const char *filename) {
     Notebook *notebook = malloc(sizeof(Notebook));
@@ -25,18 +23,21 @@ Notebook *notebook_new(const char *filename) {
         for (int i = 0; i < project_count; i++) {
             //int properties = 
                 getw(file);
-            const char *name = _notebook_read_string(file);
+            char *name = util_read_string(file);
             secretary_start(secretary, name);
+            free(name);
         }
 
         int task_count = getw(file);
         for (int i = 0; i < task_count; i++) {
             int properties = getw(file);
-            const char *description = _notebook_read_string(file);
+            char *description = util_read_string(file);
             Task *task = secretary_appoint(secretary, description);
+            free(description);
             if (properties & TASK_HAS_PROJECT) {
-                const char *name  = _notebook_read_string(file);
+                char *name  = util_read_string(file);
                 Project *project = secretary_get_project(secretary, name);
+                free(name);
                 secretary_move(secretary, task, project);
             }
             if (properties & TASK_IS_SCHEDULED) {
@@ -64,7 +65,7 @@ void notebook_save(Notebook *notebook) {
         Project *project = secretary_get_nth_project(secretary, i);
         int mask = 0;
         putw(mask, file);
-        _notebook_write_string(file, project_get_name(project));
+        util_write_string(file, project_get_name(project));
     }
     putw(secretary_count_task(secretary), file);
     for (int i = 0; i < secretary_count_task(secretary); i++) {
@@ -77,10 +78,10 @@ void notebook_save(Notebook *notebook) {
             mask |= TASK_IS_SCHEDULED;
         }
         putw(mask, file);
-        _notebook_write_string(file, task_get_description(task));
+        util_write_string(file, task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {
-            _notebook_write_string(file, 
+            util_write_string(file, 
                     project_get_name(task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
@@ -94,18 +95,6 @@ void notebook_save(Notebook *notebook) {
 void notebook_free(Notebook *notebook) {
     secretary_free(notebook_get_secretary(notebook));
     free(notebook);
-}
-
-static const char *_notebook_read_string(FILE *file) {
-    int length = getw(file);
-    char *string = malloc((length+2)*sizeof(char));
-    fgets(string, length+1, file);
-    return string;
-}
-
-static void _notebook_write_string(FILE *file, const char *string) {
-    putw(strlen(string), file);
-    fputs(string, file);
 }
 
 

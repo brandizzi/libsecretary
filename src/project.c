@@ -1,11 +1,11 @@
 #include <secretary/project.h>
-
+#include <secretary/util.h>
 #include <stdlib.h>
 #include <string.h>
 
 Project *project_new(const char *name) {
     Project *project = malloc(sizeof(Project));
-    project->name = name;
+    project->name = util_copy_string(name);
     project->task_count = 0;
     return project;
 }
@@ -40,5 +40,6 @@ void project_free(Project *project) {
    for (int i = 0; i < project->task_count; i++) {
        project->tasks[i]->project = NULL;
    }
+   free(project->name);
    free(project);
 }

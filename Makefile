@@ -4,7 +4,7 @@ vpath %.c src cutest
 CFLAGS=${_CFLAGS} -Wall -std=c99
 CPPFLAGS=-Iinclude -Icutest
 
-LIBOBJS=secretary.o project.o task.o notebook.o
+LIBOBJS=secretary.o project.o task.o notebook.o util.o
 TESTOBJS=test_secretary.o test_notebook.o CuTest.o
 
 LIBNAME=libsecretary.dylib

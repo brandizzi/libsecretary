@@ -15,7 +15,6 @@ void RunAllTests(void)
 
     CuSuiteAddSuite(suite, test_secretary_suite());
     CuSuiteAddSuite(suite, test_notebook_suite());    
-
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);
     CuSuiteDetails(suite, output);

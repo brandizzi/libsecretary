@@ -9,7 +9,7 @@ struct Project;
 
 typedef struct {
     int number;
-    const char *description;
+    char *description;
     struct Project *project;
 
     bool scheduled;
@@ -33,6 +33,6 @@ void task_unschedule(Task *task);
     ((task)->scheduled_for.tm_mon == (date).tm_mon) && \
     ((task)->scheduled_for.tm_year == (date).tm_year))
 
-#define task_free(task) (free(task))
+void task_free(Task *task);
 
 #endif

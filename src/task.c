@@ -1,11 +1,11 @@
 #include <secretary/task.h>
-
+#include <secretary/util.h>
 #include <stdlib.h>
 
 Task *task_new(int number, const char *description) {
     Task *task = malloc(sizeof(Task));
     task->number = number;
-    task->description = description;
+    task->description = util_copy_string(description);
     task->project = NULL;
     task->scheduled = false;
     return task;
@@ -24,3 +24,7 @@ void task_unschedule(Task *task) {
     task->scheduled = false;
 }
 
+void task_free(Task *task) {
+    free(task->description);
+    free(task);
+}

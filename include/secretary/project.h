@@ -8,7 +8,7 @@
 #define PROJECT_ARRAY_SIZE 128
 
 typedef struct Project {
-    const char *name;
+    char *name;
 
     Task *tasks[PROJECT_ARRAY_SIZE];
     int task_count;
