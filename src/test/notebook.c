@@ -228,6 +228,65 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     remove("nofile");
 }
 
+void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
+    // Opens an nonexistent file.
+    remove("nofile");
+    Notebook *notebook = notebook_new("nofile");
+    Secretary *secretary = notebook_get_secretary(notebook);
+
+    Project *project1 = secretary_start(secretary, "libsecretary"),
+            *project2 = secretary_start(secretary, "chocrotary");
+
+    Task *task1 = secretary_appoint(secretary, "Test notebook"),
+         *task2 = secretary_appoint(secretary, "Create Cocoa interface"),
+         *task3 = secretary_appoint(secretary, "Buy pequi");
+
+    struct tm date;
+    date.tm_hour = 0;
+    date.tm_mday = 30;
+    date.tm_mon = 4;
+    date.tm_year = 2002-1900;
+    secretary_schedule(secretary, task2, date);
+
+    time_t now = time(NULL);
+    secretary_schedule(secretary, task3, *localtime(&now));
+
+    secretary_move(secretary, task1, project1);
+    secretary_move(secretary, task2, project2);
+
+    CuAssertIntEquals(test, 3, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
+
+    notebook_save(notebook);
+    notebook_free(notebook);
+
+    // Retrieving it
+    notebook = notebook_new("nofile");
+    secretary = notebook_get_secretary(notebook);
+
+    CuAssertIntEquals(test, 3, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+
+    Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
+    CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
+    CuAssertTrue(test, task_get_project(task) != NULL);
+    CuAssertStrEquals(test, "chocrotary", 
+            project_get_name(task_get_project(task)));
+    task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
+
+    task = secretary_get_nth_inbox_task(secretary, 0);
+    CuAssertPtrEquals(test, NULL, task);
+
+    notebook_free(notebook);
+    remove("nofile");
+}
+
 CuSuite *test_notebook_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_notebook_create);
@@ -236,6 +295,7 @@ CuSuite *test_notebook_suite() {
     SUITE_ADD_TEST(suite, test_notebook_save_with_project);
     SUITE_ADD_TEST(suite, test_notebook_save_with_project_task);
     SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks);
+    SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks_with_projects);
     return suite;
 }
 
