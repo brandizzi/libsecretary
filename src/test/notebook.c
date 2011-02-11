@@ -34,6 +34,7 @@ void test_notebook_save_with_task(CuTest *test) {
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
     notebook_save(notebook);
+    notebook_free(notebook);
 
     // Retrieving it
     notebook = notebook_new("nofile");
@@ -66,7 +67,8 @@ void test_notebook_save_many_tasks(CuTest *test) {
     CuAssertIntEquals(test, 3, secretary_count_inbox(secretary));
 
     notebook_save(notebook);
-
+    notebook_free(notebook);
+    
     // Retrieving it
     notebook = notebook_new("nofile");
     secretary = notebook_get_secretary(notebook);
@@ -75,6 +77,8 @@ void test_notebook_save_many_tasks(CuTest *test) {
     CuAssertIntEquals(test, 3, secretary_count_inbox(secretary));
 
     task1 = secretary_get_task(secretary, 1);
+    task2 = secretary_get_task(secretary, 2);
+    task3 = secretary_get_task(secretary, 3);
     CuAssertStrEquals(test, "Create first task", task_get_description(task1));
     CuAssertStrEquals(test, "Create snd task", task_get_description(task2));
     CuAssertStrEquals(test, "Create third task", task_get_description(task3));
@@ -96,6 +100,7 @@ void test_notebook_save_with_project(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
 
     notebook_save(notebook);
+    notebook_free(notebook);
 
     // Retrieving it
     notebook = notebook_new("nofile");
@@ -124,8 +129,8 @@ void test_notebook_save_with_project_task(CuTest *test) {
             *project2 = secretary_start(secretary, "chocrotary");
 
     Task *task1 = secretary_appoint(secretary, "Test notebook"),
-         *task2 = secretary_appoint(secretary, "Create Cocoa interface"),
-         *task3 = secretary_appoint(secretary, "Buy coffee");
+         *task2 = secretary_appoint(secretary, "Create Cocoa interface");
+    secretary_appoint(secretary, "Buy coffee");
 
     secretary_move(secretary, task1, project1);
     secretary_move(secretary, task2, project2);
@@ -136,6 +141,7 @@ void test_notebook_save_with_project_task(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
 
     notebook_save(notebook);
+    notebook_free(notebook);
 
     // Retrieving it
     notebook = notebook_new("nofile");
@@ -149,7 +155,7 @@ void test_notebook_save_with_project_task(CuTest *test) {
     // Who is in inbox?
     Task *task = secretary_get_nth_inbox_task(secretary, 0);
     CuAssertTrue(test, task != NULL);
-    CuAssertStrEquals(test, task_get_description(task3), task_get_description(task));
+    CuAssertStrEquals(test, "Buy coffee", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
     CuAssertTrue(test, !task_is_scheduled(task));
 
@@ -159,7 +165,7 @@ void test_notebook_save_with_project_task(CuTest *test) {
     CuAssertIntEquals(test, 1, project_count_task(project));
     task = project_get_nth_task(project, 0);
     CuAssertTrue(test, task != NULL);
-    CuAssertStrEquals(test, task_get_description(task1), task_get_description(task));
+    CuAssertStrEquals(test, "Test notebook", task_get_description(task));
     CuAssertPtrEquals(test, project, task_get_project(task));
     CuAssertTrue(test, !task_is_scheduled(task));
 
@@ -168,9 +174,55 @@ void test_notebook_save_with_project_task(CuTest *test) {
     CuAssertIntEquals(test, 1, project_count_task(project));
     task = project_get_nth_task(project, 0);
     CuAssertTrue(test, task != NULL);
-    CuAssertStrEquals(test, task_get_description(task2), task_get_description(task));
+    CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
     CuAssertPtrEquals(test, project, task_get_project(task));
     CuAssertTrue(test, !task_is_scheduled(task));
+
+    notebook_free(notebook);
+    remove("nofile");
+}
+
+void test_notebook_save_scheduled_tasks(CuTest *test) {
+    // Opens an nonexistent file.
+    remove("nofile");
+    Notebook *notebook = notebook_new("nofile");
+    Secretary *secretary = notebook_get_secretary(notebook);
+    Task *task1 = secretary_appoint(secretary, "Create first task"),
+         *task2 = secretary_appoint(secretary, "Create snd task");
+    secretary_appoint(secretary, "Create third task");
+
+    struct tm date;
+    date.tm_hour = 0;
+    date.tm_mday = 30;
+    date.tm_mon = 4;
+    date.tm_year = 2002-1900;
+    secretary_schedule(secretary, task1, date);
+
+    time_t now = time(NULL);
+    secretary_schedule(secretary, task2, *localtime(&now));
+
+    CuAssertIntEquals(test, 3, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
+
+    notebook_save(notebook);
+    notebook_free(notebook);
+
+    // Retrieving it
+    notebook = notebook_new("nofile");
+    secretary = notebook_get_secretary(notebook);
+
+    CuAssertIntEquals(test, 3, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+
+    Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
+    CuAssertStrEquals(test, "Create first task", task_get_description(task));
+    task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertStrEquals(test, "Create snd task", task_get_description(task));
+    task = secretary_get_nth_inbox_task(secretary, 0);
+    CuAssertStrEquals(test, "Create third task", task_get_description(task));
 
     notebook_free(notebook);
     remove("nofile");
@@ -183,6 +235,7 @@ CuSuite *test_notebook_suite() {
     SUITE_ADD_TEST(suite, test_notebook_save_many_tasks);
     SUITE_ADD_TEST(suite, test_notebook_save_with_project);
     SUITE_ADD_TEST(suite, test_notebook_save_with_project_task);
+    SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks);
     return suite;
 }
 

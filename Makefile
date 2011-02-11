@@ -11,7 +11,7 @@ LIBNAME=libsecretary.dylib
 DYNAMIC_LIB_OPTION=-dynamiclib
 VERSION=0.1
 
-all: test ${LIBNAME}
+all: run_all ${LIBNAME}
 
 ${LIBNAME}: ${LIBOBJS}
 	${CC} ${DYNAMIC_LIB_OPTION} -current_version ${VERSION} ${CFLAGS} -shared -o $@ ${LIBOBJS} 
@@ -27,5 +27,6 @@ run_all.o: test/run_all.c test/secretary.h
 
 run_all: ${TESTOBJS} ${LIBNAME}
 test: run_all
+	./run_all
 clean:
 	-rm *.o

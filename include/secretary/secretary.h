@@ -20,6 +20,7 @@ Secretary *secretary_new();
 Task *secretary_appoint(Secretary *secretary, const char* description);
 #define secretary_count_task(secretary) ((secretary)->task_count)
 Task *secretary_get_task(Secretary *secretary, int number);
+#define secretary_get_nth_task(secretary, n) ((secretary)->tasks[n])
 
 int secretary_count_inbox(Secretary *secretary);
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
@@ -37,8 +38,10 @@ void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);
 
 void secretary_schedule(Secretary *secretary, Task *task, struct tm date);
+int secretary_count_scheduled(Secretary *secretary);
 int secretary_count_scheduled_for(Secretary *secretary, struct tm date);
 int secretary_count_scheduled_for_today(Secretary *secretary);
+Task *secretary_get_nth_scheduled(Secretary *secretary, int n);
 Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int n);
 Task *secretary_get_nth_scheduled_for_today(Secretary *secretary, int n);
 void secretary_unschedule(Secretary *secretary, Task *task);

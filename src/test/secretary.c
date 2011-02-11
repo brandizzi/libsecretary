@@ -342,13 +342,18 @@ void test_secretary_unschedule(CuTest *test) {
 
     CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
 
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
 
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
     CuAssertPtrEquals(test, task1, task);
+    task = secretary_get_nth_scheduled(secretary, 0);
+    CuAssertPtrEquals(test, task1, task);
     
     task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_scheduled(secretary, 1);
     CuAssertPtrEquals(test, task2, task);
 
     secretary_unschedule(secretary, task1);

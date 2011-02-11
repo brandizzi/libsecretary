@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define BUFFER_SIZE 2048
-#define TASK_HAS_PROJECT 0X1
+#define TASK_HAS_PROJECT 0x1
+#define TASK_IS_SCHEDULED 0x2
 
 static const char *_notebook_read_string(FILE *file);
 static void _notebook_write_string(FILE *file, const char *string);
@@ -37,6 +39,11 @@ Notebook *notebook_new(const char *filename) {
                 Project *project = secretary_get_project(secretary, name);
                 secretary_move(secretary, task, project);
             }
+            if (properties & TASK_IS_SCHEDULED) {
+                struct tm date;
+                fread(&date, sizeof(date), 1, file);
+                secretary_schedule(secretary, task, date);
+            }
         }
         fclose(file);
     } else {
@@ -60,22 +67,25 @@ void notebook_save(Notebook *notebook) {
         _notebook_write_string(file, project_get_name(project));
     }
     putw(secretary_count_task(secretary), file);
-    for (int i = 0; i < secretary_count_inbox(secretary); i++) {
-        Task *task = secretary_get_nth_inbox_task(secretary, i);
+    for (int i = 0; i < secretary_count_task(secretary); i++) {
+        Task *task = secretary_get_nth_task(secretary, i);
         int mask = 0;
+        if (task_get_project(task)) {
+            mask |= TASK_HAS_PROJECT;
+        }
+        if (task_is_scheduled(task)) {
+            mask |= TASK_IS_SCHEDULED;
+        }
         putw(mask, file);
         _notebook_write_string(file, task_get_description(task));
-    }
-    // Saving tasks from projects
-    for (int i = 0; i < secretary_count_project(secretary); i++) {
-        Project *project = secretary_get_nth_project(secretary, i);
-        for (int j = 0; j < project_count_task(project); j++) {
-            Task *task = project_get_nth_task(project, j);
-            int mask = TASK_HAS_PROJECT;
-            putw(mask, file);
-            _notebook_write_string(file, task_get_description(task));
+
+        if (mask & TASK_HAS_PROJECT) {
             _notebook_write_string(file, 
                     project_get_name(task_get_project(task)));
+        }
+        if (mask & TASK_IS_SCHEDULED) {
+            struct tm date = task_get_scheduled_date(task);
+            fwrite(&date, sizeof(date), 1, file);
         }
     }
     fclose(file);
