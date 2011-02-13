@@ -155,6 +155,22 @@ void secretary_unschedule(Secretary *secretary, Task *task) {
     task_unschedule(task);
 }
 
+int secretary_count_done_tasks(Secretary *secretary) {
+    int counter = 0;
+    for (int i = 0; i < secretary->task_count; i++) {
+        if (task_is_done(secretary->tasks[i])) counter++;
+    }
+    return counter;
+}
+
+Task *secretary_get_nth_done_task(Secretary *secretary, int n) {
+    for (int i = 0; i < secretary->task_count; i++) {
+        if (task_is_done(secretary->tasks[i])) {
+            if (n-- == 0) return secretary->tasks[i];
+        }
+    }
+    return NULL;
+}
 
 // PRIVATE STUFF
 static void _secretary_delete(void *todelete, void **array, int *count) {

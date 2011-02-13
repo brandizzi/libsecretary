@@ -46,6 +46,11 @@ Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int 
 Task *secretary_get_nth_scheduled_for_today(Secretary *secretary, int n);
 void secretary_unschedule(Secretary *secretary, Task *task);
 
+#define secretary_do(secretary, task) (task_mark_as_done(task))
+#define secretary_undo(secretary, task) (task_unmark_as_done(task))
+int secretary_count_done_tasks(Secretary *secretary);
+Task *secretary_get_nth_done_task(Secretary *secretary, int n);
+
 void secretary_free(Secretary *secretary);
 
 #define secretary_count_area(secretary) 0

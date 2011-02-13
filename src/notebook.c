@@ -9,6 +9,7 @@
 #define BUFFER_SIZE 2048
 #define TASK_HAS_PROJECT 0x1
 #define TASK_IS_SCHEDULED 0x2
+#define TASK_IS_DONE 0x4
 
 Notebook *notebook_new(const char *filename) {
     Notebook *notebook = malloc(sizeof(Notebook));
@@ -45,6 +46,9 @@ Notebook *notebook_new(const char *filename) {
                 fread(&date, sizeof(date), 1, file);
                 secretary_schedule(secretary, task, date);
             }
+            if (properties & TASK_IS_DONE) {
+                secretary_do(secretary, task);
+            }
         }
         fclose(file);
     } else {
@@ -76,6 +80,9 @@ void notebook_save(Notebook *notebook) {
         }
         if (task_is_scheduled(task)) {
             mask |= TASK_IS_SCHEDULED;
+        }
+        if (task_is_done(task)) {
+            mask |= TASK_IS_DONE;
         }
         putw(mask, file);
         util_write_string(file, task_get_description(task));

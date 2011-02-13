@@ -25,6 +25,15 @@ Task *project_get_task(Project *project, int number) {
     return NULL;
 }
 
+Task *project_get_nth_task(Project *project, int n) {
+    for (int i = 0; i < project->task_count; i++) {
+        if (!task_is_done(project->tasks[i])) {
+            if (n-- == 0) return project->tasks[i];
+        }
+    }
+    return NULL;
+}
+
 void project_remove(Project *project, Task *task) {
     for (int i = 0; i < project->task_count; i++) {
         Task *cursor = project->tasks[i];

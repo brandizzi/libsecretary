@@ -14,6 +14,8 @@ typedef struct {
 
     bool scheduled;
     struct tm scheduled_for;
+
+    bool done;
 } Task;
 
 Task *task_new(int number, const char *description);
@@ -21,17 +23,19 @@ Task *task_new(int number, const char *description);
 #define task_get_number(task) ((task)->number)
 #define task_get_description(task) ((task)->description)
 #define task_get_project(task) ((task)->project)
-#define task_get_scheduled_date(task) ((task)->scheduled_for);
+
 bool task_is_in_inbox(Task *task);
 
+
 void task_schedule(Task *task, struct tm date);
+#define task_get_scheduled_date(task) ((task)->scheduled_for)
 void task_unschedule(Task *task);
-#define task_is_scheduled(task) ((task)->scheduled)
-#define task_is_scheduled_for(task, date) (\
-    task_is_scheduled(task) && \
-    ((task)->scheduled_for.tm_mday == (date).tm_mday) && \
-    ((task)->scheduled_for.tm_mon == (date).tm_mon) && \
-    ((task)->scheduled_for.tm_year == (date).tm_year))
+bool task_is_scheduled(Task *task);
+bool task_is_scheduled_for(Task *task, struct tm date);
+
+#define task_mark_as_done(task) ((task)->done = true)
+#define task_unmark_as_done(task) ((task)->done = false)
+#define task_is_done(task) ((task)->done)
 
 void task_free(Task *task);
 
