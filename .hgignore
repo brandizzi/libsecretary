@@ -1,3 +1,4 @@
 .*\.o 
 run_all
 lib.*\.dylib
+lib.*\.a

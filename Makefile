@@ -7,14 +7,14 @@ CPPFLAGS=-Iinclude -Icutest
 LIBOBJS=secretary.o project.o task.o notebook.o util.o
 TESTOBJS=test_secretary.o test_notebook.o CuTest.o
 
-LIBNAME=libsecretary.dylib
+LIBNAME=libsecretary.a
 DYNAMIC_LIB_OPTION=-dynamiclib
 VERSION=0.1
 
 all: run_all ${LIBNAME}
 
 ${LIBNAME}: ${LIBOBJS}
-	${CC} ${DYNAMIC_LIB_OPTION} -current_version ${VERSION} ${CFLAGS} -shared -o $@ ${LIBOBJS} 
+	ar rcs $@ ${LIBOBJS} 
 
 test_%.o: test/%.c test/%.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
