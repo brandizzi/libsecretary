@@ -22,6 +22,7 @@ Task *task_new(int number, const char *description);
 
 #define task_get_number(task) ((task)->number)
 #define task_get_description(task) ((task)->description)
+void task_set_description(Task *task, const char *description);
 #define task_get_project(task) ((task)->project)
 
 bool task_is_in_inbox(Task *task);

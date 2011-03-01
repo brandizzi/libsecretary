@@ -12,6 +12,11 @@ Task *task_new(int number, const char *description) {
     return task;
 }
 
+void task_set_description(Task *task, const char *description) {
+    free(task->description);
+    task->description = util_copy_string(description);
+}
+
 bool task_is_in_inbox(Task *task) {
     return task->project == NULL && !task->scheduled && !task->done;
 }
