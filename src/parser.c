@@ -7,7 +7,7 @@
 #define TASK_IS_DONE 0x4
 
 // Parser implementations
-static Secretary *parser_v1_1(FILE *file) {
+static Secretary *parser_reader_v1_1(FILE *file) {
     Secretary *secretary  = secretary_new();
     int project_count = getw(file);
     for (int i = 0; i < project_count; i++) {
@@ -45,13 +45,13 @@ static Secretary *parser_v1_1(FILE *file) {
 typedef struct {
     int major_version;
     int minor_version;
-    ParserFunction parser;
+    ParserReaderFunction parser;
 } ParserRow;
 
 // Parser retriever
-ParserFunction parser_get_reader(int major_version, int minor_version) {
+ParserReaderFunction parser_get_reader(int major_version, int minor_version) {
     static ParserRow parsers[] = {
-        {1, 1, parser_v1_1}
+        {1, 1, parser_reader_v1_1}
     };
     for (int i = 0; i < sizeof(parsers)/sizeof(ParserRow); i++) {
         if (parsers[i].major_version == major_version && 

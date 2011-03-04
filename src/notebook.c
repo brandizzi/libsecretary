@@ -6,20 +6,25 @@
 #include <string.h>
 #include <time.h>
 
+#define BUFFER_SIZE 2048
+#define TASK_HAS_PROJECT 0x1
+#define TASK_IS_SCHEDULED 0x2
+#define TASK_IS_DONE 0x4
+
 Notebook *notebook_new(const char *filename) {
     Notebook *notebook = malloc(sizeof(Notebook));
-    Secretary *secretary = notebook->secretary = secretary_new();    
     notebook->filename = filename;
 
     FILE *file = fopen(filename, "r");
     if (file) {
         notebook->major_version = getc(file);
         notebook->minor_version = getc(file);
-        ParserFunction parser = parser_get(notebook->major_version, notebook->minor_version);
+        ParserReaderFunction parser = parser_get_reader(notebook->major_version, notebook->minor_version);
         notebook->secretary = parser(file);
     } else {
         notebook->major_version = PARSER_LATEST_MAJOR_VERSION;
         notebook->minor_version = PARSER_LATEST_MINOR_VERSION;
+        notebook->secretary = secretary_new();
 
     }
     return notebook;

@@ -10,6 +10,6 @@
 typedef Secretary* (*ParserReaderFunction)(FILE *file);
 typedef void (*ParserWriterFunction)(Secretary *secretary, FILE *file);
 
-ParserFunction parser_get_reader(int major_version, int minor_version);
+ParserReaderFunction parser_get_reader(int major_version, int minor_version);
 
 #endif

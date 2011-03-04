@@ -8,7 +8,6 @@ typedef struct {
     const char *filename;
     int major_version;
     int minor_version;
-    ParserFunction parser;
     Secretary *secretary;
 } Notebook;
 
