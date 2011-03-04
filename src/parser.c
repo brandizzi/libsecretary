@@ -49,7 +49,7 @@ typedef struct {
 } ParserRow;
 
 // Parser retriever
-ParserFunction parser_get(int major_version, int minor_version) {
+ParserFunction parser_get_reader(int major_version, int minor_version) {
     static ParserRow parsers[] = {
         {1, 1, parser_v1_1}
     };

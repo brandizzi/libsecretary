@@ -7,8 +7,9 @@
 #define PARSER_LATEST_MAJOR_VERSION 1
 #define PARSER_LATEST_MINOR_VERSION 1
 
-typedef Secretary* (*ParserFunction)(FILE *file);
+typedef Secretary* (*ParserReaderFunction)(FILE *file);
+typedef void (*ParserWriterFunction)(Secretary *secretary, FILE *file);
 
-ParserFunction parser_get(int major_version, int minor_version);
+ParserFunction parser_get_reader(int major_version, int minor_version);
 
 #endif

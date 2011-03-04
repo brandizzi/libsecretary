@@ -6,11 +6,6 @@
 #include <string.h>
 #include <time.h>
 
-#define BUFFER_SIZE 2048
-#define TASK_HAS_PROJECT 0x1
-#define TASK_IS_SCHEDULED 0x2
-#define TASK_IS_DONE 0x4
-
 Notebook *notebook_new(const char *filename) {
     Notebook *notebook = malloc(sizeof(Notebook));
     Secretary *secretary = notebook->secretary = secretary_new();    
