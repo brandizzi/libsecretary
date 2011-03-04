@@ -20,40 +20,11 @@ Notebook *notebook_new(const char *filename) {
     if (file) {
         notebook->major_version = getc(file);
         notebook->minor_version = getc(file);
-        int project_count = getw(file);
-        for (int i = 0; i < project_count; i++) {
-            //int properties = 
-                getw(file);
-            char *name = util_read_string(file);
-            secretary_start(secretary, name);
-            free(name);
-        }
-
-        int task_count = getw(file);
-        for (int i = 0; i < task_count; i++) {
-            int properties = getw(file);
-            char *description = util_read_string(file);
-            Task *task = secretary_appoint(secretary, description);
-            free(description);
-            if (properties & TASK_HAS_PROJECT) {
-                char *name  = util_read_string(file);
-                Project *project = secretary_get_project(secretary, name);
-                free(name);
-                secretary_move(secretary, task, project);
-            }
-            if (properties & TASK_IS_SCHEDULED) {
-                struct tm date;
-                fread(&date, sizeof(date), 1, file);
-                secretary_schedule(secretary, task, date);
-            }
-            if (properties & TASK_IS_DONE) {
-                secretary_do(secretary, task);
-            }
-        }
-        fclose(file);
+        ParserFunction parser = parser_get(notebook->major_version, notebook->minor_version);
+        notebook->secretary = parser(file);
     } else {
-        notebook->major_version = 1;
-        notebook->minor_version = 1;
+        notebook->major_version = PARSER_LATEST_MAJOR_VERSION;
+        notebook->minor_version = PARSER_LATEST_MINOR_VERSION;
 
     }
     return notebook;

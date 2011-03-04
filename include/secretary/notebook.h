@@ -2,11 +2,13 @@
 # define _SECRETARY_NOTEBOOK_H
 
 #include <secretary/secretary.h>
+#include <secretary/parser.h>
 
 typedef struct {
     const char *filename;
     int major_version;
     int minor_version;
+    ParserFunction parser;
     Secretary *secretary;
 } Notebook;
 
