@@ -45,6 +45,18 @@ void project_remove(Project *project, Task *task) {
     task->project = NULL;
 }
 
+const char* project_get_name(Project *project) {
+    return project->name;
+}
+void project_set_name(Project *project, const char *name) {
+    free(project->name);
+    project->name = util_copy_string(name);
+}
+
+int project_count_task(Project *project) {
+    return project->task_count;
+}
+
 void project_free(Project *project) {
    for (int i = 0; i < project->task_count; i++) {
        project->tasks[i]->project = NULL;

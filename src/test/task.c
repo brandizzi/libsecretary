@@ -1,14 +1,14 @@
 #include <secretary/test/task.h>
 #include <stdlib.h>
 
-void test_task_create(CuTest *test) {
+static void test_task_create(CuTest *test) {
     Task *task = task_new(1, "Do something" );
     CuAssertStrEquals(test, "Do something", task_get_description(task));
 
     task_free(task);
 }
 
-void test_task_alter_description(CuTest *test) {
+static void test_task_alter_description(CuTest *test) {
     Task *task = task_new(1, "Do something" );
     CuAssertStrEquals(test, "Do something", task_get_description(task));
     task_set_description(task, "Do something else");

@@ -5,6 +5,7 @@
 #include <secretary/test/secretary.h>
 #include <secretary/test/notebook.h>
 #include <secretary/test/task.h>
+#include <secretary/test/project.h>
 
 #include <CuTest.h>
 
@@ -14,6 +15,7 @@ void RunAllTests(void)
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
 
+    CuSuiteAddSuite(suite, test_project_suite());
     CuSuiteAddSuite(suite, test_task_suite());
     CuSuiteAddSuite(suite, test_secretary_suite());
     CuSuiteAddSuite(suite, test_notebook_suite());    
