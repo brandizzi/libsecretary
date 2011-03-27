@@ -306,9 +306,11 @@ void test_secretary_schedule(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
 
+    CuAssertIntEquals(test, secretary_count_scheduled_for(secretary, date), 1);
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
     CuAssertPtrEquals(test, task1, task);
-    
+
+    CuAssertIntEquals(test, secretary_count_scheduled_for_today(secretary), 1);    
     task = secretary_get_nth_scheduled_for_today(secretary, 0);
     CuAssertPtrEquals(test, task2, task);
 
