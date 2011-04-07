@@ -351,6 +351,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     remove("nofile");
 }
 
+
 CuSuite *test_notebook_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_notebook_create);

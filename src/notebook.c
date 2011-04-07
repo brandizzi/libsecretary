@@ -13,7 +13,7 @@
 
 Notebook *notebook_new(const char *filename) {
     Notebook *notebook = malloc(sizeof(Notebook));
-    notebook->filename = filename;
+    notebook->filename = util_copy_string(filename);
 
     FILE *file = fopen(filename, "r");
     if (file) {
@@ -44,6 +44,7 @@ void notebook_save(Notebook *notebook) {
 
 void notebook_free(Notebook *notebook) {
     secretary_free(notebook_get_secretary(notebook));
+    free(notebook->filename);
     free(notebook);
 }
 
