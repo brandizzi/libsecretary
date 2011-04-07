@@ -351,6 +351,15 @@ void test_notebook_save_done_tasks(CuTest *test) {
     remove("nofile");
 }
 
+void test_notebook_free(CuTest *test) {
+    // Opens an nonexistent file.
+    remove("nofile");
+    Notebook *notebook = notebook_new("nofile");
+
+    free(notebook->filename);
+    secretary_free(notebook->secretary);
+    free(notebook);
+}
 
 CuSuite *test_notebook_suite() {
     CuSuite *suite  = CuSuiteNew();
@@ -362,6 +371,7 @@ CuSuite *test_notebook_suite() {
     SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks);
     SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks_with_projects);
     SUITE_ADD_TEST(suite, test_notebook_save_done_tasks);
+    SUITE_ADD_TEST(suite, test_notebook_free);
     return suite;
 }
 
