@@ -18,9 +18,16 @@ static void test_project_alter_name(CuTest *test) {
     project_free(project);
 }
 
+static void test_project_free(CuTest *test) {
+    Project *project = project_new("libsecretary");
+    free(project->name);
+    free(project);
+}
+
 CuSuite *test_project_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_project_create);
     SUITE_ADD_TEST(suite, test_project_alter_name);
+    SUITE_ADD_TEST(suite, test_project_free);
     return suite;
 }
