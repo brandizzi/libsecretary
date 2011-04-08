@@ -37,6 +37,10 @@ Project *secretary_get_project(Secretary *secretary, const char *name) {
 }
 
 void secretary_move(Secretary *secretary, Task *task, Project *project) {
+    Project *origin = task_get_project(task);
+    if (origin != NULL) {
+        project_remove(origin, task);
+    }
     project_add(project, task);
 }
 

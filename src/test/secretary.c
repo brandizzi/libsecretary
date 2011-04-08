@@ -139,6 +139,36 @@ void test_secretary_move_task_from_project(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_move_task_from_project_to_project(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_appoint(secretary, "Test task transference");
+    Project *origin = secretary_start(secretary, "libsecretary"),
+    *destination = secretary_start(secretary, "Chocrotary");
+    
+    secretary_move(secretary, task, origin);
+
+    CuAssertIntEquals(test, 1, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_project(secretary));
+    // No more in inbox
+    CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
+    // Now in project origin
+    CuAssertIntEquals(test, 1, project_count_task(origin));
+    CuAssertIntEquals(test, 0, project_count_task(destination));
+    CuAssertPtrEquals(test, task, project_get_nth_task(origin, 0));
+    CuAssertPtrEquals(test, origin, task_get_project(task));
+    // move
+    secretary_move(secretary, task, destination);
+    // Now in project destination
+    CuAssertIntEquals(test, 0, project_count_task(origin));
+    CuAssertIntEquals(test, 1, project_count_task(destination));
+    CuAssertPtrEquals(test, task, project_get_nth_task(destination, 0));
+    CuAssertPtrEquals(test, destination, task_get_project(task));
+
+
+    secretary_free(secretary);
+}
+
+
 void test_secretary_remove_task(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_appoint(secretary, "Test task transference");
@@ -501,6 +531,8 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_get_project);
     SUITE_ADD_TEST(suite, test_secretary_get_nth_project);
     SUITE_ADD_TEST(suite, test_secretary_move_task_to_project);
+    SUITE_ADD_TEST(suite, test_secretary_move_task_from_project);
+    SUITE_ADD_TEST(suite, test_secretary_move_task_from_project_to_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_task);
     SUITE_ADD_TEST(suite, test_secretary_remove_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_task);

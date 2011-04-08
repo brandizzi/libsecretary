@@ -37,8 +37,10 @@ Task *project_get_nth_task(Project *project, int n) {
 void project_remove(Project *project, Task *task) {
     for (int i = 0; i < project->task_count; i++) {
         Task *cursor = project->tasks[i];
-        if (cursor->number == task-> number) {
-            memmove(project->tasks+i, project->tasks+i, (project->task_count-i+1)*sizeof(Task*));
+        if (cursor == task) {
+            Task **destination = project->tasks+i;
+            Task **origin = project->tasks+(i+1);
+            memmove(destination, origin, (project->task_count-i-1)*sizeof(Task*));
             project->task_count--;
         }
     }
