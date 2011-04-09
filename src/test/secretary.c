@@ -211,15 +211,22 @@ void test_secretary_remove_project_task(CuTest *test) {
 
 void test_secretary_remove_project(CuTest *test) {
     Secretary *secretary = secretary_new();
-    Project *project = secretary_start(secretary, "libsecretary");
+    Project *project1 = secretary_start(secretary, "libsecretary"),
+        *project2 = secretary_start(secretary, "Chocrotary"),
+        *project3 = secretary_start(secretary, "Netuno NG");
 
-    CuAssertIntEquals(test, 1, secretary_count_project(secretary));
-    CuAssertPtrEquals(test, project, secretary_get_project(secretary, "libsecretary"));
+    CuAssertIntEquals(test, 3, secretary_count_project(secretary));
+    CuAssertPtrEquals(test, project2, secretary_get_project(secretary, "Chocrotary"));
+    CuAssertPtrEquals(test, project1, secretary_get_nth_project(secretary, 0));
+    CuAssertPtrEquals(test, project2, secretary_get_nth_project(secretary, 1));
+    CuAssertPtrEquals(test, project3, secretary_get_nth_project(secretary, 2));
 
-    secretary_delete_project(secretary, project);
+    secretary_delete_project(secretary, project2);
 
-    CuAssertIntEquals(test, 0, secretary_count_project(secretary));
-    CuAssertPtrEquals(test, NULL, secretary_get_project(secretary, "libsecretary"));
+    CuAssertIntEquals(test, 2, secretary_count_project(secretary));
+    CuAssertPtrEquals(test, NULL, secretary_get_project(secretary, "Chocrotary"));
+    CuAssertPtrEquals(test, project1, secretary_get_nth_project(secretary, 0));
+    CuAssertPtrEquals(test, project3, secretary_get_nth_project(secretary, 1));
 
     secretary_free(secretary);
 }
