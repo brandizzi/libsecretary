@@ -19,7 +19,7 @@ void task_set_description(Task *task, const char *description) {
 }
 
 bool task_is_in_inbox(Task *task) {
-    return task->project == NULL && !task->scheduled && !task->done;
+    return task->project == NULL && !task->scheduled;
 }
 
 void task_schedule(Task *task, struct tm date) {
@@ -28,7 +28,7 @@ void task_schedule(Task *task, struct tm date) {
 }
 
 bool task_is_scheduled(Task *task) {
-    return task->scheduled && !task->done;
+    return task->scheduled;
 }
 
 bool task_is_scheduled_for(Task *task, struct tm date) {

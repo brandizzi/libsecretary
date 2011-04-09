@@ -435,22 +435,22 @@ void test_secretary_do(CuTest *test) {
     secretary_do(secretary, task3);
 
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_scheduled(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
     CuAssertIntEquals(test, 3, secretary_count_done_tasks(secretary));
 
-    // Not found in inbox
+    // Should be found in their places
     Task *task = secretary_get_nth_inbox_task(secretary, 0);
-    CuAssertPtrEquals(test, NULL, task);
-    // Not found as scheduled
+    CuAssertPtrEquals(test, task3, task);
+    // Should be found as scheduled
     task = secretary_get_nth_scheduled_for(secretary, date, 0);
-    CuAssertPtrEquals(test, NULL, task);
+    CuAssertPtrEquals(test, task1, task);
     task = secretary_get_nth_scheduled(secretary, 0);
-    CuAssertPtrEquals(test, NULL, task);
-    // Not found in project
+    CuAssertPtrEquals(test, task1, task);
+    // Should be found in project
     task = project_get_nth_task(project, 0);
-    CuAssertPtrEquals(test, NULL, task);
+    CuAssertPtrEquals(test, task2, task);
 
     // Getting the things done :)
     task = secretary_get_nth_done_task(secretary, 0);
@@ -491,22 +491,22 @@ void test_secretary_undo(CuTest *test) {
     secretary_do(secretary, task3);
 
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_scheduled(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
     CuAssertIntEquals(test, 3, secretary_count_done_tasks(secretary));
 
-    // Not found in inbox
+    // Should be found in inbox
     Task *task = secretary_get_nth_inbox_task(secretary, 0);
-    CuAssertPtrEquals(test, NULL, task);
-    // Not found as scheduled
+    CuAssertPtrEquals(test, task3, task);
+    // Should be found as scheduled
     task = secretary_get_nth_scheduled_for(secretary, date, 0);
-    CuAssertPtrEquals(test, NULL, task);
+    CuAssertPtrEquals(test, task1, task);
     task = secretary_get_nth_scheduled(secretary, 0);
-    CuAssertPtrEquals(test, NULL, task);
-    // Not found in project
+    CuAssertPtrEquals(test, task1, task);
+    // Should be found in project
     task = project_get_nth_task(project, 0);
-    CuAssertPtrEquals(test, NULL, task);
+    CuAssertPtrEquals(test, task2, task);
 
     // UNDOING
     secretary_undo(secretary, task1);
