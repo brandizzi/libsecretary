@@ -33,7 +33,6 @@ Notebook *notebook_new(const char *filename) {
 
 void notebook_save(Notebook *notebook) {
     FILE *file = fopen(notebook->filename, "w");
-    Secretary *secretary = notebook_get_secretary(notebook);
     putc(notebook->major_version, file);
     putc(notebook->minor_version, file);
     ParserWriterFunction writer = parser_get_writer(

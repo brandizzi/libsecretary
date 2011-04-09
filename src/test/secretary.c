@@ -142,8 +142,8 @@ void test_secretary_move_task_from_project(CuTest *test) {
 void test_secretary_move_task_from_project_to_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_appoint(secretary, "Test task transference");
-    Project *origin = secretary_start(secretary, "libsecretary"),
-    *destination = secretary_start(secretary, "Chocrotary");
+    Project *destination = secretary_start(secretary, "Chocrotary");
+    Project *origin = secretary_start(secretary, "libsecretary");
     
     secretary_move(secretary, task, origin);
 
@@ -531,8 +531,8 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_get_project);
     SUITE_ADD_TEST(suite, test_secretary_get_nth_project);
     SUITE_ADD_TEST(suite, test_secretary_move_task_to_project);
-    SUITE_ADD_TEST(suite, test_secretary_move_task_from_project);
     SUITE_ADD_TEST(suite, test_secretary_move_task_from_project_to_project);
+    SUITE_ADD_TEST(suite, test_secretary_move_task_from_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_task);
     SUITE_ADD_TEST(suite, test_secretary_remove_project);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_task);

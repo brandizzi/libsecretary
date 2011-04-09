@@ -36,15 +36,16 @@ Task *project_get_nth_task(Project *project, int n) {
 
 void project_remove(Project *project, Task *task) {
     for (int i = 0; i < project->task_count; i++) {
-        Task *cursor = project->tasks[i];
-        if (cursor == task) {
-            Task **destination = project->tasks+i;
-            Task **origin = project->tasks+(i+1);
+        Task **cursor = project->tasks+i;
+        if (*cursor == task) {
+            Task **destination = cursor;
+            Task **origin = cursor+1;
             memmove(destination, origin, (project->task_count-i-1)*sizeof(Task*));
             project->task_count--;
+            task->project = NULL;
+            break;
         }
     }
-    task->project = NULL;
 }
 
 const char* project_get_name(Project *project) {

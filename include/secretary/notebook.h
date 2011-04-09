@@ -5,7 +5,7 @@
 #include <secretary/parser.h>
 
 typedef struct {
-    const char *filename;
+    char *filename;
     int major_version;
     int minor_version;
     Secretary *secretary;
