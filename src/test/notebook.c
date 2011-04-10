@@ -191,14 +191,9 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
          *task2 = secretary_appoint(secretary, "Create snd task");
     secretary_appoint(secretary, "Create third task");
 
-    struct tm date;
-    date.tm_hour = 0;
-    date.tm_mday = 30;
-    date.tm_mon = 4;
-    date.tm_year = 2002-1900;
+    time_t now = time(NULL), future_time = now+60*60*48;
+    struct tm date = *localtime(&future_time);
     secretary_schedule(secretary, task1, date);
-
-    time_t now = time(NULL);
     secretary_schedule(secretary, task2, *localtime(&now));
 
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
@@ -215,7 +210,7 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
     CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for(secretary, date));
 
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
     CuAssertStrEquals(test, "Create first task", task_get_description(task));
@@ -241,14 +236,9 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
          *task2 = secretary_appoint(secretary, "Create Cocoa interface"),
          *task3 = secretary_appoint(secretary, "Buy pequi");
 
-    struct tm date;
-    date.tm_hour = 0;
-    date.tm_mday = 30;
-    date.tm_mon = 4;
-    date.tm_year = 2002-1900;
+    time_t now = time(NULL), future_time = now+60*60*48;
+    struct tm date = *localtime(&future_time);
     secretary_schedule(secretary, task2, date);
-
-    time_t now = time(NULL);
     secretary_schedule(secretary, task3, *localtime(&now));
 
     secretary_move(secretary, task1, project1);
@@ -269,7 +259,8 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
     CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    // Includes today
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for(secretary, date));
 
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
     CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
@@ -300,14 +291,9 @@ void test_notebook_save_done_tasks(CuTest *test) {
          *task2 = secretary_appoint(secretary, "Create Cocoa interface"),
          *task3 = secretary_appoint(secretary, "Buy pequi");
 
-    struct tm date;
-    date.tm_hour = 0;
-    date.tm_mday = 30;
-    date.tm_mon = 4;
-    date.tm_year = 2002-1900;
+    time_t now = time(NULL), future_time = now+60*60*48;
+    struct tm date = *localtime(&future_time);
     secretary_schedule(secretary, task2, date);
-
-    time_t now = time(NULL);
     secretary_schedule(secretary, task3, *localtime(&now));
 
     secretary_move(secretary, task1, project1);
@@ -332,7 +318,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_count_inbox(secretary));
     CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for(secretary, date));
 
     Task *task = secretary_get_nth_done_task(secretary, 1);
     CuAssertTrue(test, task_is_done(task));

@@ -327,29 +327,56 @@ void test_secretary_schedule(CuTest *test) {
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
     CuAssertIntEquals(test, 3, secretary_count_inbox(secretary));
 
-    struct tm date;
-    date.tm_hour = 0;
-    date.tm_mday = 30;
-    date.tm_mon = 4;
-    date.tm_year = 2002-1900;
-    secretary_schedule(secretary, task1, date);
-
-    time_t now = time(NULL);
+    time_t now = time(NULL), future_time;
+    future_time = now+60*60*48;
+    struct tm future_date = *localtime(&future_time);
+    secretary_schedule(secretary, task1, future_date);
     secretary_schedule(secretary, task2, *localtime(&now));
 
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
 
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for(secretary, future_date));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
 
-    CuAssertIntEquals(test, secretary_count_scheduled_for(secretary, date), 1);
-    Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
+    Task *task = secretary_get_nth_scheduled_for(secretary, future_date, 0);
     CuAssertPtrEquals(test, task1, task);
 
     CuAssertIntEquals(test, secretary_count_scheduled_for_today(secretary), 1);    
     task = secretary_get_nth_scheduled_for_today(secretary, 0);
     CuAssertPtrEquals(test, task2, task);
+
+    secretary_free(secretary);
+}
+
+void test_secretary_late_scheduled_appears_in_today(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_appoint(secretary, "Create first task"),
+         *task2 = secretary_appoint(secretary, "Create snd task"),
+         *task3 = secretary_appoint(secretary, "Create thrid task");
+         
+    CuAssertIntEquals(test, 3, secretary_count_task(secretary));
+    CuAssertIntEquals(test, 3, secretary_count_inbox(secretary));
+
+    time_t now = time(NULL), future_time, past_time;
+    future_time = now + 60*60*48;
+    past_time =   now - 60*60*48;
+    struct tm future_date = *localtime(&future_time);
+    struct tm past_date = *localtime(&past_time);
+    secretary_schedule(secretary, task1, future_date);
+    secretary_schedule(secretary, task2, *localtime(&now));
+    secretary_schedule(secretary, task3, past_date);
+
+    CuAssertIntEquals(test, 3, secretary_count_scheduled_for(secretary, future_date));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for_today(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, past_date));
+
+    Task *task = secretary_get_nth_scheduled_for(secretary, future_date, 0);
+    CuAssertPtrEquals(test, task1, task);
+    task = secretary_get_nth_scheduled_for_today(secretary, 0);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_scheduled_for_today(secretary, 1);
+    CuAssertPtrEquals(test, task3, task);
 
     secretary_free(secretary);
 }
@@ -364,17 +391,13 @@ void test_secretary_unschedule(CuTest *test) {
     CuAssertIntEquals(test, 3, secretary_count_task(secretary));
     CuAssertIntEquals(test, 3, secretary_count_inbox(secretary));
 
-    struct tm date;
-    date.tm_hour = 0;
-    date.tm_mday = 30;
-    date.tm_mon = 4;
-    date.tm_year = 2002-1900;
+    time_t now = time(NULL), future_time = now+60*60*48;
+    struct tm date = *localtime(&future_time);
+
     secretary_schedule(secretary, task1, date);
 
     // One less in inbox
     CuAssertIntEquals(test, 2, secretary_count_inbox(secretary));
-
-    time_t now = time(NULL);
     secretary_schedule(secretary, task2, *localtime(&now));
     // The SCHEDULE state should be preserved!
     secretary_move(secretary, task2, project);
@@ -382,7 +405,7 @@ void test_secretary_unschedule(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_inbox(secretary));
 
     CuAssertIntEquals(test, 2, secretary_count_scheduled(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));
+    CuAssertIntEquals(test, 2, secretary_count_scheduled_for(secretary, date));
     CuAssertIntEquals(test, 1, secretary_count_scheduled_for_today(secretary));
 
     Task *task = secretary_get_nth_scheduled_for(secretary, date, 0);
@@ -398,7 +421,7 @@ void test_secretary_unschedule(CuTest *test) {
     secretary_unschedule(secretary, task1);
     // One more in inbox, since it returns
     CuAssertIntEquals(test, 2, secretary_count_inbox(secretary));    
-    CuAssertIntEquals(test, 0, secretary_count_scheduled_for(secretary, date));   
+    CuAssertIntEquals(test, 1, secretary_count_scheduled_for(secretary, date));   
 
     secretary_unschedule(secretary, task2);
     // No one more, since the task2 was in a project
@@ -546,6 +569,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_remove_task_with_others);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_with_others);
     SUITE_ADD_TEST(suite, test_secretary_schedule);
+    SUITE_ADD_TEST(suite, test_secretary_late_scheduled_appears_in_today);
     SUITE_ADD_TEST(suite, test_secretary_unschedule);
     SUITE_ADD_TEST(suite, test_secretary_do);
     SUITE_ADD_TEST(suite, test_secretary_undo);

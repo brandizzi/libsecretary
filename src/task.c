@@ -3,6 +3,8 @@
 #include <secretary/util.h>
 #include <stdlib.h>
 
+#define SECONDS_IN_DAY (60*60*24)
+
 Task *task_new(int number, const char *description) {
     Task *task = malloc(sizeof(Task));
     task->number = number;
@@ -32,10 +34,11 @@ bool task_is_scheduled(Task *task) {
 }
 
 bool task_is_scheduled_for(Task *task, struct tm date) {
-    return task_is_scheduled(task) &&
-        (task->scheduled_for.tm_mday == date.tm_mday) &&
-        (task->scheduled_for.tm_mon == date.tm_mon) && 
-        (task->scheduled_for.tm_year == date.tm_year);
+    time_t scheduled = mktime(&task->scheduled_for),
+           compared = mktime(&date);
+    long scheduled_date = scheduled/SECONDS_IN_DAY, // removing hours, minutes etc.
+         compared_date = compared/SECONDS_IN_DAY;
+    return task_is_scheduled(task) && scheduled_date <= compared_date;
 }
 
 void task_unschedule(Task *task) {
