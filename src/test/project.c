@@ -18,24 +18,24 @@ static void test_project_alter_name(CuTest *test) {
     project_free(project);
 }
 
-static void test_project_remove(CuTest *test) {
+static void test_project_remove_task(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new(1, "Create first task"),
          *task2 = task_new(2, "Create snd task"),
          *task3 = task_new(3, "Create thrid task");
 
-    project_add(project, task1);
-    project_add(project, task2);
-    project_add(project, task3);
+    project_add_task(project, task1);
+    project_add_task(project, task2);
+    project_add_task(project, task3);
 
-    CuAssertIntEquals(test, project_count_task(project), 3);
+    CuAssertIntEquals(test, project_count_tasks(project), 3);
     CuAssertPtrEquals(test, project_get_nth_task(project, 0), task1);
     CuAssertPtrEquals(test, project_get_nth_task(project, 1), task2);
     CuAssertPtrEquals(test, project_get_nth_task(project, 2), task3);
 
-    project_remove(project, task2);
+    project_remove_task(project, task2);
 
-    CuAssertIntEquals(test, project_count_task(project), 2);
+    CuAssertIntEquals(test, project_count_tasks(project), 2);
     CuAssertPtrEquals(test, project_get_nth_task(project, 0), task1);
     CuAssertPtrEquals(test, project_get_nth_task(project, 1), task3);
 
@@ -56,6 +56,6 @@ CuSuite *test_project_suite() {
     SUITE_ADD_TEST(suite, test_project_create);
     SUITE_ADD_TEST(suite, test_project_alter_name);
     SUITE_ADD_TEST(suite, test_project_free_name);
-    SUITE_ADD_TEST(suite, test_project_remove);
+    SUITE_ADD_TEST(suite, test_project_remove_task);
     return suite;
 }

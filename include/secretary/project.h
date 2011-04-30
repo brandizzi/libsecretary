@@ -15,13 +15,13 @@ typedef struct Project {
 } Project;
 
 Project *project_new(const char *name);
-void project_add(Project *project, Task *task);
-void project_remove(Project *project, Task *task);
+void project_add_task(Project *project, Task *task);
+void project_remove_task(Project *project, Task *task);
 
 const char* project_get_name (Project *project);
 void project_set_name(Project *project, const char *name);
 
-int project_count_task (Project *project);
+int project_count_tasks (Project *project);
 Task *project_get_task(Project *project, int number);
 Task *project_get_nth_task(Project *project, int n);
 

@@ -14,7 +14,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
         //int project_properties = 
             getw(file);
         char *name = util_read_string(file);
-        secretary_start(secretary, name);
+        secretary_create_project(secretary, name);
         free(name);
     }
 
@@ -22,13 +22,13 @@ static Secretary *parser_reader_v1_1(FILE *file) {
     for (int i = 0; i < task_count; i++) {
         int properties = getw(file);
         char *description = util_read_string(file);
-        Task *task = secretary_appoint(secretary, description);
+        Task *task = secretary_create_task(secretary, description);
         free(description);
         if (properties & TASK_HAS_PROJECT) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            secretary_move(secretary, task, project);
+            secretary_move_to_project(secretary, task, project);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
@@ -36,22 +36,22 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             secretary_schedule(secretary, task, date);
         }
         if (properties & TASK_IS_DONE) {
-            secretary_do(secretary, task);
+            secretary_mark_task_as_done(secretary, task);
         }
     }
     return secretary;
 }
 
 static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
-    putw(secretary_count_project(secretary), file);
-    for (int i = 0; i < secretary_count_project(secretary); i++) {
+    putw(secretary_count_projects(secretary), file);
+    for (int i = 0; i < secretary_count_projects(secretary); i++) {
         Project *project = secretary_get_nth_project(secretary, i);
         int mask = 0;
         putw(mask, file);
         util_write_string(file, project_get_name(project));
     }
-    putw(secretary_count_task(secretary), file);
-    for (int i = 0; i < secretary_count_task(secretary); i++) {
+    putw(secretary_count_tasks(secretary), file);
+    for (int i = 0; i < secretary_count_tasks(secretary); i++) {
         Task *task = secretary_get_nth_task(secretary, i);
         int mask = 0;
         if (task_get_project(task)) {
@@ -81,7 +81,7 @@ typedef struct {
     int major_version;
     int minor_version;
     ParserReaderFunction reader;
-    ParserReaderFunction writer;
+    ParserWriterFunction writer;
 } ParserRow;
 
 #define PARSER_ROW(major_version, minor_version) { \

@@ -13,13 +13,13 @@ Secretary *secretary_new() {
     return secretary;
 }
 
-Task *secretary_appoint(Secretary *secretary, const char* description) {
+Task *secretary_create_task(Secretary *secretary, const char* description) {
     Task *task = task_new(++secretary->task_count, description);
     secretary->tasks[secretary->task_count-1] = task;
     return task;
 }
 
-Project *secretary_start(Secretary *secretary, const char* name) {
+Project *secretary_create_project(Secretary *secretary, const char* name) {
     Project *project = project_new(name);
     secretary->projects[secretary->project_count++] = project;
     return project;
@@ -36,40 +36,40 @@ Project *secretary_get_project(Secretary *secretary, const char *name) {
     return NULL;
 }
 
-void secretary_move(Secretary *secretary, Task *task, Project *project) {
+void secretary_move_to_project(Secretary *secretary, Task *task, Project *project) {
     Project *origin = task_get_project(task);
     if (origin != NULL) {
-        project_remove(origin, task);
+        project_remove_task(origin, task);
     }
-    project_add(project, task);
+    project_add_task(project, task);
 }
 
-void secretary_move_to_inbox(Secretary *secretary, Task *task) {
+void secretary_move_to_project_to_inbox(Secretary *secretary, Task *task) {
     Project *project = task_get_project(task);
     if (project) {
-        project_remove(project, task);
+        project_remove_task(project, task);
     }
 }
 
 void secretary_delete_task(Secretary *secretary, Task *task) {
     Project *project = task_get_project(task);
     if (project) {
-        project_remove(project, task);
+        project_remove_task(project, task);
     }
     _secretary_delete(task, (void**)secretary->tasks, &(secretary->task_count));
     task_free(task);
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    int tn = project_count_task(project);
+    int tn = project_count_tasks(project);
     for (int i = 0; i < tn; i++) {
-        secretary_move_to_inbox(secretary, project_get_nth_task(project, i));
+        secretary_move_to_project_to_inbox(secretary, project_get_nth_task(project, i));
     }
     _secretary_delete(project, (void**)secretary->projects, &(secretary->project_count));
     project_free(project);
 }
 
-int secretary_count_inbox(Secretary *secretary) {
+int secretary_count_inbox_tasks(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_is_in_inbox(secretary->tasks[i])) counter++;
@@ -109,7 +109,7 @@ void secretary_schedule(Secretary *secretary, Task *task, struct tm date) {
     task_schedule(task, date);
 }
 
-int secretary_count_scheduled(Secretary *secretary) {
+int secretary_count_tasks_scheduled(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_is_scheduled(secretary->tasks[i])) counter++;
@@ -118,7 +118,7 @@ int secretary_count_scheduled(Secretary *secretary) {
 }
 
 
-int secretary_count_scheduled_for(Secretary *secretary, struct tm date) {
+int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_is_scheduled_for(secretary->tasks[i], date)) {
@@ -127,12 +127,12 @@ int secretary_count_scheduled_for(Secretary *secretary, struct tm date) {
     }
     return counter;
 }
-int secretary_count_scheduled_for_today(Secretary *secretary) {
+int secretary_count_tasks_scheduled_for_today(Secretary *secretary) {
     time_t now = time(NULL);
-    return secretary_count_scheduled_for(secretary, *localtime(&now));
+    return secretary_count_tasks_scheduled_for(secretary, *localtime(&now));
 }
 
-Task *secretary_get_nth_scheduled(Secretary *secretary, int n) {
+Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n) {
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_is_scheduled(secretary->tasks[i])) {
             if (n-- == 0) return secretary->tasks[i];
@@ -141,7 +141,7 @@ Task *secretary_get_nth_scheduled(Secretary *secretary, int n) {
     return NULL;
 }
 
-Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int n) {
+Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, int n) {
     for (int i = 0; i < secretary->task_count; i++) {
         Task *task = secretary->tasks[i];
         if (task_is_scheduled_for(task, date)) {
@@ -150,12 +150,12 @@ Task *secretary_get_nth_scheduled_for(Secretary *secretary, struct tm date, int 
     }
     return NULL;
 }
-Task *secretary_get_nth_scheduled_for_today(Secretary *secretary, int n) {
+Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n) {
     time_t now = time(NULL);
-    return secretary_get_nth_scheduled_for(secretary, *localtime(&now), n);
+    return secretary_get_nth_task_scheduled_for(secretary, *localtime(&now), n);
 }
 
-void secretary_unschedule(Secretary *secretary, Task *task) {
+void secretary_unschedule_task(Secretary *secretary, Task *task) {
     task_unschedule(task);
 }
 

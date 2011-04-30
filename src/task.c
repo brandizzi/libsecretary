@@ -47,7 +47,7 @@ void task_unschedule(Task *task) {
 
 void task_free(Task *task) {
     if (task_get_project(task) != NULL) {
-        project_remove(task_get_project(task), task);
+        project_remove_task(task_get_project(task), task);
     }
     free(task->description);
     free(task);

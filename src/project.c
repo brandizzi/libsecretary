@@ -10,7 +10,7 @@ Project *project_new(const char *name) {
     return project;
 }
 
-void project_add(Project *project, Task *task) {
+void project_add_task(Project *project, Task *task) {
     project->tasks[project->task_count++] = task;
     task->project = project;
 }
@@ -29,7 +29,7 @@ Task *project_get_nth_task(Project *project, int n) {
     return project->tasks[n];
 }
 
-void project_remove(Project *project, Task *task) {
+void project_remove_task(Project *project, Task *task) {
     for (int i = 0; i < project->task_count; i++) {
         Task **cursor = project->tasks+i;
         if (*cursor == task) {
@@ -51,7 +51,7 @@ void project_set_name(Project *project, const char *name) {
     project->name = util_copy_string(name);
 }
 
-int project_count_task(Project *project) {
+int project_count_tasks(Project *project) {
     return project->task_count;
 }
 
