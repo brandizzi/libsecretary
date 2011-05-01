@@ -44,7 +44,7 @@ void secretary_move_to_project(Secretary *secretary, Task *task, Project *projec
     project_add_task(project, task);
 }
 
-void secretary_move_to_project_to_inbox(Secretary *secretary, Task *task) {
+void secretary_remove_from_project(Secretary *secretary, Task *task) {
     Project *project = task_get_project(task);
     if (project) {
         project_remove_task(project, task);
@@ -63,7 +63,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
 void secretary_delete_project(Secretary *secretary, Project *project) {
     int tn = project_count_tasks(project);
     for (int i = 0; i < tn; i++) {
-        secretary_move_to_project_to_inbox(secretary, project_get_nth_task(project, i));
+        secretary_remove_from_project(secretary, project_get_nth_task(project, i));
     }
     _secretary_delete(project, (void**)secretary->projects, &(secretary->project_count));
     project_free(project);

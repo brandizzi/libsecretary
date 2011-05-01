@@ -32,7 +32,7 @@ Project *secretary_get_project(Secretary *secretary, const char *name);
         (((secretary)->project_count > (n))? ((secretary)->projects[n]) : NULL)
 
 void secretary_move_to_project(Secretary *secretary, Task *task, Project *project);
-void secretary_move_to_project_to_inbox(Secretary *secretary, Task *task);
+void secretary_remove_from_project(Secretary *secretary, Task *task);
 
 void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);

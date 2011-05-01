@@ -129,7 +129,7 @@ void test_secretary_move_to_project_task_from_project(CuTest *test) {
     CuAssertIntEquals(test, 1, project_count_tasks(project));
     CuAssertPtrEquals(test, task, project_get_task(project, 1));
 
-    secretary_move_to_project_to_inbox(secretary, task);
+    secretary_remove_from_project(secretary, task);
 
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
