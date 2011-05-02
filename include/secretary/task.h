@@ -24,10 +24,11 @@ int task_get_number(Task *task);
 const char *task_get_description(Task *task);
 void task_set_description(Task *task, const char *description);
 
-bool task_has_project(Task *task);
 struct Project *task_get_project(Task *task);
 void task_set_project(Task *task, struct Project *project);
 void task_unset_project(Task *task);
+bool task_has_project(Task *task);
+bool task_is_in_project(Task *task, struct Project *project);
 
 bool task_is_in_inbox(Task *task);
 

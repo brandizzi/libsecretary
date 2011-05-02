@@ -40,6 +40,10 @@ bool task_has_project(Task *task) {
     return task->project != NULL;
 }
 
+bool task_is_in_project(Task *task, struct Project *project) {
+    return task->project == project;
+}
+
 void task_unset_project(Task *task) {
     if (task->project == NULL) return;
     project_remove_task(task->project, task);

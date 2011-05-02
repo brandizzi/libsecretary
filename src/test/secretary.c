@@ -333,8 +333,8 @@ void test_secretary_schedule(CuTest *test) {
     time_t now = time(NULL), future_time;
     future_time = now+60*60*48;
     struct tm future_date = *localtime(&future_time);
-    secretary_schedule(secretary, task1, future_date);
-    secretary_schedule(secretary, task2, *localtime(&now));
+    task_schedule(task1, future_date);
+    task_schedule(task2, *localtime(&now));
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
@@ -366,9 +366,9 @@ void test_secretary_late_scheduled_appears_in_today(CuTest *test) {
     past_time =   now - 60*60*48;
     struct tm future_date = *localtime(&future_time);
     struct tm past_date = *localtime(&past_time);
-    secretary_schedule(secretary, task1, future_date);
-    secretary_schedule(secretary, task2, *localtime(&now));
-    secretary_schedule(secretary, task3, past_date);
+    task_schedule(task1, future_date);
+    task_schedule(task2, *localtime(&now));
+    task_schedule(task3, past_date);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks_scheduled_for(secretary, future_date));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled_for_today(secretary));
@@ -397,11 +397,11 @@ void test_secretary_unschedule_task(CuTest *test) {
     time_t now = time(NULL), future_time = now+60*60*48;
     struct tm date = *localtime(&future_time);
 
-    secretary_schedule(secretary, task1, date);
+    task_schedule(task1, date);
 
     // One less in inbox
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary));
-    secretary_schedule(secretary, task2, *localtime(&now));
+    task_schedule(task2, *localtime(&now));
     // The SCHEDULE state should be preserved!
     project_add_task(project, task2);
 
@@ -446,7 +446,7 @@ void test_secretary_mark_task_as_done(CuTest *test) {
     date.tm_mday = 30;
     date.tm_mon = 4;
     date.tm_year = 2002-1900;
-    secretary_schedule(secretary, task1, date);
+    task_schedule(task1, date);
     project_add_task(project, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
@@ -502,7 +502,7 @@ void test_secretary_unmark_task_as_done(CuTest *test) {
     date.tm_mday = 30;
     date.tm_mon = 4;
     date.tm_year = 2002-1900;
-    secretary_schedule(secretary, task1, date);
+    task_schedule(task1, date);
     project_add_task(project, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));

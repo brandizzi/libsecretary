@@ -109,10 +109,6 @@ void secretary_free(Secretary *secretary) {
     free(secretary);
 }
 
-void secretary_schedule(Secretary *secretary, Task *task, struct tm date) {
-    task_schedule(task, date);
-}
-
 int secretary_count_tasks_scheduled(Secretary *secretary) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
