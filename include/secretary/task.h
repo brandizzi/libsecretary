@@ -41,6 +41,7 @@ bool task_is_scheduled_for(Task *task, struct tm date);
 
 void task_mark_as_done(Task *task);
 void task_unmark_as_done(Task *task);
+void task_switch_done_status(Task *task);
 bool task_is_done(Task *task);
 
 void task_free(Task *task);

@@ -85,6 +85,11 @@ void task_mark_as_done(Task *task) {
 void task_unmark_as_done(Task *task) {
     task->done = false;
 }
+
+void task_switch_done_status(Task *task) {
+    task->done = !task->done;
+}
+
 bool task_is_done(Task *task) {
     return task->done;
 }

@@ -44,10 +44,26 @@ static void test_task_is_in_project(CuTest *test) {
     project_free(project);
 }
 
+static void test_task_switch_done_status(CuTest *test) {
+    Task *task = task_new(1, "Do something" );
+    CuAssertTrue(test, !task_is_done(task));
+    task_mark_as_done(task);
+    CuAssertTrue(test, task_is_done(task));
+    task_unmark_as_done(task);
+    CuAssertTrue(test, !task_is_done(task));
+    task_switch_done_status(task);
+    CuAssertTrue(test, task_is_done(task));
+    task_switch_done_status(task);
+    CuAssertTrue(test, !task_is_done(task));
+
+    task_free(task);
+}
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
     SUITE_ADD_TEST(suite, test_task_alter_description);
     SUITE_ADD_TEST(suite, test_task_remove_from_project);
+    SUITE_ADD_TEST(suite, test_task_is_in_project);
+    SUITE_ADD_TEST(suite, test_task_switch_done_status);
     return suite;
 }
