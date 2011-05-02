@@ -12,7 +12,7 @@ typedef struct {
 } Notebook;
 
 Notebook *notebook_new(const char *filename);
-#define notebook_get_secretary(notebook) ((notebook)->secretary)
+Secretary *notebook_get_secretary(Notebook *notebook);
 void notebook_save(Notebook *notebook);
 void notebook_free(Notebook *notebook);
 

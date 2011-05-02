@@ -31,6 +31,10 @@ Notebook *notebook_new(const char *filename) {
     return notebook;
 }
 
+Secretary *notebook_get_secretary (Notebook *notebook) {
+    return notebook->secretary;
+}
+
 void notebook_save(Notebook *notebook) {
     FILE *file = fopen(notebook->filename, "w");
     putc(notebook->major_version, file);

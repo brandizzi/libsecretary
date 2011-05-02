@@ -6,7 +6,6 @@ void test_secretary_create(CuTest *test) {
     CuAssertIntEquals(test, 0, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_area(secretary));
 
     secretary_free(secretary);
 }
@@ -17,7 +16,6 @@ void test_secretary_create_task(CuTest *test) {
     
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_area(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
 
     CuAssertIntEquals(test, 1, task_get_number(task));
@@ -53,7 +51,6 @@ void test_secretary_create_project(CuTest *test) {
     
     CuAssertIntEquals(test, 0, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_area(secretary));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
 
     CuAssertStrEquals(test, "libsecretary", project_get_name(project));
@@ -90,6 +87,12 @@ void test_secretary_get_nth_project(CuTest *test) {
     // OTOH, if no project with given name is found, return null
     p = secretary_get_nth_project(secretary, 3);
     CuAssertPtrEquals(test, NULL, p);
+
+    secretary_delete_project(secretary, project1);
+    secretary_delete_project(secretary, project2);
+    p = secretary_get_nth_project(secretary, 1);
+    CuAssertPtrEquals(test, NULL, p);
+
     secretary_free(secretary);
 }
 

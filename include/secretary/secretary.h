@@ -18,18 +18,17 @@ typedef struct {
 
 Secretary *secretary_new();
 Task *secretary_create_task(Secretary *secretary, const char* description);
-#define secretary_count_tasks(secretary) ((secretary)->task_count)
+int secretary_count_tasks(Secretary *secretary);
 Task *secretary_get_task(Secretary *secretary, int number);
-#define secretary_get_nth_task(secretary, n) ((secretary)->tasks[n])
+Task *secretary_get_nth_task(Secretary *secretary, int n);
 
 int secretary_count_inbox_tasks(Secretary *secretary);
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
 
 Project *secretary_create_project(Secretary *secretary, const char* name);
-#define secretary_count_projects(secretary) ((secretary)->project_count)
+int secretary_count_projects(Secretary *secretary);
 Project *secretary_get_project(Secretary *secretary, const char *name);
-#define secretary_get_nth_project(secretary, n) \
-        (((secretary)->project_count > (n))? ((secretary)->projects[n]) : NULL)
+Project *secretary_get_nth_project(Secretary *secretary, int n);
 
 void secretary_move_to_project(Secretary *secretary, Task *task, Project *project);
 void secretary_remove_from_project(Secretary *secretary, Task *task);
@@ -46,13 +45,11 @@ Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date,
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n);
 void secretary_unschedule_task(Secretary *secretary, Task *task);
 
-#define secretary_mark_task_as_done(secretary, task) (task_mark_as_done(task))
-#define secretary_unmark_task_as_done(secretary, task) (task_unmark_as_done(task))
+void secretary_mark_task_as_done(Secretary *secretary, Task *task);
+void secretary_unmark_task_as_done(Secretary *secretary, Task *task);
 int secretary_count_done_tasks(Secretary *secretary);
 Task *secretary_get_nth_done_task(Secretary *secretary, int n);
 
 void secretary_free(Secretary *secretary);
-
-#define secretary_count_area(secretary) 0
 
 #endif

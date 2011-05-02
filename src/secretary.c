@@ -19,10 +19,22 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     return task;
 }
 
+int secretary_count_tasks(Secretary *secretary) {
+    return secretary->task_count;
+}
+
+Task *secretary_get_nth_task(Secretary *secretary, int n) {
+    return secretary->tasks[n];
+}
+
 Project *secretary_create_project(Secretary *secretary, const char* name) {
     Project *project = project_new(name);
     secretary->projects[secretary->project_count++] = project;
     return project;
+}
+
+int secretary_count_projects(Secretary *secretary) {
+    return secretary->project_count;
 }
 
 Project *secretary_get_project(Secretary *secretary, const char *name) {
@@ -33,6 +45,13 @@ Project *secretary_get_project(Secretary *secretary, const char *name) {
         }
     }
     
+    return NULL;
+}
+
+Project *secretary_get_nth_project(Secretary *secretary, int n) {
+    if (n < secretary->project_count) {
+        return secretary->projects[n];
+    }
     return NULL;
 }
 
@@ -158,6 +177,15 @@ Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n) {
 void secretary_unschedule_task(Secretary *secretary, Task *task) {
     task_unschedule(task);
 }
+
+void secretary_mark_task_as_done(Secretary *secretary, Task *task) {
+    task_mark_as_done(task);
+}
+
+void secretary_unmark_task_as_done(Secretary *secretary, Task *task) {
+    task_unmark_as_done(task);
+}
+
 
 int secretary_count_done_tasks(Secretary *secretary) {
     int counter = 0;
