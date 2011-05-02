@@ -1,4 +1,5 @@
 #include <secretary/test/task.h>
+#include <secretary/project.h>
 #include <stdlib.h>
 
 static void test_task_create(CuTest *test) {
@@ -15,6 +16,18 @@ static void test_task_alter_description(CuTest *test) {
     CuAssertStrEquals(test, "Do something else", task_get_description(task));
     
     task_free(task);
+}
+
+static void test_task_remove_from_project(CuTest *test) {
+    Task *task = task_new(1, "Do something" );
+    Project *project = project_new("libsecretary");
+    CuAssertPtrEquals(test, task_get_project(task), NULL);
+
+    task_set_project(task, project);
+    CuAssertPtrEquals(test, task_get_project(task), project);
+    task_unset_project(task);
+    CuAssertPtrEquals(test, task_get_project(task), NULL);
+    
 }
 
 CuSuite *test_task_suite() {

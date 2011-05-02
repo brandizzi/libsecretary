@@ -55,21 +55,6 @@ Project *secretary_get_nth_project(Secretary *secretary, int n) {
     return NULL;
 }
 
-void secretary_move_to_project(Secretary *secretary, Task *task, Project *project) {
-    Project *origin = task_get_project(task);
-    if (origin != NULL) {
-        project_remove_task(origin, task);
-    }
-    project_add_task(project, task);
-}
-
-void secretary_remove_from_project(Secretary *secretary, Task *task) {
-    Project *project = task_get_project(task);
-    if (project) {
-        project_remove_task(project, task);
-    }
-}
-
 void secretary_delete_task(Secretary *secretary, Task *task) {
     Project *project = task_get_project(task);
     if (project) {
@@ -82,7 +67,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
 void secretary_delete_project(Secretary *secretary, Project *project) {
     int tn = project_count_tasks(project);
     for (int i = 0; i < tn; i++) {
-        secretary_remove_from_project(secretary, project_get_nth_task(project, i));
+        project_remove_task(project, project_get_nth_task(project, i));
     }
     _secretary_delete(project, (void**)secretary->projects, &(secretary->project_count));
     project_free(project);
@@ -172,18 +157,6 @@ Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date,
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n) {
     time_t now = time(NULL);
     return secretary_get_nth_task_scheduled_for(secretary, *localtime(&now), n);
-}
-
-void secretary_unschedule_task(Secretary *secretary, Task *task) {
-    task_unschedule(task);
-}
-
-void secretary_mark_task_as_done(Secretary *secretary, Task *task) {
-    task_mark_as_done(task);
-}
-
-void secretary_unmark_task_as_done(Secretary *secretary, Task *task) {
-    task_unmark_as_done(task);
 }
 
 

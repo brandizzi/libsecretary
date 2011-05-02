@@ -28,15 +28,15 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            secretary_move_to_project(secretary, task, project);
+            project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             fread(&date, sizeof(date), 1, file);
-            secretary_schedule(secretary, task, date);
+            task_schedule(task, date);
         }
         if (properties & TASK_IS_DONE) {
-            secretary_mark_task_as_done(secretary, task);
+            task_mark_as_done(task);
         }
     }
     return secretary;

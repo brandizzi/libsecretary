@@ -11,6 +11,7 @@ Project *project_new(const char *name) {
 }
 
 void project_add_task(Project *project, Task *task) {
+    task_unset_project(task);
     project->tasks[project->task_count++] = task;
     task->project = project;
 }

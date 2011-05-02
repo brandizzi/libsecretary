@@ -20,6 +20,19 @@ void task_set_description(Task *task, const char *description) {
     task->description = util_copy_string(description);
 }
 
+void task_set_project(Task *task, Project *project) {
+    project_add_task(project, task);
+}
+
+bool task_has_project(Task *task) {
+    return task->project != NULL;
+}
+
+void task_unset_project(Task *task) {
+    if (task_has_project(task) == NULL) return;
+    project_remove_task(task->project, task);
+}
+
 bool task_is_in_inbox(Task *task) {
     return task->project == NULL && !task->scheduled;
 }

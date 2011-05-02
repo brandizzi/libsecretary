@@ -23,7 +23,11 @@ Task *task_new(int number, const char *description);
 #define task_get_number(task) ((task)->number)
 #define task_get_description(task) ((task)->description)
 void task_set_description(Task *task, const char *description);
+
+bool task_has_project(Task *task);
 #define task_get_project(task) ((task)->project)
+void task_set_project(Task *task, struct Project *project);
+void task_unset_project(Task *task);
 
 bool task_is_in_inbox(Task *task);
 
