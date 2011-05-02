@@ -20,12 +20,12 @@ typedef struct {
 
 Task *task_new(int number, const char *description);
 
-#define task_get_number(task) ((task)->number)
-#define task_get_description(task) ((task)->description)
+int task_get_number(Task *task);
+const char *task_get_description(Task *task);
 void task_set_description(Task *task, const char *description);
 
 bool task_has_project(Task *task);
-#define task_get_project(task) ((task)->project)
+Project *task_get_project(Task *task);
 void task_set_project(Task *task, struct Project *project);
 void task_unset_project(Task *task);
 
@@ -33,14 +33,14 @@ bool task_is_in_inbox(Task *task);
 
 
 void task_schedule(Task *task, struct tm date);
-#define task_get_scheduled_date(task) ((task)->scheduled_for)
+struct date task_get_scheduled_date(Task *task);
 void task_unschedule(Task *task);
 bool task_is_scheduled(Task *task);
 bool task_is_scheduled_for(Task *task, struct tm date);
 
-#define task_mark_as_done(task) ((task)->done = true)
-#define task_unmark_as_done(task) ((task)->done = false)
-#define task_is_done(task) ((task)->done)
+void task_mark_as_done(Task *task);
+void task_unmark_as_done(Task *task);
+void task_is_done(Task *task);
 
 void task_free(Task *task);
 

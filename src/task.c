@@ -15,9 +15,21 @@ Task *task_new(int number, const char *description) {
     return task;
 }
 
+int task_get_number(Task *task) {
+    return task->number;
+}
+
+const char *task_get_description(Task *task) {
+    return task->description;
+}
+
 void task_set_description(Task *task, const char *description) {
     free(task->description);
     task->description = util_copy_string(description);
+}
+
+Project *task_get_project(Task *task) {
+    return task->project;
 }
 
 void task_set_project(Task *task, Project *project) {
@@ -42,6 +54,10 @@ void task_schedule(Task *task, struct tm date) {
     task->scheduled_for = date;
 }
 
+struct date task_get_scheduled_date(Task *task) {
+    return task->scheduled_for;
+}
+
 bool task_is_scheduled(Task *task) {
     return task->scheduled;
 }
@@ -56,6 +72,17 @@ bool task_is_scheduled_for(Task *task, struct tm date) {
 
 void task_unschedule(Task *task) {
     task->scheduled = false;
+}
+
+void task_mark_as_done(Task *task) {
+    task->done = true;
+}
+
+void task_unmark_as_done(Task *task) {
+    task->done = false;
+}
+void task_is_done(Task *task) {
+    return task->done;
 }
 
 void task_free(Task *task) {
