@@ -25,7 +25,7 @@ const char *task_get_description(Task *task);
 void task_set_description(Task *task, const char *description);
 
 bool task_has_project(Task *task);
-Project *task_get_project(Task *task);
+struct Project *task_get_project(Task *task);
 void task_set_project(Task *task, struct Project *project);
 void task_unset_project(Task *task);
 
@@ -33,14 +33,14 @@ bool task_is_in_inbox(Task *task);
 
 
 void task_schedule(Task *task, struct tm date);
-struct date task_get_scheduled_date(Task *task);
+struct tm task_get_scheduled_date(Task *task);
 void task_unschedule(Task *task);
 bool task_is_scheduled(Task *task);
 bool task_is_scheduled_for(Task *task, struct tm date);
 
 void task_mark_as_done(Task *task);
 void task_unmark_as_done(Task *task);
-void task_is_done(Task *task);
+bool task_is_done(Task *task);
 
 void task_free(Task *task);
 

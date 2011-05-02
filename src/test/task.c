@@ -34,5 +34,6 @@ CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
     SUITE_ADD_TEST(suite, test_task_alter_description);
+    SUITE_ADD_TEST(suite, test_task_remove_from_project);
     return suite;
 }

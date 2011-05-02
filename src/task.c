@@ -41,7 +41,7 @@ bool task_has_project(Task *task) {
 }
 
 void task_unset_project(Task *task) {
-    if (task_has_project(task) == NULL) return;
+    if (task->project == NULL) return;
     project_remove_task(task->project, task);
 }
 
@@ -54,7 +54,7 @@ void task_schedule(Task *task, struct tm date) {
     task->scheduled_for = date;
 }
 
-struct date task_get_scheduled_date(Task *task) {
+struct tm task_get_scheduled_date(Task *task) {
     return task->scheduled_for;
 }
 
@@ -81,7 +81,7 @@ void task_mark_as_done(Task *task) {
 void task_unmark_as_done(Task *task) {
     task->done = false;
 }
-void task_is_done(Task *task) {
+bool task_is_done(Task *task) {
     return task->done;
 }
 
