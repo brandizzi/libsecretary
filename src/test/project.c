@@ -45,6 +45,33 @@ static void test_project_remove_task(CuTest *test) {
     project_free(project);
 }
 
+void test_secretary_archived_inbox(CuTest *test) {
+    Project *project = project_new("libsecretary");
+    Task *task1 = task_new(1, "Create first task"),
+         *task2 = task_new(2, "Create snd task"),
+         *task3 = task_new(3, "Create thrid task");
+
+    project_add_task(project, task1);
+    project_add_task(project, task2);
+    project_add_task(project, task3);
+
+    task_mark_as_done(task1);
+    task_mark_as_done(task2);
+    task_archive(task2);
+
+    CuAssertIntEquals(test, 2, project_count_tasks(project, false));
+    Task *task = project_get_nth_task(project, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = project_get_nth_task(project, 1, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    CuAssertIntEquals(test, 1,project_count_tasks(project, true));
+    task = project_get_nth_task(project, 1, true);
+    CuAssertPtrEquals(test, task, task2);
+    
+    secretary_free(secretary);
+}
+
 static void test_project_free_name(CuTest *test) {
     Project *project = project_new("libsecretary");
     free(project->name);
