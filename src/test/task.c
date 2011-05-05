@@ -120,8 +120,15 @@ static void test_task_archive(CuTest *test) {
     task_archive(task); // Now it archives
     CuAssertTrue(test, task_is_archived(task));
 
+    // Now testing unarchival - which is done by undoing the task
+    task_unmark_as_done(task);
+    CuAssertTrue(test, !task_is_archived(task));
+    task_mark_as_done(task); // Should not return to archives
+    CuAssertTrue(test, !task_is_archived(task));
+    
     task_free(task);
 }
+
 
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();

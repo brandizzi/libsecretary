@@ -109,65 +109,83 @@ void secretary_free(Secretary *secretary) {
     free(secretary);
 }
 
-int secretary_count_tasks_scheduled(Secretary *secretary) {
+int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_scheduled(secretary->tasks[i])) counter++;
+        Task *task = secretary->tasks[i];
+        if (task_is_scheduled(task) && task_is_archived(task) == archived) {
+            counter++;
+        }
     }
     return counter;
 }
 
 
-int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date) {
+int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
+            bool archived) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_scheduled_for(secretary->tasks[i], date)) {
+        Task *task = secretary->tasks[i];
+        if (task_is_scheduled_for(task, date) 
+                && task_is_archived(task) == archived) {
            counter++;
         }
     }
     return counter;
 }
-int secretary_count_tasks_scheduled_for_today(Secretary *secretary) {
+int secretary_count_tasks_scheduled_for_today(Secretary *secretary, 
+            bool archived) {
     time_t now = time(NULL);
-    return secretary_count_tasks_scheduled_for(secretary, *localtime(&now));
+    return secretary_count_tasks_scheduled_for(secretary, *localtime(&now), archived);
 }
 
-Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n) {
+Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
+            bool archived) {
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_scheduled(secretary->tasks[i])) {
+        Task *task = secretary->tasks[i];
+        if (task_is_scheduled(task) && task_is_archived(task) == archived) {
             if (n-- == 0) return secretary->tasks[i];
         }
     }
     return NULL;
 }
 
-Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, int n) {
+Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, 
+        int n, bool archived) {
     for (int i = 0; i < secretary->task_count; i++) {
         Task *task = secretary->tasks[i];
-        if (task_is_scheduled_for(task, date)) {
+        if (task_is_scheduled_for(task, date) 
+                && task_is_archived(task) == archived) {
             if (n-- == 0) return task;
         }
     }
     return NULL;
 }
-Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n) {
+Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
+        bool archived) {
     time_t now = time(NULL);
-    return secretary_get_nth_task_scheduled_for(secretary, *localtime(&now), n);
+    return 
+        secretary_get_nth_task_scheduled_for(secretary, *localtime(&now), n, archived);
 }
 
 
-int secretary_count_done_tasks(Secretary *secretary) {
+int secretary_count_done_tasks(Secretary *secretary, bool archived) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_done(secretary->tasks[i])) counter++;
+        Task *task = secretary->tasks[i];
+        if (task_is_done(task) && task_is_archived(task) == archived) {
+            counter++;
+        }
     }
     return counter;
 }
 
-Task *secretary_get_nth_done_task(Secretary *secretary, int n) {
+Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_done(secretary->tasks[i])) {
-            if (n-- == 0) return secretary->tasks[i];
+        Task *task = secretary->tasks[i];
+        if (task_is_done(task) && task_is_archived(task) == archived 
+                && n-- == 0) {
+            return task;
         }
     }
     return NULL;

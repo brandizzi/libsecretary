@@ -19,8 +19,9 @@ ${LIBNAME}: ${LIBOBJS}
 test_%.o: test/%.c test/%.h %.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 
-#%.o: %.c %.h
+%.o: %.c %.h
 #	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
+
 
 run_all.o: test/run_all.c test/secretary.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@

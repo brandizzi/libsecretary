@@ -85,6 +85,7 @@ void task_mark_as_done(Task *task) {
 
 void task_unmark_as_done(Task *task) {
     task->done = false;
+    task->archived = false;
 }
 
 void task_switch_done_status(Task *task) {
