@@ -555,6 +555,21 @@ void test_secretary_unmark_task_as_done(CuTest *test) {
     CuAssertPtrEquals(test, NULL, secretary_get_nth_done_task(secretary, 0));
 }
 
+void test_secretary_archived_inbox(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "Create first task"),
+         *task2 = secretary_create_task(secretary, "Create snd task"),
+         *task3 = secretary_create_task(secretary, "Create thrid task");
+
+    task_mark_as_done(task1);
+    task_mark_as_done(task2);
+    task_archive(task1);
+
+    CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary));
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_secretary_create);
@@ -576,6 +591,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_unschedule_task);
     SUITE_ADD_TEST(suite, test_secretary_mark_task_as_done);
     SUITE_ADD_TEST(suite, test_secretary_unmark_task_as_done);
+    SUITE_ADD_TEST(suite, test_secretary_archived_inbox);
     return suite;
 }
 

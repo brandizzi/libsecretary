@@ -11,6 +11,7 @@ Task *task_new(int number, const char *description) {
     task->description = util_copy_string(description);
     task->project = NULL;
     task->scheduled = false;
+    task->archived = false;
     task->done = false;
     return task;
 }
@@ -50,7 +51,7 @@ void task_unset_project(Task *task) {
 }
 
 bool task_is_in_inbox(Task *task) {
-    return task->project == NULL && !task->scheduled;
+    return task->project == NULL && !task->scheduled && !task->archived;
 }
 
 void task_schedule(Task *task, struct tm date) {
@@ -92,6 +93,14 @@ void task_switch_done_status(Task *task) {
 
 bool task_is_done(Task *task) {
     return task->done;
+}
+
+void task_archive(Task *task) {
+    task->archived = task->done && true;
+}
+
+bool task_is_archived(Task *task) {
+    return task->archived;
 }
 
 void task_free(Task *task) {

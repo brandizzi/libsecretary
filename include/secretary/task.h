@@ -16,6 +16,7 @@ typedef struct {
     struct tm scheduled_for;
 
     bool done;
+    bool archived;
 } Task;
 
 Task *task_new(int number, const char *description);
@@ -43,6 +44,9 @@ void task_mark_as_done(Task *task);
 void task_unmark_as_done(Task *task);
 void task_switch_done_status(Task *task);
 bool task_is_done(Task *task);
+
+void task_archive(Task *task);
+bool task_is_archived(Task *task);
 
 void task_free(Task *task);
 

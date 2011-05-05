@@ -58,6 +58,45 @@ static void test_task_switch_done_status(CuTest *test) {
 
     task_free(task);
 }
+
+static void test_task_is_in_inbox(CuTest *test) {
+    Task *task = task_new(1, "Do something" );
+    CuAssertTrue(test, task_is_in_inbox(task));
+
+    task_mark_as_done(task);
+    CuAssertTrue(test, task_is_in_inbox(task));
+
+    time_t t = time(NULL);
+    task_schedule(task, *localtime(&t));
+    CuAssertTrue(test, !task_is_in_inbox(task));
+    task_unschedule(task);
+    CuAssertTrue(test, task_is_in_inbox(task));
+
+    Project *project = project_new("libsecretary");
+    project_add_task(project, task);
+    CuAssertTrue(test, !task_is_in_inbox(task));
+    project_remove_task(project, task);
+    CuAssertTrue(test, task_is_in_inbox(task));
+
+    task_archive(task);
+    CuAssertTrue(test, !task_is_in_inbox(task));
+
+    project_free(project);
+    task_free(task);
+}
+
+static void test_task_archive(CuTest *test) {
+    Task *task = task_new(1, "Do something" );
+    CuAssertTrue(test, !task_is_archived(task));
+    task_archive(task); // does nothing, task is not done
+    CuAssertTrue(test, !task_is_archived(task));
+    task_mark_as_done(task);
+    task_archive(task); // Now it archives
+    CuAssertTrue(test, task_is_archived(task));
+
+    task_free(task);
+}
+
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
@@ -65,5 +104,7 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_remove_from_project);
     SUITE_ADD_TEST(suite, test_task_is_in_project);
     SUITE_ADD_TEST(suite, test_task_switch_done_status);
+    SUITE_ADD_TEST(suite, test_task_archive);
+    SUITE_ADD_TEST(suite, test_task_is_in_inbox);
     return suite;
 }
