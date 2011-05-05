@@ -570,6 +570,10 @@ void test_secretary_archived_inbox(CuTest *test) {
     CuAssertPtrEquals(test, task, task1);
     task = secretary_get_nth_inbox_task(secretary, 1);
     CuAssertPtrEquals(test, task, task3);
+
+    CuAssertIntEquals(test, 1, secretary_count_archived_inbox_tasks(secretary));
+    Task *task = secretary_get_nth_archived_inbox_task(secretary, 0);
+    CuAssertPtrEquals(test, task, task2);
     
     secretary_free(secretary);
 }
