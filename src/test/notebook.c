@@ -11,7 +11,7 @@ void test_notebook_create(CuTest *test) {
     CuAssertTrue(test, secretary != NULL);
     CuAssertIntEquals(test, 0, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
 
     notebook_free(notebook);
     remove("nofile");
@@ -26,7 +26,7 @@ void test_notebook_save_with_task(CuTest *test) {
     
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 1, task_get_number(task));
     CuAssertStrEquals(test, "Test task creation", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
@@ -42,7 +42,7 @@ void test_notebook_save_with_task(CuTest *test) {
     CuAssertTrue(test, task != NULL);
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 1, task_get_number(task));
     CuAssertStrEquals(test, "Test task creation", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
@@ -61,7 +61,7 @@ void test_notebook_save_many_tasks(CuTest *test) {
          *task3 = secretary_create_task(secretary, "Create third task");
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -71,7 +71,7 @@ void test_notebook_save_many_tasks(CuTest *test) {
     secretary = notebook_get_secretary(notebook);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
 
     task1 = secretary_get_task(secretary, 1);
     task2 = secretary_get_task(secretary, 2);
@@ -93,7 +93,7 @@ void test_notebook_save_with_project(CuTest *test) {
     
     CuAssertIntEquals(test, 0, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -106,7 +106,7 @@ void test_notebook_save_with_project(CuTest *test) {
     CuAssertTrue(test, project != NULL);
     CuAssertIntEquals(test, 0, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
     CuAssertStrEquals(test, "libsecretary", project_get_name(project));
     CuAssertIntEquals(test, 0, project_count_tasks(project));
 
@@ -132,7 +132,7 @@ void test_notebook_save_with_project_task(CuTest *test) {
     
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 2, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -143,10 +143,10 @@ void test_notebook_save_with_project_task(CuTest *test) {
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 2, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
 
     // Who is in inbox?
-    Task *task = secretary_get_nth_inbox_task(secretary, 0);
+    Task *task = secretary_get_nth_inbox_task(secretary, 0, false);
     CuAssertTrue(test, task != NULL);
     CuAssertStrEquals(test, "Buy coffee", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
@@ -190,7 +190,7 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     task_schedule(task2, *localtime(&now));
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -200,7 +200,7 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     secretary = notebook_get_secretary(notebook);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for_today(secretary));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled_for(secretary, date));
@@ -209,7 +209,7 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     CuAssertStrEquals(test, "Create first task", task_get_description(task));
     task = secretary_get_nth_task_scheduled_for_today(secretary, 0);
     CuAssertStrEquals(test, "Create snd task", task_get_description(task));
-    task = secretary_get_nth_inbox_task(secretary, 0);
+    task = secretary_get_nth_inbox_task(secretary, 0, false);
     CuAssertStrEquals(test, "Create third task", task_get_description(task));
 
     notebook_free(notebook);
@@ -239,7 +239,7 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -249,7 +249,7 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
     secretary = notebook_get_secretary(notebook);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for_today(secretary));
     // Includes today
@@ -264,7 +264,7 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
-    task = secretary_get_nth_inbox_task(secretary, 0);
+    task = secretary_get_nth_inbox_task(secretary, 0, false);
     CuAssertPtrEquals(test, NULL, task);
 
     notebook_free(notebook);
@@ -298,7 +298,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
 
     notebook_save(notebook);
     notebook_free(notebook);
@@ -308,7 +308,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     secretary = notebook_get_secretary(notebook);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
-    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary));
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for_today(secretary));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled_for(secretary, date));

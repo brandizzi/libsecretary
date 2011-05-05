@@ -73,17 +73,17 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
     project_free(project);
 }
 
-int secretary_count_inbox_tasks(Secretary *secretary) {
+int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
     int counter = 0;
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_in_inbox(secretary->tasks[i])) counter++;
+        if (task_is_in_inbox(secretary->tasks[i], archived)) counter++;
     }
     return counter;
 }
 
-Task *secretary_get_nth_inbox_task(Secretary *secretary, int n) {
+Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
     for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_in_inbox(secretary->tasks[i])) {
+        if (task_is_in_inbox(secretary->tasks[i], archived)) {
             if (n-- == 0) return secretary->tasks[i];
         }
     }

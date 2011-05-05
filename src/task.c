@@ -50,8 +50,8 @@ void task_unset_project(Task *task) {
     project_remove_task(task->project, task);
 }
 
-bool task_is_in_inbox(Task *task) {
-    return task->project == NULL && !task->scheduled && !task->archived;
+bool task_is_in_inbox(Task *task, bool archived) {
+    return task->project == NULL && !task->scheduled && task->archived == archived;
 }
 
 void task_schedule(Task *task, struct tm date) {

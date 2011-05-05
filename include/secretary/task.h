@@ -31,8 +31,7 @@ void task_unset_project(Task *task);
 bool task_has_project(Task *task);
 bool task_is_in_project(Task *task, struct Project *project);
 
-bool task_is_in_inbox(Task *task);
-
+bool task_is_in_inbox(Task *task, bool archived);
 
 void task_schedule(Task *task, struct tm date);
 struct tm task_get_scheduled_date(Task *task);

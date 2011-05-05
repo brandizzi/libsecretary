@@ -22,8 +22,8 @@ int secretary_count_tasks(Secretary *secretary);
 Task *secretary_get_task(Secretary *secretary, int number);
 Task *secretary_get_nth_task(Secretary *secretary, int n);
 
-int secretary_count_inbox_tasks(Secretary *secretary);
-Task *secretary_get_nth_inbox_task(Secretary *secretary, int n);
+int secretary_count_inbox_tasks(Secretary *secretary, bool archived);
+Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived);
 
 Project *secretary_create_project(Secretary *secretary, const char* name);
 int secretary_count_projects(Secretary *secretary);
