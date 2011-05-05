@@ -563,7 +563,7 @@ void test_secretary_archived_inbox(CuTest *test) {
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
-    task_archive(task1);
+    task_archive(task2);
 
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary));
     Task *task = secretary_get_nth_inbox_task(secretary, 0);
