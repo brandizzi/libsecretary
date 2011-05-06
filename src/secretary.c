@@ -65,10 +65,6 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    int tn = project_count_tasks(project);
-    for (int i = 0; i < tn; i++) {
-        project_remove_task(project, project_get_nth_task(project, i));
-    }
     _secretary_delete(project, (void**)secretary->projects, &(secretary->project_count));
     project_free(project);
 }

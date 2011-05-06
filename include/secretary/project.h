@@ -21,9 +21,9 @@ void project_remove_task(Project *project, Task *task);
 const char* project_get_name (Project *project);
 void project_set_name(Project *project, const char *name);
 
-int project_count_tasks (Project *project);
+int project_count_tasks (Project *project, bool archived);
 Task *project_get_task(Project *project, int number);
-Task *project_get_nth_task(Project *project, int n);
+Task *project_get_nth_task(Project *project, int n, bool archived);
 
 void project_free(Project *project);
 

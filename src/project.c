@@ -26,8 +26,25 @@ Task *project_get_task(Project *project, int number) {
     return NULL;
 }
 
-Task *project_get_nth_task(Project *project, int n) {
-    return project->tasks[n];
+Task *project_get_nth_task(Project *project, int n, bool archived) {
+    for (int i = 0; i < project->task_count; i++) {
+        Task *task = project->tasks[i];
+        if (task_is_archived(task) == archived && n-- == 0) {
+            return task;
+        }
+    }
+    return NULL;
+}
+
+int project_count_tasks(Project *project, bool archived) {
+    int counter = 0;
+    for (int i = 0; i < project->task_count; i++) {
+        Task *task = project->tasks[i];
+        if (task_is_archived(task) == archived) {
+            counter++;
+        }
+    }
+    return counter;
 }
 
 void project_remove_task(Project *project, Task *task) {
@@ -50,10 +67,6 @@ const char* project_get_name(Project *project) {
 void project_set_name(Project *project, const char *name) {
     free(project->name);
     project->name = util_copy_string(name);
-}
-
-int project_count_tasks(Project *project) {
-    return project->task_count;
 }
 
 void project_free(Project *project) {

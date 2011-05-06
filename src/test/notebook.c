@@ -108,7 +108,7 @@ void test_notebook_save_with_project(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
     CuAssertStrEquals(test, "libsecretary", project_get_name(project));
-    CuAssertIntEquals(test, 0, project_count_tasks(project));
+    CuAssertIntEquals(test, 0, project_count_tasks(project, false));
 
     notebook_free(notebook);
     remove("nofile");
@@ -155,8 +155,8 @@ void test_notebook_save_with_project_task(CuTest *test) {
     // Projects
     Project *project = secretary_get_project(secretary, "libsecretary");
     CuAssertTrue(test, project != NULL);
-    CuAssertIntEquals(test, 1, project_count_tasks(project));
-    task = project_get_nth_task(project, 0);
+    CuAssertIntEquals(test, 1, project_count_tasks(project, false));
+    task = project_get_nth_task(project, 0, false);
     CuAssertTrue(test, task != NULL);
     CuAssertStrEquals(test, "Test notebook", task_get_description(task));
     CuAssertPtrEquals(test, project, task_get_project(task));
@@ -164,8 +164,8 @@ void test_notebook_save_with_project_task(CuTest *test) {
 
     project = secretary_get_project(secretary, "chocrotary");
     CuAssertTrue(test, project != NULL);
-    CuAssertIntEquals(test, 1, project_count_tasks(project));
-    task = project_get_nth_task(project, 0);
+    CuAssertIntEquals(test, 1, project_count_tasks(project, false));
+    task = project_get_nth_task(project, 0, false);
     CuAssertTrue(test, task != NULL);
     CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
     CuAssertPtrEquals(test, project, task_get_project(task));
@@ -320,7 +320,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     CuAssertIntEquals(test, 2, 
             secretary_count_tasks_scheduled_for(secretary, date, false));
 
-    Task *task = secretary_get_nth_done_task(secretary, 1);
+    Task *task = secretary_get_nth_done_task(secretary, 1, false);
     CuAssertTrue(test, task_is_done(task));
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
@@ -328,7 +328,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
     CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
 
-    task = secretary_get_nth_done_task(secretary, 2);
+    task = secretary_get_nth_done_task(secretary, 2, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
