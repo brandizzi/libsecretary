@@ -25,6 +25,8 @@ int project_count_tasks (Project *project, bool archived);
 Task *project_get_task(Project *project, int number);
 Task *project_get_nth_task(Project *project, int n, bool archived);
 
+void project_archive_tasks(Project *project);
+
 void project_free(Project *project);
 
 #endif

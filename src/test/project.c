@@ -72,7 +72,7 @@ void test_project_archived(CuTest *test) {
     project_free(project);
 }
 
-void test_project_archived(CuTest *test) {
+void test_project_archive_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new(1, "Create first task"),
          *task2 = task_new(2, "Create snd task"),
@@ -95,7 +95,7 @@ void test_project_archived(CuTest *test) {
     project_archive_tasks(project);
     
     CuAssertIntEquals(test, 2, project_count_tasks(project, false));
-    Task *task = project_get_nth_task(project, 0, false);
+    task = project_get_nth_task(project, 0, false);
     CuAssertPtrEquals(test, task, task1);
     task = project_get_nth_task(project, 1, false);
     CuAssertPtrEquals(test, task, task3);
@@ -148,5 +148,6 @@ CuSuite *test_project_suite() {
     SUITE_ADD_TEST(suite, test_project_free_name);
     SUITE_ADD_TEST(suite, test_project_remove_task);
     SUITE_ADD_TEST(suite, test_project_archived);
+    SUITE_ADD_TEST(suite, test_project_archive_tasks);
     return suite;
 }

@@ -69,6 +69,15 @@ void project_set_name(Project *project, const char *name) {
     project->name = util_copy_string(name);
 }
 
+void project_archive_tasks(Project *project) {
+   for (int i = 0; i < project->task_count; i++) {
+        Task *task = project->tasks[i];
+        if (task_is_done(task)) {
+            task_archive(task);
+        }
+    }
+}
+
 void project_free(Project *project) {
    for (int i = 0; i < project->task_count; i++) {
        project->tasks[i]->project = NULL;
