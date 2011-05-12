@@ -694,6 +694,108 @@ void test_secretary_archive_inbox_tasks(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_archive_scheduled_task(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "Create first task"),
+         *task2 = secretary_create_task(secretary, "Create snd task"),
+         *task3 = secretary_create_task(secretary, "Create thrid task");
+
+    time_t seconds = time(NULL);
+    struct tm date1 = *localtime(&seconds);
+
+    task_schedule(task1, date1);
+    seconds += 24*60*60*30;
+    struct tm date2 = *localtime(&seconds);
+    task_schedule(task2, date2);
+    seconds += 24*60*60*30;
+    struct tm date3 = *localtime(&seconds);
+    task_schedule(task3, date3);
+
+    task_mark_as_done(task1);
+    task_mark_as_done(task2);
+    task_mark_as_done(task3);
+
+    CuAssertIntEquals(test, 3, 
+            secretary_count_tasks_scheduled(secretary, false));
+    CuAssertIntEquals(test, 1, 
+            secretary_count_tasks_scheduled_for(secretary, date1, false));
+    CuAssertIntEquals(test, 2, 
+            secretary_count_tasks_scheduled_for(secretary, date2, false));
+    CuAssertIntEquals(test, 3, 
+            secretary_count_tasks_scheduled_for(secretary, date3, false));
+    CuAssertIntEquals(test, 1,
+            secretary_count_tasks_scheduled_for_today(secretary, false));
+
+    Task *task = secretary_get_nth_task_scheduled(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for(secretary, date1, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+
+    task = secretary_get_nth_task_scheduled(secretary, 1, false);
+    CuAssertPtrEquals(test, task, task2);
+    task = secretary_get_nth_task_scheduled_for(secretary, date2, 1, false);
+    CuAssertPtrEquals(test, task, task2);
+
+    task = secretary_get_nth_task_scheduled(secretary, 2, false);
+    CuAssertPtrEquals(test, task, task3);
+    task = secretary_get_nth_task_scheduled_for(secretary, date3, 2, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    secretary_archive_tasks_scheduled_for_today(secretary);
+
+    CuAssertIntEquals(test, 2, 
+            secretary_count_tasks_scheduled(secretary, false));
+    CuAssertIntEquals(test, 0, 
+            secretary_count_tasks_scheduled_for(secretary, date1, false));
+    CuAssertIntEquals(test, 0,
+            secretary_count_tasks_scheduled_for_today(secretary, false));
+
+    task = secretary_get_nth_task_scheduled(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task2);
+    task = secretary_get_nth_task_scheduled(secretary, 1, false);
+    CuAssertPtrEquals(test, task, task3);
+    task = secretary_get_nth_task_scheduled(secretary, 0, true);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for(secretary, date1, 0, true);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for_today(secretary, 0, true);
+    CuAssertPtrEquals(test, task, task1);
+
+    secretary_archive_tasks_scheduled_for(secretary, date2);
+
+    CuAssertIntEquals(test, 1, 
+            secretary_count_tasks_scheduled(secretary, false));
+    CuAssertIntEquals(test, 0, 
+            secretary_count_tasks_scheduled_for(secretary, date2, false));
+
+    task = secretary_get_nth_task_scheduled(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task3);
+    task = secretary_get_nth_task_scheduled_for(secretary, date2, 0, true);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for(secretary, date2, 1, true);
+    CuAssertPtrEquals(test, task, task2);
+
+
+    secretary_archive_scheduled_tasks(secretary);
+
+    CuAssertIntEquals(test, 0, 
+            secretary_count_tasks_scheduled(secretary, false));
+    CuAssertIntEquals(test, 0, 
+            secretary_count_tasks_scheduled_for(secretary, date3, false));
+
+    task = secretary_get_nth_task_scheduled_for(secretary, date3, 0, true);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_task_scheduled_for(secretary, date3, 1, true);
+    CuAssertPtrEquals(test, task, task2);
+    task = secretary_get_nth_task_scheduled_for(secretary, date3, 2, true);
+    CuAssertPtrEquals(test, task, task3);
+
+
+    secretary_free(secretary);
+}
+
 
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();
@@ -720,6 +822,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_archived_scheduled);
     SUITE_ADD_TEST(suite, test_secretary_archived_done);
     SUITE_ADD_TEST(suite, test_secretary_archive_inbox_tasks);
+    SUITE_ADD_TEST(suite, test_secretary_archive_scheduled_task);
     return suite;
 }
 

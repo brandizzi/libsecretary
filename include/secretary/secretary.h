@@ -37,6 +37,9 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary, bool archive
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, bool archived);
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, int n, bool archived);
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n, bool archived);
+void secretary_archive_scheduled_tasks(Secretary *secretary);
+void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date);
+void secretary_archive_tasks_scheduled_for_today(Secretary *secretary);
 
 int secretary_count_done_tasks(Secretary *secretary, bool archived);
 Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived);

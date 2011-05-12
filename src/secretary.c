@@ -144,6 +144,28 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary,
     return secretary_count_tasks_scheduled_for(secretary, *localtime(&now), archived);
 }
 
+void secretary_archive_scheduled_tasks(Secretary *secretary) {
+   for (int i = 0; i < secretary->task_count; i++) {
+        Task *task = secretary->tasks[i];
+        if (task_is_done(task) && task_is_scheduled(task)) {
+            task_archive(task);
+        }
+    }
+}
+void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date) {
+    for (int i = 0; i < secretary->task_count; i++) {
+        Task *task = secretary->tasks[i];
+        if (task_is_done(task) && 
+                task_is_scheduled_for(task, date)) {
+            task_archive(task);
+        }
+    }
+}
+void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
+    time_t now = time(NULL);
+    secretary_archive_tasks_scheduled_for(secretary, *localtime(&now));
+}
+
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
     for (int i = 0; i < secretary->task_count; i++) {
