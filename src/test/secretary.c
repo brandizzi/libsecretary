@@ -663,6 +663,38 @@ void test_secretary_archived_done(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_archive_inbox_tasks(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "Create first task"),
+         *task2 = secretary_create_task(secretary, "Create snd task"),
+         *task3 = secretary_create_task(secretary, "Create thrid task");
+
+    task_mark_as_done(task2);
+
+    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
+    Task *task = secretary_get_nth_inbox_task(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_inbox_task(secretary, 1, false);
+    CuAssertPtrEquals(test, task, task2);
+    task = secretary_get_nth_inbox_task(secretary, 2, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    secretary_archive_inbox_tasks(secretary);
+
+    CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
+    task = secretary_get_nth_inbox_task(secretary, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = secretary_get_nth_inbox_task(secretary, 1, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, true));
+    task = secretary_get_nth_inbox_task(secretary, 0, true);
+    CuAssertPtrEquals(test, task, task2);
+    
+    secretary_free(secretary);
+}
+
+
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_secretary_create);
@@ -687,6 +719,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_archived_inbox);
     SUITE_ADD_TEST(suite, test_secretary_archived_scheduled);
     SUITE_ADD_TEST(suite, test_secretary_archived_done);
+    SUITE_ADD_TEST(suite, test_secretary_archive_inbox_tasks);
     return suite;
 }
 

@@ -86,6 +86,15 @@ Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
     return NULL;
 }
 
+void secretary_archive_inbox_tasks(Secretary *secretary) {
+    for (int i = 0; i < secretary->task_count; i++) {
+        Task *task = secretary->tasks[i];
+        if (task_is_done(task) && task_is_in_inbox(task, false)) {
+            task_archive(task);
+        }
+    }
+}
+
 Task *secretary_get_task(Secretary *secretary, int number) {
     for (int i = 0; i < secretary->task_count; i++) {
         if (task_get_number(secretary->tasks[i]) == number) {
