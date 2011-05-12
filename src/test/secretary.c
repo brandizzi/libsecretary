@@ -777,7 +777,6 @@ void test_secretary_archive_scheduled_task(CuTest *test) {
     task = secretary_get_nth_task_scheduled_for(secretary, date2, 1, true);
     CuAssertPtrEquals(test, task, task2);
 
-
     secretary_archive_scheduled_tasks(secretary);
 
     CuAssertIntEquals(test, 0, 
@@ -825,5 +824,4 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_archive_scheduled_task);
     return suite;
 }
-
 

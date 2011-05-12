@@ -72,6 +72,42 @@ void test_project_archived(CuTest *test) {
     project_free(project);
 }
 
+void test_project_archived(CuTest *test) {
+    Project *project = project_new("libsecretary");
+    Task *task1 = task_new(1, "Create first task"),
+         *task2 = task_new(2, "Create snd task"),
+         *task3 = task_new(3, "Create thrid task");
+
+    project_add_task(project, task1);
+    project_add_task(project, task2);
+    project_add_task(project, task3);
+
+    task_mark_as_done(task2);
+
+    CuAssertIntEquals(test, 3, project_count_tasks(project, false));
+    Task *task = project_get_nth_task(project, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = project_get_nth_task(project, 1, false);
+    CuAssertPtrEquals(test, task, task2);
+    task = project_get_nth_task(project, 2, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    project_archive_tasks(project);
+    
+    CuAssertIntEquals(test, 2, project_count_tasks(project, false));
+    Task *task = project_get_nth_task(project, 0, false);
+    CuAssertPtrEquals(test, task, task1);
+    task = project_get_nth_task(project, 1, false);
+    CuAssertPtrEquals(test, task, task3);
+
+    CuAssertIntEquals(test, 1,project_count_tasks(project, true));
+    task = project_get_nth_task(project, 0, true);
+    CuAssertPtrEquals(test, task, task2);
+    
+    project_free(project);
+}
+
+
 static void test_project_free_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new(1, "Create first task"),
