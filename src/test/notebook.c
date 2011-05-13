@@ -345,6 +345,7 @@ void test_notebook_free(CuTest *test) {
     free(notebook->filename);
     secretary_free(notebook->secretary);
     free(notebook);
+    remove("nofile");
 }
 
 CuSuite *test_notebook_suite() {

@@ -6,6 +6,7 @@
 #include <secretary/test/notebook.h>
 #include <secretary/test/task.h>
 #include <secretary/test/project.h>
+#include <secretary/test/list.h>
 
 #include <CuTest.h>
 
@@ -19,6 +20,8 @@ void RunAllTests(void)
     CuSuiteAddSuite(suite, test_task_suite());
     CuSuiteAddSuite(suite, test_secretary_suite());
     CuSuiteAddSuite(suite, test_notebook_suite());    
+    CuSuiteAddSuite(suite, test_list_suite());    
+
     CuSuiteRun(suite);
     CuSuiteSummary(suite, output);
     CuSuiteDetails(suite, output);
