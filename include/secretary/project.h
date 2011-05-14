@@ -2,6 +2,7 @@
 # define _PROJECT_H
 
 #include <secretary/task.h>
+#include <secretary/list.h>
 
 #include <stdlib.h>
 
@@ -9,9 +10,7 @@
 
 typedef struct Project {
     char *name;
-
-    Task *tasks[PROJECT_ARRAY_SIZE];
-    int task_count;
+    List *tasks;
 } Project;
 
 Project *project_new(const char *name);

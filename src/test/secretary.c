@@ -795,7 +795,6 @@ void test_secretary_archive_scheduled_task(CuTest *test) {
     secretary_free(secretary);
 }
 
-
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_secretary_create);

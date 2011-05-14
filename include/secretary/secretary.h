@@ -3,17 +3,11 @@
 
 #include <secretary/task.h>
 #include <secretary/project.h>
+#include <secretary/list.h>
 #include <time.h>
 
-#define ARRAY_SIZE 1024
-
 typedef struct {
-    Task *tasks[ARRAY_SIZE];
-    int task_count;
-
-    Project *projects[ARRAY_SIZE];
-    int project_count;
-    
+    List *tasks, *projects;    
 } Secretary;
 
 Secretary *secretary_new();
@@ -48,5 +42,12 @@ void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);
 
 void secretary_free(Secretary *secretary);
+
+#ifdef _SECRETARY_FRIEND_MODULE
+/**
+ * A "friend" interface for internal purproses. It should not be used by
+ * libsecretary clients but only by libsecretary modules themselves.
+ */
+#endif
 
 #endif

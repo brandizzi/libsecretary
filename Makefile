@@ -5,7 +5,7 @@ CFLAGS=${_CFLAGS} -Wall -std=c99
 CPPFLAGS=-Iinclude -Icutest
 
 LIBOBJS=secretary.o project.o task.o notebook.o parser.o util.o list.o
-TESTOBJS=test_secretary.o test_notebook.o test_task.o test_project.o test_list.o CuTest.o
+TESTOBJS=test_secretary.o test_notebook.o test_task.o test_project.o test_list.o test_optimization_requisites.o CuTest.o
 
 LIBNAME=libsecretary.a
 DYNAMIC_LIB_OPTION=-dynamiclib
@@ -16,7 +16,7 @@ all: run_all ${LIBNAME}
 ${LIBNAME}: ${LIBOBJS}
 	ar rcs $@ ${LIBOBJS} 
 
-test_%.o: test/%.c test/%.h %.h
+test_%.o: test/%.c test/%.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 
 %.o: %.c %.h

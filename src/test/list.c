@@ -11,6 +11,18 @@ static void test_list_create(CuTest *test) {
     list_free(list);
 }
 
+static void test_list_get_invalid_item(CuTest *test) {
+    List *list = list_new();
+
+
+    CuAssertTrue(test, list!=NULL);
+    CuAssertIntEquals(test, list_count_items(list), 0);
+
+    CuAssertPtrEquals(test, NULL, list_get_nth_item(list, 8000));
+
+    list_free(list);
+}
+
 static void test_list_add_items(CuTest *test) {
     List *list = list_new();
     CuAssertIntEquals(test, list_count_items(list), 0);
@@ -49,7 +61,7 @@ static void test_list_add_a_lot(CuTest *test) {
 
 }
 
-static void test_list_remove(CuTest *test) {
+static void test_list_remove_item(CuTest *test) {
     List *list = list_new();
     CuAssertIntEquals(test, list_count_items(list), 0);
 
@@ -68,8 +80,8 @@ static void test_list_remove(CuTest *test) {
     CuAssertPtrEquals(test, list_get_nth_item(list, 3), item4);
     CuAssertPtrEquals(test, list_get_nth_item(list, 4), item5);
 
-    list_remove(list, item2);
-    list_remove(list, item4);
+    list_remove_item(list, item2);
+    list_remove_item(list, item4);
 
     CuAssertIntEquals(test, list_count_items(list), 3);
     CuAssertPtrEquals(test, list_get_nth_item(list, 0), item1);
@@ -82,8 +94,9 @@ static void test_list_remove(CuTest *test) {
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
+    SUITE_ADD_TEST(suite, test_list_get_invalid_item);
     SUITE_ADD_TEST(suite, test_list_add_items);
     SUITE_ADD_TEST(suite, test_list_add_a_lot);
-    SUITE_ADD_TEST(suite, test_list_remove);
+    SUITE_ADD_TEST(suite, test_list_remove_item);
     return suite;
 }

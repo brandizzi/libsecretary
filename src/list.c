@@ -26,10 +26,14 @@ void list_add_item(List *list, void *item) {
 }
 
 void *list_get_nth_item(List *list, int index) {
-    return list->items[index];
+    if (index < list->number_of_items) {
+        return list->items[index];
+    } else {
+        return NULL;
+    }
 }
 
-void list_remove(List *list, void *item) {
+void list_remove_item(List *list, void *item) {
     for (int i = 0; i < list->number_of_items; i++) {   
         if (list->items[i] == item) {
             void **found = list->items+i;

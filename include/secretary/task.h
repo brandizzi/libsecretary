@@ -6,11 +6,18 @@
 #include <stdbool.h>
 
 struct Project;
+struct Secretary;
 
 typedef struct {
     int number;
     char *description;
     struct Project *project;
+    /**
+     * This secretary reference is only useful for optimizations and should not
+     * be used by any client. (Actually, no struct field should be directly
+     * used by libsecretary clients at all.)
+     */
+    struct Secretary *secretary;
 
     bool scheduled;
     struct tm scheduled_for;

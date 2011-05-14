@@ -4,42 +4,41 @@
 #include <string.h>
 #include <stdbool.h>
 
-static void _secretary_delete(void *todelete, void **array, int *count);
-
 Secretary *secretary_new() {
     Secretary *secretary = malloc(sizeof(Secretary));
-    secretary->task_count = 0;
-    secretary->project_count = 0;
+    secretary->tasks = list_new();
+    secretary->projects = list_new();
     return secretary;
 }
 
 Task *secretary_create_task(Secretary *secretary, const char* description) {
-    Task *task = task_new(++secretary->task_count, description);
-    secretary->tasks[secretary->task_count-1] = task;
+    Task *task = task_new(list_count_items(secretary->tasks)+1, description);
+    task->secretary = secretary;
+    list_add_item(secretary->tasks, task);
     return task;
 }
 
 int secretary_count_tasks(Secretary *secretary) {
-    return secretary->task_count;
+    return list_count_items(secretary->tasks);
 }
 
 Task *secretary_get_nth_task(Secretary *secretary, int n) {
-    return secretary->tasks[n];
+    return list_get_nth_item(secretary->tasks, n);
 }
 
 Project *secretary_create_project(Secretary *secretary, const char* name) {
     Project *project = project_new(name);
-    secretary->projects[secretary->project_count++] = project;
+    list_add_item(secretary->projects, project);
     return project;
 }
 
 int secretary_count_projects(Secretary *secretary) {
-    return secretary->project_count;
+    return list_count_items(secretary->projects);
 }
 
 Project *secretary_get_project(Secretary *secretary, const char *name) {
-    for (int i = 0; i < secretary->project_count; i++) {
-        Project *project = secretary->projects[i];
+    for (int i = 0; i < list_count_items(secretary->projects); i++) {
+        Project *project = list_get_nth_item(secretary->projects, i);
         if (strcmp(name, project_get_name(project)) == 0) {
             return project;
         }
@@ -49,10 +48,7 @@ Project *secretary_get_project(Secretary *secretary, const char *name) {
 }
 
 Project *secretary_get_nth_project(Secretary *secretary, int n) {
-    if (n < secretary->project_count) {
-        return secretary->projects[n];
-    }
-    return NULL;
+    return list_get_nth_item(secretary->projects, n);
 }
 
 void secretary_delete_task(Secretary *secretary, Task *task) {
@@ -60,35 +56,36 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
     if (project) {
         project_remove_task(project, task);
     }
-    _secretary_delete(task, (void**)secretary->tasks, &(secretary->task_count));
+    list_remove_item(secretary->tasks, task);
     task_free(task);
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    _secretary_delete(project, (void**)secretary->projects, &(secretary->project_count));
+    list_remove_item(secretary->projects, project);
     project_free(project);
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
     int counter = 0;
-    for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_in_inbox(secretary->tasks[i], archived)) counter++;
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        if (task_is_in_inbox(list_get_nth_item(secretary->tasks, i), archived))
+            counter++;
     }
     return counter;
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        if (task_is_in_inbox(secretary->tasks[i], archived)) {
-            if (n-- == 0) return secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        if (task_is_in_inbox(list_get_nth_item(secretary->tasks, i), archived)) {
+            if (n-- == 0) return list_get_nth_item(secretary->tasks, i);
         }
     }
     return NULL;
 }
 
 void secretary_archive_inbox_tasks(Secretary *secretary) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_done(task) && task_is_in_inbox(task, false)) {
             task_archive(task);
         }
@@ -96,28 +93,28 @@ void secretary_archive_inbox_tasks(Secretary *secretary) {
 }
 
 Task *secretary_get_task(Secretary *secretary, int number) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        if (task_get_number(secretary->tasks[i]) == number) {
-           return secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        if (task_get_number(list_get_nth_item(secretary->tasks, i)) == number) {
+           return list_get_nth_item(secretary->tasks, i);
         }
     }
     return NULL;
 }
 
 void secretary_free(Secretary *secretary) {
-    for (int i = 0; i < secretary->project_count; i++) {
-        project_free(secretary->projects[i]);
+    for (int i = 0; i < list_count_items(secretary->projects); i++) {
+        project_free(list_get_nth_item(secretary->projects, i));
     }
-    for (int i = 0; i < secretary->task_count; i++) {
-        task_free(secretary->tasks[i]);
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        task_free(list_get_nth_item(secretary->tasks, i));
     }
     free(secretary);
 }
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
     int counter = 0;
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_scheduled(task) && task_is_archived(task) == archived) {
             counter++;
         }
@@ -129,8 +126,8 @@ int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
 int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
             bool archived) {
     int counter = 0;
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_scheduled_for(task, date) 
                 && task_is_archived(task) == archived) {
            counter++;
@@ -145,16 +142,16 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary,
 }
 
 void secretary_archive_scheduled_tasks(Secretary *secretary) {
-   for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+   for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_done(task) && task_is_scheduled(task)) {
             task_archive(task);
         }
     }
 }
 void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_done(task) && 
                 task_is_scheduled_for(task, date)) {
             task_archive(task);
@@ -168,10 +165,10 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_scheduled(task) && task_is_archived(task) == archived) {
-            if (n-- == 0) return secretary->tasks[i];
+            if (n-- == 0) return list_get_nth_item(secretary->tasks, i);
         }
     }
     return NULL;
@@ -179,8 +176,8 @@ Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n,
 
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, 
         int n, bool archived) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_scheduled_for(task, date) 
                 && task_is_archived(task) == archived) {
             if (n-- == 0) return task;
@@ -198,8 +195,8 @@ Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
 
 int secretary_count_done_tasks(Secretary *secretary, bool archived) {
     int counter = 0;
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_done(task) && task_is_archived(task) == archived) {
             counter++;
         }
@@ -208,8 +205,8 @@ int secretary_count_done_tasks(Secretary *secretary, bool archived) {
 }
 
 Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
-    for (int i = 0; i < secretary->task_count; i++) {
-        Task *task = secretary->tasks[i];
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
         if (task_is_done(task) && task_is_archived(task) == archived 
                 && n-- == 0) {
             return task;
@@ -217,18 +214,4 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
     }
     return NULL;
 }
-
-// PRIVATE STUFF
-static void _secretary_delete(void *todelete, void **array, int *count) {
-    int _count = *count;
-    for (int i = 0; i < _count; i++) {
-        void **cursor = array+i;
-        if (*cursor == todelete) {
-            memmove(cursor, cursor+1, (_count-i)*sizeof(void*));
-            (*count)--;
-            return;
-        }
-    }
-}
-
 
