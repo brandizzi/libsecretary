@@ -1,6 +1,7 @@
 #include <secretary/list.h>
 #include <secretary/util.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define LIST_INITIAL_SPACE 256
 
@@ -26,6 +27,17 @@ void list_add_item(List *list, void *item) {
 
 void *list_get_nth_item(List *list, int index) {
     return list->items[index];
+}
+
+void list_remove(List *list, void *item) {
+    for (int i = 0; i < list->number_of_items; i++) {   
+        if (list->items[i] == item) {
+            void **found = list->items+i;
+            memmove(found, found+1, (list->number_of_items-i)*sizeof(void*));
+            list->number_of_items--;
+            break;
+        }
+    }
 }
 
 void list_free(List *list) {

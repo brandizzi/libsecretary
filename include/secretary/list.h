@@ -10,6 +10,7 @@ List *list_new();
 int list_count_items(List *list);
 void list_add_item(List *list, void *item);
 void *list_get_nth_item(List *list, int index);
+void list_remove(List *list, void *item);
 
 void list_free(List *list);
 
