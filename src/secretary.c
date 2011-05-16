@@ -224,14 +224,23 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
 void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
-    if (secretary && (task_is_in_inbox(task, true) || task_is_in_inbox(task, false))) {
-        list_add_item(secretary->inbox_perspective.visible_tasks, task);
+    if (secretary) {
+        if (task_is_in_inbox(task, false)) {
+            list_add_item(secretary->inbox_perspective.visible_tasks, task);
+        } else if (task_is_in_inbox(task, true)) {
+            list_add_item(secretary->inbox_perspective.archived_tasks, task);
+        }
     }
 }
 
 void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
     if (secretary) {
-        list_remove_item(secretary->inbox_perspective.visible_tasks, task);
+        if (task_is_archived(task)) {
+            list_remove_item(secretary->inbox_perspective.archived_tasks, task);
+        } else {
+            list_remove_item(secretary->inbox_perspective.visible_tasks, task);
+        }
+        
     }
 }
 

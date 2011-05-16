@@ -209,6 +209,49 @@ static void test_optimization_requisites_register_in_inbox(CuTest *test) {
     secretary_free(secretary);
 }
 
+static void test_optimization_requisites_register_archived_in_inbox(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task = task_new(0, "task");
+    task_mark_as_done(task);
+    task_archive(task);
+
+    _secretary_register_in_inbox(secretary, task);
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->inbox_perspective.archived_tasks, 0));
+
+    _secretary_unregister_from_inbox(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+            
+
+    time_t now;
+    task->scheduled_for = *localtime(&now);
+    task->scheduled = true;
+
+    // Should not register to inbox because is scheduled
+    _secretary_register_in_inbox(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    task->scheduled = false;
+    // Should not be registered in inbox - has project
+    Project *project = project_new("project");
+    project_add_task(project, task);
+
+    _secretary_register_in_inbox(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+
+    secretary_free(secretary);
+}
+
 static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_create_task(secretary, "task");
@@ -253,6 +296,7 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, test_optimization_requisites_secretary_perspectives);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_perspective);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_inbox);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_do_not_go_to_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_scheduled);
     return suite;
