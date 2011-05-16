@@ -3,6 +3,8 @@
 #include <secretary/util.h>
 #include <stdlib.h>
 
+#include <secretary/_internal/secretary.h>
+
 #define SECONDS_IN_DAY (60*60*24)
 
 Task *task_new(int number, const char *description) {
@@ -13,6 +15,7 @@ Task *task_new(int number, const char *description) {
     task->scheduled = false;
     task->archived = false;
     task->done = false;
+    task->secretary = NULL;
     return task;
 }
 
@@ -51,12 +54,22 @@ void task_unset_project(Task *task) {
 }
 
 bool task_is_in_inbox(Task *task, bool archived) {
+#warning Remove bool archived from signature.
     return task->project == NULL && !task->scheduled && task->archived == archived;
 }
 
 void task_schedule(Task *task, struct tm date) {
+    bool was_in_inbox = task_is_in_inbox(task, true) || task_is_in_inbox(task, false),
+        was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
     task->scheduled_for = date;
+    // For optimization of secretary
+    if (was_in_inbox) {
+        _secretary_unregister_from_inbox(task->secretary, task);
+    }
+    if (!was_scheduled) {
+        _secretary_register_in_scheduled(task->secretary, task);
+    }
 }
 
 struct tm task_get_scheduled_date(Task *task) {
@@ -77,6 +90,11 @@ bool task_is_scheduled_for(Task *task, struct tm date) {
 
 void task_unschedule(Task *task) {
     task->scheduled = false;
+    // For secretary optimization
+    _secretary_unregister_from_scheduled(task->secretary, task);
+    if (task_is_in_inbox(task, true) || task_is_in_inbox(task, false)) {
+        _secretary_register_in_inbox(task->secretary, task);
+    }
 }
 
 void task_mark_as_done(Task *task) {

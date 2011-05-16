@@ -6,8 +6,15 @@
 #include <secretary/list.h>
 #include <time.h>
 
-typedef struct {
-    List *tasks, *projects;    
+typedef struct Secretary {
+    List *tasks, *projects;
+    /**
+     * This struct represents some perspectives of the secretary. It allows
+     * secretary to somewhat "cache" inbox and scheduled tasks. 
+     */
+    struct {
+        List *visible_tasks, *archived_tasks;
+    } inbox_perspective, scheduled_perspective;
 } Secretary;
 
 Secretary *secretary_new();
@@ -42,12 +49,5 @@ void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);
 
 void secretary_free(Secretary *secretary);
-
-#ifdef _SECRETARY_FRIEND_MODULE
-/**
- * A "friend" interface for internal purproses. It should not be used by
- * libsecretary clients but only by libsecretary modules themselves.
- */
-#endif
 
 #endif

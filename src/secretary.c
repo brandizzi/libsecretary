@@ -5,9 +5,13 @@
 #include <stdbool.h>
 
 Secretary *secretary_new() {
-    Secretary *secretary = malloc(sizeof(Secretary));
+    Secretary *secretary = calloc(1, sizeof(Secretary));
     secretary->tasks = list_new();
     secretary->projects = list_new();
+    secretary->inbox_perspective.visible_tasks = list_new();
+    secretary->inbox_perspective.archived_tasks = list_new();
+    secretary->scheduled_perspective.visible_tasks = list_new();
+    secretary->scheduled_perspective.archived_tasks = list_new();
     return secretary;
 }
 
@@ -15,6 +19,8 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     Task *task = task_new(list_count_items(secretary->tasks)+1, description);
     task->secretary = secretary;
     list_add_item(secretary->tasks, task);
+    // Registering in inbox
+    list_add_item(secretary->inbox_perspective.visible_tasks, task);
     return task;
 }
 
@@ -214,4 +220,32 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
     }
     return NULL;
 }
+
+/* INTERNAL INTERFACE: functions which should never be used by secretary clients
+ */
+void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
+    if (secretary) {
+        list_add_item(secretary->inbox_perspective.visible_tasks, task);
+    }
+}
+
+void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
+    if (secretary) {
+        list_remove_item(secretary->inbox_perspective.visible_tasks, task);
+    }
+}
+
+void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
+    if (secretary) {
+        list_add_item(secretary->scheduled_perspective.visible_tasks, task);
+    }
+}
+
+void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
+    if (secretary) {
+        list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
+    }
+}
+
+
 
