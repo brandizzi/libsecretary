@@ -187,6 +187,24 @@ static void test_optimization_requisites_register_in_inbox(CuTest *test) {
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
 
+    time_t now;
+    task->scheduled_for = *localtime(&now);
+    task->scheduled = true;
+
+    // Should not register to inbox because is scheduled
+    _secretary_register_in_inbox(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+
+    task->scheduled = false;
+    // Should not be registered in inbox - has project
+    Project *project = project_new("project");
+    project_add_task(project, task);
+
+    _secretary_register_in_inbox(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+
 
     secretary_free(secretary);
 }
@@ -201,8 +219,13 @@ static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->scheduled_perspective.visible_tasks));
 
-    _secretary_register_in_scheduled(secretary, task);
+    time_t now;
+    task->scheduled_for = *localtime(&now);
+    task->scheduled = true;
 
+    // Should  register in scheduled
+    _secretary_register_in_scheduled(secretary, task);
+    
     CuAssertIntEquals(test, 1, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
     CuAssertIntEquals(test, 1, 
@@ -212,6 +235,12 @@ static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
 
     _secretary_unregister_from_scheduled(secretary, task);
 
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+
+    task->scheduled = false;
+    // Should not register - task is not scheduled
+    _secretary_register_in_scheduled(secretary, task);
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->scheduled_perspective.visible_tasks));
 

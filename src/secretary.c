@@ -224,7 +224,7 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
 void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
-    if (secretary) {
+    if (secretary && (task_is_in_inbox(task, true) || task_is_in_inbox(task, false))) {
         list_add_item(secretary->inbox_perspective.visible_tasks, task);
     }
 }
@@ -236,7 +236,7 @@ void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
 }
 
 void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
-    if (secretary) {
+    if (secretary && task_is_scheduled(task)) {
         list_add_item(secretary->scheduled_perspective.visible_tasks, task);
     }
 }
