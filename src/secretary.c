@@ -246,13 +246,21 @@ void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
 
 void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
     if (secretary && task_is_scheduled(task)) {
-        list_add_item(secretary->scheduled_perspective.visible_tasks, task);
+        if (task_is_archived(task)) {
+            list_add_item(secretary->scheduled_perspective.archived_tasks, task);
+        } else {
+            list_add_item(secretary->scheduled_perspective.visible_tasks, task);
+        }
     }
 }
 
 void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
     if (secretary) {
-        list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
+        if (task_is_archived(task)) {
+            list_remove_item(secretary->scheduled_perspective.archived_tasks, task);
+        } else {
+            list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
+        }
     }
 }
 

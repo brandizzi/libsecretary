@@ -290,6 +290,39 @@ static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
     secretary_free(secretary);
 }
 
+static void test_optimization_requisites_register_archived_in_scheduled(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task = task_new(0, "task");
+    time_t now;
+    task->scheduled_for = *localtime(&now);
+    task->scheduled = true;
+
+    task->done = task->archived = true;
+
+    // Should  register in scheduled
+    _secretary_register_in_scheduled(secretary, task);
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->scheduled_perspective.archived_tasks, 0));
+
+    _secretary_unregister_from_scheduled(secretary, task);
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+
+    task->scheduled = false;
+    // Should not register - task is not scheduled
+    _secretary_register_in_scheduled(secretary, task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
@@ -299,5 +332,6 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_do_not_go_to_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_scheduled);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_scheduled);
     return suite;
 }
