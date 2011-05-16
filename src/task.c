@@ -92,9 +92,7 @@ void task_unschedule(Task *task) {
     task->scheduled = false;
     // For secretary optimization
     _secretary_unregister_from_scheduled(task->secretary, task);
-    if (task_is_in_inbox(task, true) || task_is_in_inbox(task, false)) {
-        _secretary_register_in_inbox(task->secretary, task);
-    }
+    _secretary_register_in_inbox(task->secretary, task);
 }
 
 void task_mark_as_done(Task *task) {
