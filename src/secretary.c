@@ -1,4 +1,5 @@
 #include <secretary/secretary.h>
+#include <secretary/_internal/secretary.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -63,6 +64,10 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
         project_remove_task(project, task);
     }
     list_remove_item(secretary->tasks, task);
+
+    _secretary_unregister_from_inbox(secretary, task);
+    _secretary_unregister_from_scheduled(secretary, task);
+
     task_free(task);
 }
 
@@ -72,12 +77,11 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
-    int counter = 0;
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        if (task_is_in_inbox(list_get_nth_item(secretary->tasks, i), archived))
-            counter++;
+    if (archived) {
+        return list_count_items(secretary->inbox_perspective.archived_tasks);
+    } else {
+        return list_count_items(secretary->inbox_perspective.visible_tasks);
     }
-    return counter;
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
