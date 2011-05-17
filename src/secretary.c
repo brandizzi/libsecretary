@@ -264,5 +264,28 @@ void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
     }
 }
 
+void _secretary_switch_list_in_inbox_perspective(Secretary *secretary, Task *task) {
+    if (secretary) {
+        if (task_is_in_inbox(task, true)) {
+            list_remove_item(secretary->inbox_perspective.visible_tasks, task);
+            list_add_item(secretary->inbox_perspective.archived_tasks, task);
+        } else if (task_is_in_inbox(task, false)) {
+            list_remove_item(secretary->inbox_perspective.archived_tasks, task);
+            list_add_item(secretary->inbox_perspective.visible_tasks, task);
+        }
+    }
+}
+
+void _secretary_switch_list_in_scheduled_perspective(Secretary *secretary, Task *task) {
+    if (secretary && task_is_scheduled(task)) {
+        if (task_is_archived(task)) {
+            list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
+            list_add_item(secretary->scheduled_perspective.archived_tasks, task);
+        } else {
+            list_remove_item(secretary->scheduled_perspective.archived_tasks, task);
+            list_add_item(secretary->scheduled_perspective.visible_tasks, task);
+        }
+    }
+}
 
 

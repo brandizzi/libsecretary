@@ -45,9 +45,9 @@ static void test_optimization_requisites_secretary_perspectives(CuTest *test) {
 }
 
 /**
- * Ensures that a secretary has some lists to store inbox and scheduled tasks.
- * It will ease the process of efficiently retrieve some of the tasks in inbox
- * and scheduled ones.
+ * Ensures that a secretary creates tasks putting them in inbox perspective and
+ * remove them from it when it is the case (the task is scheduled and/or
+ * added to a project.
  */
 static void test_optimization_requisites_inbox_perspective(CuTest *test) {
     Secretary *secretary = secretary_new();
@@ -95,6 +95,54 @@ static void test_optimization_requisites_inbox_perspective(CuTest *test) {
             list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
     CuAssertPtrEquals(test, task1, 
             list_get_nth_item(secretary->inbox_perspective.visible_tasks, 1));
+
+    secretary_free(secretary);
+}
+
+/**
+ * Ensures that a secretary moves a task to scheduled perspective when it is
+ * scheduled.
+ */
+static void test_optimization_requisites_scheduled_perspective(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    Task *task = secretary_create_task(secretary, "task 1");
+    // All in inbox
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+    // Scheduled task not in inbox anymore
+    time_t now = time(NULL);
+    task_schedule(task, *localtime(&now));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+    // Project-related task nt in inbox anymore
+    Project *project = secretary_create_project(secretary, "project");
+    project_add_task(project, task);
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+    // Removed from project - returns to inbox
+    project_remove_task(project, task);
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+
+    task_unschedule(task);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
 
     secretary_free(secretary);
 }
@@ -323,15 +371,168 @@ static void test_optimization_requisites_register_archived_in_scheduled(CuTest *
     secretary_free(secretary);
 }
 
+/**
+ * Ensures that a secretary manages correctly the archival of a task in inbox.
+ */
+static void test_optimization_requisites_inbox_archived(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    Task *task1 = secretary_create_task(secretary, "task 1"),
+        *task2 = secretary_create_task(secretary, "task 2");
+    // All in inbox
+    CuAssertIntEquals(test, 2, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 1));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    // Do some task
+    task_mark_as_done(task1);
+    task_mark_as_done(task2);
+    // Nothing changes
+    CuAssertIntEquals(test, 2, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 1));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    // Archive this tasks
+    task_archive(task1);
+    // One less task in visible tasks
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    // One task in archived tasks
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->inbox_perspective.archived_tasks, 0));
+
+    // Undo task
+    task_unmark_as_done(task1);
+    // Returns to initial configuration... except that tasks change order.
+    CuAssertIntEquals(test, 2, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 1));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    
+    secretary_free(secretary);
+}
+
+/**
+ * Ensures that a secretary creates tasks putting them in inbox perspective and
+ * remove them from it when it is the case (the task is scheduled and/or
+ * added to a project.
+ */
+static void test_optimization_requisites_switch_list(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+
+    Task *task1 = secretary_create_task(secretary, "task 1"),
+        *task2 = secretary_create_task(secretary, "task 2");
+    // All in inbox
+    CuAssertIntEquals(test, 2, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 1));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+    // Scheduled task not in inbox anymore
+    time_t now = time(NULL);
+    task_schedule(task1, *localtime(&now));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+
+    // Archive tasks
+    task1->done = task1->archived = true;
+    task2->done = task2->archived = true;
+    // Now, switch
+    _secretary_switch_list_in_inbox_perspective(secretary, task1);
+    _secretary_switch_list_in_scheduled_perspective(secretary, task2);
+
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.archived_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->scheduled_perspective.archived_tasks, 0));
+
+    // Now returns to previous state...
+    task1->archived = false;
+    task2->archived = false;
+    // ...and switch again
+    _secretary_switch_list_in_inbox_perspective(secretary, task1);
+    _secretary_switch_list_in_scheduled_perspective(secretary, task2);
+    // Should return to previous situation
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertIntEquals(test, 1, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
     SUITE_ADD_TEST(suite, test_optimization_requisites_secretary_perspectives);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_perspective);
+        SUITE_ADD_TEST(suite, test_optimization_requisites_scheduled_perspective);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_do_not_go_to_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_scheduled);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_scheduled);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_archived);
     return suite;
 }

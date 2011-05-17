@@ -97,11 +97,18 @@ void task_unschedule(Task *task) {
 
 void task_mark_as_done(Task *task) {
     task->done = true;
+    // For secretary optimization
 }
 
 void task_unmark_as_done(Task *task) {
+    bool was_archived = task->archived;
     task->done = false;
     task->archived = false;
+    // For secretary optimization
+    if (was_archived) {
+        _secretary_switch_list_in_inbox_perspective(task->secretary, task);
+        _secretary_switch_list_in_scheduled_perspective(task->secretary, task);
+    }
 }
 
 void task_switch_done_status(Task *task) {
@@ -113,7 +120,12 @@ bool task_is_done(Task *task) {
 }
 
 void task_archive(Task *task) {
+    bool was_archived = task->archived;
     task->archived = task->done && true;
+    if (!was_archived) {
+        _secretary_switch_list_in_inbox_perspective(task->secretary, task);
+        _secretary_switch_list_in_scheduled_perspective(task->secretary, task);
+    }
 }
 
 bool task_is_archived(Task *task) {
