@@ -483,8 +483,8 @@ static void test_optimization_requisites_switch_list(CuTest *test) {
     task1->done = task1->archived = true;
     task2->done = task2->archived = true;
     // Now, switch
-    _secretary_switch_list_in_inbox_perspective(secretary, task1);
-    _secretary_switch_list_in_scheduled_perspective(secretary, task2);
+    _secretary_switch_list_in_inbox_perspective(secretary, task2);
+    _secretary_switch_list_in_scheduled_perspective(secretary, task1);
 
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
@@ -503,8 +503,8 @@ static void test_optimization_requisites_switch_list(CuTest *test) {
     task1->archived = false;
     task2->archived = false;
     // ...and switch again
-    _secretary_switch_list_in_inbox_perspective(secretary, task1);
-    _secretary_switch_list_in_scheduled_perspective(secretary, task2);
+    _secretary_switch_list_in_inbox_perspective(secretary, task2);
+    _secretary_switch_list_in_scheduled_perspective(secretary, task1);
     // Should return to previous situation
     CuAssertIntEquals(test, 1, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
@@ -534,5 +534,6 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_scheduled);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_scheduled);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_archived);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_switch_list);
     return suite;
 }
