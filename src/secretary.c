@@ -122,6 +122,12 @@ void secretary_free(Secretary *secretary) {
 }
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
+    if (archived) {
+        return list_count_items(secretary->scheduled_perspective.archived_tasks);
+    } else {
+        return list_count_items(secretary->scheduled_perspective.visible_tasks);
+    }
+
     int counter = 0;
     for (int i = 0; i < list_count_items(secretary->tasks); i++) {
         Task *task = list_get_nth_item(secretary->tasks, i);
