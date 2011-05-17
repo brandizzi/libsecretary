@@ -135,12 +135,9 @@ int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
     int counter = 0;
     List *list = _secretary_get_list_from_perspective(
             secretary->scheduled_perspective, archived);
-    for (int i = 0; i < list_count_items(list); i++) {
-        Task *task = list_get_nth_item(list, i);
-        if (task_is_scheduled_for(task, date) 
-                && task_is_archived(task) == archived) {
-           counter++;
-        }
+    for (counter = 0; counter < list_count_items(list); counter++) {
+        Task *task = list_get_nth_item(list, counter);
+        if (!task_is_scheduled_for(task, date)) break;
     }
     return counter;
 }
