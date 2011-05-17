@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef int (*UtilComparator)(const void *item1, const void *item2);
+
 char *util_copy_string(const char *string);
 char *util_read_string(FILE *file);
 void util_write_string(FILE *file, const char *string);

@@ -207,8 +207,12 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     CuAssertIntEquals(test, 2, 
             secretary_count_tasks_scheduled_for(secretary, date, false));
 
+    // snd task first because it is early than fst task
     Task *task = secretary_get_nth_task_scheduled_for(secretary, date, 0, false);
+    CuAssertStrEquals(test, "Create snd task", task_get_description(task));
+    task = secretary_get_nth_task_scheduled_for(secretary, date, 1, false);
     CuAssertStrEquals(test, "Create first task", task_get_description(task));
+    // For today
     task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
     CuAssertStrEquals(test, "Create snd task", task_get_description(task));
     task = secretary_get_nth_inbox_task(secretary, 0, false);
@@ -260,10 +264,16 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
             secretary_count_tasks_scheduled_for(secretary, date, false));
 
     Task *task = secretary_get_nth_task_scheduled_for(secretary, date, 0, false);
+    // Buy pequi comes first because it is scheduled for earlier
+    CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
+    task = secretary_get_nth_task_scheduled_for(secretary, date, 1, false);
     CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
+
+    // For today
     task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));

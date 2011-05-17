@@ -1,5 +1,6 @@
 #include <secretary/test/optimization_requisites.h>
 #include <secretary/_internal/secretary.h>
+#include <secretary/_internal/task.h>
 
 /**
  * Ensures that each task knows its secretary.
@@ -525,7 +526,7 @@ static void test_optimization_requisites_switch_list(CuTest *test) {
 /**
  * Tests functions for getting lists from perspectives
  */
-static void test_optimization_requisites_get_list(CuTest *test) {
+static void test_optimization_requisites_secretary_get_list_from_perspective(CuTest *test) {
     Secretary *secretary = secretary_new();
 
     CuAssertPtrNotNull(test, secretary->inbox_perspective.visible_tasks);
@@ -555,19 +556,142 @@ static void test_optimization_requisites_get_list(CuTest *test) {
     secretary_free(secretary);
 }
 
+static void test_optimization_requisites_task_compare_by_date(CuTest *test) {
+    Task *task1 = task_new(0, "task 1"),
+        *task2 = task_new(0, "task 2"),
+        *task3 = task_new(0, "task 3");
+
+    time_t now = time(NULL);
+    struct tm date = *localtime(&now);
+
+    task_schedule(task1, date);
+    task_schedule(task2, date);
+    date.tm_mday += 5;
+    // Greater date
+    task_schedule(task3, date);
+
+    CuAssertIntEquals(test, 0, _task_compare_by_date(&task1, &task2));
+    CuAssertTrue(test, _task_compare_by_date(&task1, &task3) < 0);
+    CuAssertTrue(test, _task_compare_by_date(&task3, &task1) > 0);
+}
+
+/**
+ * Ensures that the scheduled tasks are ordered by date in spite of the order
+ * they are scheduled
+ */
+static void test_optimization_requisites_scheduled_ordered_by_date(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "task 1"),
+        *task2 = secretary_create_task(secretary, "task 2"),
+        *task3 = secretary_create_task(secretary, "task 3"),
+        *task4 = secretary_create_task(secretary, "task 4"),
+        *task5 = secretary_create_task(secretary, "task 5");
+
+   time_t now = time(NULL);
+    struct tm date = *localtime(&now);
+
+    date.tm_mday = 4;
+    task_schedule(task4, date);
+    date.tm_mday = 1;
+    task_schedule(task1, date);
+    date.tm_mday = 3;
+    task_schedule(task3, date);
+    date.tm_mday = 5;
+    task_schedule(task5, date);
+    date.tm_mday = 2;
+    task_schedule(task2, date);
+
+    CuAssertIntEquals(test, 5, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+
+    CuAssertPtrEquals(test, task1, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 0));
+    CuAssertPtrEquals(test, task2, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 1));
+    CuAssertPtrEquals(test, task3, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 2));
+    CuAssertPtrEquals(test, task4, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 3));
+    CuAssertPtrEquals(test, task5, 
+            list_get_nth_item(secretary->scheduled_perspective.visible_tasks, 4));
+
+}
+
+/**
+ * Tests list_sort() using _task_compare_by_date.
+ */
+static void test_optimization_requisites_list_sort_task_by_date(CuTest *test) {
+    Task *task1 = task_new(0, "task 1"),
+         *task2 = task_new(0, "task 2"),
+         *task3 = task_new(0, "task 3"),
+         *task4 = task_new(0, "task 4"),
+         *task5 = task_new(0, "task 5");
+
+    time_t now = time(NULL);
+    struct tm date = *localtime(&now);
+
+    List *list = list_new();
+    date.tm_mday = 4;
+    task_schedule(task4, date);
+    list_add_item(list, task4);
+
+    date.tm_mday = 1;
+    task_schedule(task1, date);
+    list_add_item(list, task1);
+    
+    date.tm_mday = 3;
+    task_schedule(task3, date);
+    list_add_item(list, task3);
+    
+    date.tm_mday = 5;
+    task_schedule(task5, date);
+    list_add_item(list, task5);
+    
+    date.tm_mday = 2;
+    task_schedule(task2, date);
+    list_add_item(list, task2);
+
+    CuAssertPtrEquals(test, task4, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, task1, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, task3, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, task5, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, task2, list_get_nth_item(list, 4));
+
+    list_sort(list, _task_compare_by_date);
+
+    CuAssertPtrEquals(test, task1, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, task2, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, task3, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, task4, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, task5, list_get_nth_item(list, 4));
+
+    list_free(list);
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+    task_free(task4);
+    task_free(task5);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
     SUITE_ADD_TEST(suite, test_optimization_requisites_secretary_perspectives);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_perspective);
-        SUITE_ADD_TEST(suite, test_optimization_requisites_scheduled_perspective);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_scheduled_perspective);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_do_not_go_to_inbox);
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_in_scheduled);
-    SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_scheduled);
+    SUITE_ADD_TEST(suite, 
+            test_optimization_requisites_register_archived_in_scheduled);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_archived);
     SUITE_ADD_TEST(suite, test_optimization_requisites_switch_list);
-    SUITE_ADD_TEST(suite, test_optimization_requisites_get_list);
+    SUITE_ADD_TEST(suite, 
+            test_optimization_requisites_secretary_get_list_from_perspective);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_task_compare_by_date);
+    SUITE_ADD_TEST(suite, 
+        test_optimization_requisites_scheduled_ordered_by_date);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_list_sort_task_by_date);
     return suite;
 }

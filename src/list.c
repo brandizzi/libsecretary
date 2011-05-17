@@ -49,6 +49,12 @@ void list_free(List *list) {
     free(list);
 }
 
+void list_sort(List *list, UtilComparator comparator) {
+    qsort(list->items, list->number_of_items, sizeof(void*), comparator);
+}
+
+/* PRIVATE FUNCTIONS */
+
 static void list_expand(List *list) {
     list->space *= 2;
     list->items = realloc(list->items, list->space*sizeof(void*));

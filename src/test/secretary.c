@@ -343,6 +343,8 @@ void test_secretary_schedule(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for_today(secretary, false));
 
     Task *task = secretary_get_nth_task_scheduled_for(secretary, future_date, 0, false);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, future_date, 1, false);
     CuAssertPtrEquals(test, task1, task);
 
     CuAssertIntEquals(test, secretary_count_tasks_scheduled_for_today(secretary, false), 1);    
@@ -375,11 +377,16 @@ void test_secretary_late_scheduled_appears_in_today(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for(secretary, past_date, false));
 
     Task *task = secretary_get_nth_task_scheduled_for(secretary, future_date, 0, false);
-    CuAssertPtrEquals(test, task1, task);
-    task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
-    CuAssertPtrEquals(test, task2, task);
-    task = secretary_get_nth_task_scheduled_for_today(secretary, 1, false);
     CuAssertPtrEquals(test, task3, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, future_date, 1, false);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, future_date, 2, false);
+    CuAssertPtrEquals(test, task1, task);
+
+    task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
+    CuAssertPtrEquals(test, task3, task);
+    task = secretary_get_nth_task_scheduled_for_today(secretary, 1, false);
+    CuAssertPtrEquals(test, task2, task);
 
     secretary_free(secretary);
 }
@@ -412,14 +419,19 @@ void test_secretary_unschedule_task(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for_today(secretary, false));
 
     Task *task = secretary_get_nth_task_scheduled_for(secretary, date, 0, false);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, date, 1, false);
     CuAssertPtrEquals(test, task1, task);
+
     task = secretary_get_nth_task_scheduled(secretary, 0, false);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_task_scheduled(secretary, 1, false);
     CuAssertPtrEquals(test, task1, task);
     
     task = secretary_get_nth_task_scheduled_for_today(secretary, 0, false);
     CuAssertPtrEquals(test, task2, task);
     task = secretary_get_nth_task_scheduled(secretary, 1, false);
-    CuAssertPtrEquals(test, task2, task);
+    CuAssertPtrEquals(test, task1, task);
 
     task_unschedule(task1);
     // One more in inbox, since it returns

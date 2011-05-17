@@ -12,7 +12,7 @@ Project *project_new(const char *name) {
 }
 
 void project_add_task(Project *project, Task *task) {
-    bool was_in_inbox = task_is_in_inbox(task, true) || task_is_in_inbox(task, false);
+    bool was_in_inbox = task_is_in_inbox(task);
     task_unset_project(task);
     list_add_item(project->tasks, task);
     task->project = project;
@@ -57,7 +57,7 @@ void project_remove_task(Project *project, Task *task) {
     list_remove_item(project->tasks, task);
     task->project = NULL;
     // For secretary optimization
-    if (task_is_in_inbox(task, true) || task_is_in_inbox(task, false)) {
+    if (task_is_in_inbox(task)) {
         _secretary_register_in_inbox(task->secretary, task);
     }
 }

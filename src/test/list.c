@@ -91,6 +91,41 @@ static void test_list_remove_item(CuTest *test) {
     list_free(list);
 }
 
+static int intcomp(const void *i1, const void *i2) {
+    return *(int*)i2 - *(int*)i1;
+}
+
+static void test_list_sort(CuTest *test) {
+    List *list = list_new();
+
+    int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
+
+    list_add_item(list, &i1);
+    list_add_item(list, &i4);
+    list_add_item(list, &i3);
+    list_add_item(list, &i5);
+    list_add_item(list, &i2);
+
+    CuAssertIntEquals(test, list_count_items(list), 5);
+    CuAssertPtrEquals(test, &i1, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, &i4, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, &i3, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, &i5, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, &i2, list_get_nth_item(list, 4));
+
+
+    list_sort(list, intcomp);
+
+    CuAssertIntEquals(test, list_count_items(list), 5);
+    CuAssertPtrEquals(test, &i1, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, &i2, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, &i3, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, &i4, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, &i5, list_get_nth_item(list, 4));
+
+    list_free(list);
+}
+
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
@@ -98,5 +133,6 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_add_items);
     SUITE_ADD_TEST(suite, test_list_add_a_lot);
     SUITE_ADD_TEST(suite, test_list_remove_item);
+    SUITE_ADD_TEST(suite, test_list_sort);
     return suite;
 }

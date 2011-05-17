@@ -1,5 +1,6 @@
 #include <secretary/secretary.h>
 #include <secretary/_internal/secretary.h>
+#include <secretary/_internal/task.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -83,17 +84,14 @@ int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        if (task_is_in_inbox(list_get_nth_item(secretary->tasks, i), archived)) {
-            if (n-- == 0) return list_get_nth_item(secretary->tasks, i);
-        }
-    }
-    return NULL;
+    List *list = _secretary_get_list_from_perspective(
+            secretary->inbox_perspective, archived);
+    return list_get_nth_item(list, n);
 }
 
 void secretary_archive_inbox_tasks(Secretary *secretary) {
     List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, false);
+            secretary->inbox_perspective, false);
     for (int i = 0; i < list_count_items(list); i++) {
         Task *task = list_get_nth_item(list, i);
         if (task_is_done(task)) {
@@ -232,66 +230,62 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
  */
 void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
     if (secretary) {
-        if (task_is_in_inbox(task, false)) {
-            list_add_item(secretary->inbox_perspective.visible_tasks, task);
-        } else if (task_is_in_inbox(task, true)) {
-            list_add_item(secretary->inbox_perspective.archived_tasks, task);
+        if (task_is_in_inbox(task)) {
+            List *list = _secretary_get_list_from_perspective(
+                secretary->inbox_perspective, task->archived);
+            list_add_item(list, task);
         }
     }
 }
 
 void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
     if (secretary) {
-        if (task_is_archived(task)) {
-            list_remove_item(secretary->inbox_perspective.archived_tasks, task);
-        } else {
-            list_remove_item(secretary->inbox_perspective.visible_tasks, task);
-        }
-        
+        List *list = _secretary_get_list_from_perspective(
+                secretary->inbox_perspective, task->archived);
+        list_remove_item(list, task);
     }
 }
 
 void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
     if (secretary && task_is_scheduled(task)) {
-        if (task_is_archived(task)) {
-            list_add_item(secretary->scheduled_perspective.archived_tasks, task);
-        } else {
-            list_add_item(secretary->scheduled_perspective.visible_tasks, task);
-        }
+        List *list = _secretary_get_list_from_perspective(
+                secretary->scheduled_perspective, task->archived);
+        list_add_item(list, task);
+        // The schedule lists should always be sorted
+        list_sort(list, _task_compare_by_date);
     }
 }
 
 void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
     if (secretary) {
-        if (task_is_archived(task)) {
-            list_remove_item(secretary->scheduled_perspective.archived_tasks, task);
-        } else {
-            list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
-        }
+        List *list = _secretary_get_list_from_perspective(
+                secretary->scheduled_perspective, task->archived);
+        list_remove_item(list, task);
     }
 }
 
 void _secretary_switch_list_in_inbox_perspective(Secretary *secretary, Task *task) {
-    if (secretary) {
-        if (task_is_in_inbox(task, true)) {
-            list_remove_item(secretary->inbox_perspective.visible_tasks, task);
-            list_add_item(secretary->inbox_perspective.archived_tasks, task);
-        } else if (task_is_in_inbox(task, false)) {
-            list_remove_item(secretary->inbox_perspective.archived_tasks, task);
-            list_add_item(secretary->inbox_perspective.visible_tasks, task);
-        }
+    if (secretary && task_is_in_inbox(task)) {
+        List *origin = _secretary_get_list_from_perspective(
+                secretary->inbox_perspective, !task->archived),
+             *destination = _secretary_get_list_from_perspective(
+                secretary->inbox_perspective, task->archived);
+        list_remove_item(origin, task);
+        list_add_item(destination, task);
     }
 }
 
 void _secretary_switch_list_in_scheduled_perspective(Secretary *secretary, Task *task) {
     if (secretary && task_is_scheduled(task)) {
-        if (task_is_archived(task)) {
-            list_remove_item(secretary->scheduled_perspective.visible_tasks, task);
-            list_add_item(secretary->scheduled_perspective.archived_tasks, task);
-        } else {
-            list_remove_item(secretary->scheduled_perspective.archived_tasks, task);
-            list_add_item(secretary->scheduled_perspective.visible_tasks, task);
-        }
+        List *origin = _secretary_get_list_from_perspective(
+                secretary->scheduled_perspective, !task->archived),
+             *destination = _secretary_get_list_from_perspective(
+                secretary->scheduled_perspective, task->archived);
+        list_remove_item(origin, task);
+        list_add_item(destination, task);
+        // The schedule lists should always be sorted
+        list_sort(destination, _task_compare_by_date);
+
     }
 }
 

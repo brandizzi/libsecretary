@@ -53,13 +53,12 @@ void task_unset_project(Task *task) {
     project_remove_task(task->project, task);
 }
 
-bool task_is_in_inbox(Task *task, bool archived) {
-#warning Remove bool archived from signature.
-    return task->project == NULL && !task->scheduled && task->archived == archived;
+bool task_is_in_inbox(Task *task) {
+    return task->project == NULL && !task->scheduled;
 }
 
 void task_schedule(Task *task, struct tm date) {
-    bool was_in_inbox = task_is_in_inbox(task, true) || task_is_in_inbox(task, false),
+    bool was_in_inbox = task_is_in_inbox(task),
         was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
     task->scheduled_for = date;
@@ -97,7 +96,6 @@ void task_unschedule(Task *task) {
 
 void task_mark_as_done(Task *task) {
     task->done = true;
-    // For secretary optimization
 }
 
 void task_unmark_as_done(Task *task) {
@@ -138,4 +136,11 @@ void task_free(Task *task) {
     }
     free(task->description);
     free(task);
+}
+
+/* THE FOLLOWING FUNCTIONS SHOULD NOT BE USED BY EXTERNAL CLIENTS */
+
+int _task_compare_by_date(const void *p1, const void* p2) {
+    Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;
+    return mktime(&(task1->scheduled_for)) - mktime(&(task2->scheduled_for));
 }
