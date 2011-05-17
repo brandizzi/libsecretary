@@ -118,32 +118,27 @@ void secretary_free(Secretary *secretary) {
     for (int i = 0; i < list_count_items(secretary->tasks); i++) {
         task_free(list_get_nth_item(secretary->tasks, i));
     }
+    list_free(secretary->inbox_perspective.archived_tasks);
+    list_free(secretary->inbox_perspective.visible_tasks);
+    list_free(secretary->scheduled_perspective.archived_tasks);
+    list_free(secretary->scheduled_perspective.visible_tasks);
     free(secretary);
 }
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
-    if (archived) {
-        return list_count_items(secretary->scheduled_perspective.archived_tasks);
-    } else {
-        return list_count_items(secretary->scheduled_perspective.visible_tasks);
-    }
-
-    int counter = 0;
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_scheduled(task) && task_is_archived(task) == archived) {
-            counter++;
-        }
-    }
-    return counter;
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, archived);
+    return list_count_items(list);
 }
 
 
 int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
             bool archived) {
     int counter = 0;
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, archived);
+    for (int i = 0; i < list_count_items(list); i++) {
+        Task *task = list_get_nth_item(list, i);
         if (task_is_scheduled_for(task, date) 
                 && task_is_archived(task) == archived) {
            counter++;
@@ -158,16 +153,20 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary,
 }
 
 void secretary_archive_scheduled_tasks(Secretary *secretary) {
-   for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_done(task) && task_is_scheduled(task)) {
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, false);
+   for (int i = 0; i < list_count_items(list); i++) {
+        Task *task = list_get_nth_item(list, i);
+        if (task_is_done(task)) {
             task_archive(task);
         }
     }
 }
 void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, false);
+    for (int i = 0; i < list_count_items(list); i++) {
+        Task *task = list_get_nth_item(list, i);
         if (task_is_done(task) && 
                 task_is_scheduled_for(task, date)) {
             task_archive(task);
@@ -181,19 +180,17 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_scheduled(task) && task_is_archived(task) == archived) {
-            if (n-- == 0) return list_get_nth_item(secretary->tasks, i);
-        }
-    }
-    return NULL;
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, archived);
+    return list_get_nth_item(list, n);
 }
 
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, 
         int n, bool archived) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, archived);
+    for (int i = 0; i < list_count_items(list); i++) {
+        Task *task = list_get_nth_item(list, i);
         if (task_is_scheduled_for(task, date) 
                 && task_is_archived(task) == archived) {
             if (n-- == 0) return task;
@@ -298,4 +295,12 @@ void _secretary_switch_list_in_scheduled_perspective(Secretary *secretary, Task 
     }
 }
 
+List *_secretary_get_list_from_perspective(_SecretaryPerspective perspective,
+        bool archived) {
+    if (archived) {
+        return perspective.archived_tasks;
+    } else {
+        return perspective.visible_tasks;
+    }
+}
 

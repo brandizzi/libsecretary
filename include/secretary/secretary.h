@@ -6,15 +6,20 @@
 #include <secretary/list.h>
 #include <time.h>
 
+/**
+ * This is a private data type that should not be used by secretary clients
+ */ 
+typedef struct _SecretaryPerspective {
+    List *archived_tasks, *visible_tasks;
+} _SecretaryPerspective;
+
 typedef struct Secretary {
     List *tasks, *projects;
     /**
      * This struct represents some perspectives of the secretary. It allows
      * secretary to somewhat "cache" inbox and scheduled tasks. 
      */
-    struct {
-        List *visible_tasks, *archived_tasks;
-    } inbox_perspective, scheduled_perspective;
+    struct _SecretaryPerspective inbox_perspective, scheduled_perspective;
 } Secretary;
 
 Secretary *secretary_new();

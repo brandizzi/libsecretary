@@ -7,6 +7,7 @@
 
 #include <secretary/secretary.h>
 
+
 void _secretary_register_in_inbox(Secretary *secretary, Task *task);
 void _secretary_unregister_from_inbox(Secretary *secretary, Task *task);
 
@@ -15,5 +16,8 @@ void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task);
 
 void _secretary_switch_list_in_inbox_perspective(Secretary *secretary, Task *task);
 void _secretary_switch_list_in_scheduled_perspective(Secretary *secretary, Task *task);
+
+List *_secretary_get_list_from_perspective(_SecretaryPerspective perspective,
+        bool archived);
 
 #endif

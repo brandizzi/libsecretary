@@ -522,6 +522,39 @@ static void test_optimization_requisites_switch_list(CuTest *test) {
     secretary_free(secretary);
 }
 
+/**
+ * Tests functions for getting lists from perspectives
+ */
+static void test_optimization_requisites_get_list(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    CuAssertPtrNotNull(test, secretary->inbox_perspective.visible_tasks);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.visible_tasks));
+    CuAssertPtrNotNull(test, secretary->inbox_perspective.archived_tasks);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->inbox_perspective.archived_tasks));
+    CuAssertPtrNotNull(test, secretary->scheduled_perspective.visible_tasks);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.visible_tasks));
+    CuAssertPtrNotNull(test, secretary->scheduled_perspective.archived_tasks);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->scheduled_perspective.archived_tasks));
+
+    CuAssertPtrEquals(test, secretary->inbox_perspective.visible_tasks,
+        _secretary_get_list_from_perspective(secretary->inbox_perspective, false));
+    CuAssertPtrEquals(test, secretary->inbox_perspective.archived_tasks,
+        _secretary_get_list_from_perspective(secretary->inbox_perspective, true));
+
+    CuAssertPtrEquals(test, secretary->scheduled_perspective.visible_tasks,
+        _secretary_get_list_from_perspective(secretary->scheduled_perspective, false));
+    CuAssertPtrEquals(test, secretary->scheduled_perspective.archived_tasks,
+        _secretary_get_list_from_perspective(secretary->scheduled_perspective, true));
+
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
@@ -535,5 +568,6 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, test_optimization_requisites_register_archived_in_scheduled);
     SUITE_ADD_TEST(suite, test_optimization_requisites_inbox_archived);
     SUITE_ADD_TEST(suite, test_optimization_requisites_switch_list);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_get_list);
     return suite;
 }
