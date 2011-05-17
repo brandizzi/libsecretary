@@ -77,11 +77,9 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
-    if (archived) {
-        return list_count_items(secretary->inbox_perspective.archived_tasks);
-    } else {
-        return list_count_items(secretary->inbox_perspective.visible_tasks);
-    }
+    List *list = _secretary_get_list_from_perspective(
+            secretary->inbox_perspective, archived);
+    return list_count_items(list);
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
@@ -94,9 +92,11 @@ Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
 }
 
 void secretary_archive_inbox_tasks(Secretary *secretary) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_done(task) && task_is_in_inbox(task, false)) {
+    List *list = _secretary_get_list_from_perspective(
+            secretary->scheduled_perspective, false);
+    for (int i = 0; i < list_count_items(list); i++) {
+        Task *task = list_get_nth_item(list, i);
+        if (task_is_done(task)) {
             task_archive(task);
         }
     }
