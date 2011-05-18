@@ -23,11 +23,11 @@ Notebook *notebook_new(const char *filename) {
                 notebook->major_version, notebook->minor_version);
         notebook->secretary = reader(file);
     } else {
-        notebook->major_version = PARSER_LATEST_MAJOR_VERSION;
-        notebook->minor_version = PARSER_LATEST_MINOR_VERSION;
         notebook->secretary = secretary_new();
 
     }
+    notebook->major_version = PARSER_LATEST_MAJOR_VERSION;
+    notebook->minor_version = PARSER_LATEST_MINOR_VERSION;
     return notebook;
 }
 
@@ -37,8 +37,6 @@ Secretary *notebook_get_secretary (Notebook *notebook) {
 
 void notebook_save(Notebook *notebook) {
     FILE *file = fopen(notebook->filename, "w");
-    putc(notebook->major_version, file);
-    putc(notebook->minor_version, file);
     ParserWriterFunction writer = parser_get_writer(
             notebook->major_version, notebook->minor_version);
     writer(notebook->secretary, file);

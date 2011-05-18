@@ -5,12 +5,14 @@ CFLAGS=${_CFLAGS} -Wall -std=c99
 CPPFLAGS=-Iinclude -Icutest
 
 LIBOBJS=secretary.o project.o task.o notebook.o parser.o util.o list.o
-TESTOBJS=test_secretary.o test_notebook.o test_task.o test_project.o test_list.o test_optimization_requisites.o CuTest.o
+TESTOBJS=test_secretary.o test_notebook.o test_task.o test_project.o \
+	test_list.o test_optimization_requisites.o test_parser.o CuTest.o
 
 TASK_DEPENDENCY_HEADERS=task.h util.h
 PROJECT_DEPENDENCY_HEADERS=project.h list.h ${TASK_DEPENDENCY_HEADERS}
 SECRETARY_DEPENDENCY_HEADERS=secretary.h ${PROJECT_DEPENDENCY_HEADERS}
-NOTEBOOK_DEPENDENCY_HEADERS=notebook.h ${SECRETARY_DEPENDENCY_HEADERS}
+PARSER_DEPENDENCY_HEADERS=parser.h ${SECRETARY_DEPENDENCY_HEADERS}
+NOTEBOOK_DEPENDENCY_HEADERS=notebook.h ${PARSER_DEPENDENCY_HEADERS}
 
 LIBNAME=libsecretary.a
 DYNAMIC_LIB_OPTION=-dynamiclib
@@ -28,6 +30,8 @@ test_secretary.o: test/secretary.c test/secretary.h ${SECRETARY_DEPENDENCY_HEADE
 test_project.o: test/project.c test/project.h ${PROJECT_DEPENDENCY_HEADERS}
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 test_task.o: test/task.c test/task.h ${TASK_DEPENDENCY_HEADERS}
+	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
+test_parser.o: test/parser.c test/parser.h ${PARSER_DEPENDENCY_HEADERS}
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 test_list.o: test/list.c test/list.h list.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@

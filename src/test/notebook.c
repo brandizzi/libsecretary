@@ -347,6 +347,41 @@ void test_notebook_save_done_tasks(CuTest *test) {
     remove("nofile");
 }
 
+void test_notebook_update_format(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test notebook");
+    task_mark_as_done(task);
+    task_archive(task);
+
+    // Opens an nonexistent file.
+    remove("nofile");
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction writer = parser_get_writer(1, 1);
+    writer(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // Retrieving it
+    Notebook *notebook = notebook_new("nofile");
+    secretary = notebook_get_secretary(notebook);
+
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
+
+    task = secretary_get_nth_inbox_task(secretary, 0, false);
+    CuAssertTrue(test, task_is_done(task));
+    // v1.1 does not preserver archival
+    CuAssertTrue(test, !task_is_archived(task));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
+    CuAssertStrEquals(test, "Test notebook", task_get_description(task));
+
+    CuAssertIntEquals(test, PARSER_LATEST_MAJOR_VERSION, notebook->major_version);
+    CuAssertIntEquals(test, PARSER_LATEST_MINOR_VERSION, notebook->minor_version);
+
+    notebook_free(notebook);
+    remove("nofile");
+}
+
 void test_notebook_free(CuTest *test) {
     // Opens an nonexistent file.
     remove("nofile");
@@ -368,6 +403,7 @@ CuSuite *test_notebook_suite() {
     SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks);
     SUITE_ADD_TEST(suite, test_notebook_save_scheduled_tasks_with_projects);
     SUITE_ADD_TEST(suite, test_notebook_save_done_tasks);
+    SUITE_ADD_TEST(suite, test_notebook_update_format);
     SUITE_ADD_TEST(suite, test_notebook_free);
     return suite;
 }
