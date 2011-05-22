@@ -706,6 +706,45 @@ void test_secretary_archive_inbox_tasks(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_archive_lots_of_inbox_tasks(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *tasks[] = {
+        secretary_create_task(secretary, "Create first task"),
+        secretary_create_task(secretary, "Create snd task"),
+        secretary_create_task(secretary, "Create thrid task"),
+        secretary_create_task(secretary, "Create fourth task"),
+        secretary_create_task(secretary, "Create fifth task"),
+        secretary_create_task(secretary, "Create sixth task"),
+        secretary_create_task(secretary, "Create seventh task"),
+        secretary_create_task(secretary, "Create eighth task"),
+        secretary_create_task(secretary, "Create nineth task"),
+        secretary_create_task(secretary, "Create tenth task")
+    };
+
+    for (int i = 0; i < 10; i+= 2) {
+        task_mark_as_done(tasks[i]);
+    }
+
+    secretary_archive_inbox_tasks(secretary);
+
+    CuAssertIntEquals(test, 5, secretary_count_inbox_tasks(secretary, false));
+    for (int i = 0; i < 5; i++) {
+        Task *task = secretary_get_nth_inbox_task(secretary, i, false);
+        CuAssertPtrEquals(test, task, tasks[i*2+1]);
+        
+    }
+
+    CuAssertIntEquals(test, 5, secretary_count_inbox_tasks(secretary, true));
+    for (int i = 0; i < 5; i++) {
+        Task *task = secretary_get_nth_inbox_task(secretary, i, true);
+        CuAssertPtrEquals(test, task, tasks[i*2]);
+        
+    }
+
+    secretary_free(secretary);
+}
+
+
 void test_secretary_archive_scheduled_task(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_create_task(secretary, "Create first task"),
@@ -832,6 +871,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_archived_scheduled);
     SUITE_ADD_TEST(suite, test_secretary_archived_done);
     SUITE_ADD_TEST(suite, test_secretary_archive_inbox_tasks);
+    SUITE_ADD_TEST(suite, test_secretary_archive_lots_of_inbox_tasks);
     SUITE_ADD_TEST(suite, test_secretary_archive_scheduled_task);
     return suite;
 }
