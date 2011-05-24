@@ -68,6 +68,8 @@ void task_schedule(Task *task, struct tm date) {
     }
     if (!was_scheduled) {
         _secretary_register_in_scheduled(task->secretary, task);
+    } else {
+        _secretary_sort_scheduled_tasks(task->secretary, task);
     }
 }
 

@@ -673,6 +673,80 @@ static void test_optimization_requisites_list_sort_task_by_date(CuTest *test) {
     task_free(task5);
 }
 
+/**
+ * Assures that the list of scheduled tasks is sorted when a task has its date
+ * changed.
+ */
+static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
+ Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "task 1"),
+        *task2 = secretary_create_task(secretary, "task 2"),
+        *task3 = secretary_create_task(secretary, "task 3"),
+        *task4 = secretary_create_task(secretary, "task 4"),
+        *task5 = secretary_create_task(secretary, "task 5");
+
+    time_t now = time(NULL);
+    struct tm date = *localtime(&now);
+
+    List *list = list_new();
+    date.tm_mday = 2;
+    task_schedule(task1, date);
+
+    date.tm_mday = 3;
+    task_schedule(task2, date);
+    
+    date.tm_mday = 4;
+    task_schedule(task3, date);
+    
+    date.tm_mday = 5;
+    task_schedule(task4, date);
+    
+    date.tm_mday = 7;
+    task_schedule(task5, date);
+    list_add_item(list, task5);
+
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 0, false));
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 2, false));
+    CuAssertPtrEquals(test, task4, secretary_get_nth_task_scheduled(secretary, 3, false));
+    CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 4, false));
+
+    date.tm_mday = 10;
+    task_schedule(task3, date);
+
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 0, false));
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));
+    CuAssertPtrEquals(test, task4, secretary_get_nth_task_scheduled(secretary, 2, false));
+    CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 3, false));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
+
+    date.tm_mday = 1;
+    task_schedule(task5, date);
+
+    CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 0, false));
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 1, false));
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 2, false));
+    CuAssertPtrEquals(test, task4, secretary_get_nth_task_scheduled(secretary, 3, false));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
+
+    date.tm_mday = 6;
+    task_schedule(task1, date);
+
+    CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 0, false));
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));
+    CuAssertPtrEquals(test, task4, secretary_get_nth_task_scheduled(secretary, 2, false));
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 3, false));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
+
+
+    list_free(list);
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+    task_free(task4);
+    task_free(task5);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
@@ -693,5 +767,6 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, 
         test_optimization_requisites_scheduled_ordered_by_date);
     SUITE_ADD_TEST(suite, test_optimization_requisites_list_sort_task_by_date);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_task_set_date_sort_list);
     return suite;
 }

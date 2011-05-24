@@ -248,9 +248,19 @@ void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
                 secretary->scheduled_perspective, task->archived);
         list_add_item(list, task);
         // The schedule lists should always be sorted
+        _secretary_sort_scheduled_tasks(secretary, task);
+    }
+}
+
+void _secretary_sort_scheduled_tasks(Secretary *secretary, Task *task) {
+    if (secretary && task_is_scheduled(task)) {
+        List *list = _secretary_get_list_from_perspective(
+                secretary->scheduled_perspective, task->archived);
+        // The schedule lists should always be sorted
         list_sort(list, _task_compare_by_date);
     }
 }
+
 
 void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
     if (secretary) {
