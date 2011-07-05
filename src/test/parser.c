@@ -44,7 +44,7 @@ static void test_parser_v1_2(CuTest *test) {
     task_mark_as_done(task2);
     task_mark_as_done(task3);
 
-    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
 
@@ -62,7 +62,7 @@ static void test_parser_v1_2(CuTest *test) {
     ParserReaderFunction reader = parser_get_reader(1, 2);
     secretary = reader(file);
 
-    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 2, 
             secretary_count_tasks_scheduled(secretary, false));
@@ -102,7 +102,9 @@ static void test_parser_v1_2_save_archival(CuTest *test) {
     secretary_archive_inbox_tasks(secretary);
     task_mark_as_done(task3);
 
-    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_tasks(secretary, false));
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, true));
+    CuAssertIntEquals(test, 3, secretary_count_all_tasks(secretary));
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, true));
 
@@ -119,7 +121,10 @@ static void test_parser_v1_2_save_archival(CuTest *test) {
     ParserReaderFunction reader = parser_get_reader(1, 2);
     secretary = reader(file);
 
-    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 2, secretary_count_tasks(secretary, false));
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, true));
+    CuAssertIntEquals(test, 3, secretary_count_all_tasks(secretary));
+
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, true));
 

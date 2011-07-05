@@ -30,7 +30,7 @@ static void test_optimization_requisites_task_points_secretary(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_create_task(secretary, "Test task creation");
     
-    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
 

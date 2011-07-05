@@ -45,7 +45,8 @@ typedef struct Secretary {
 
 Secretary *secretary_new();
 Task *secretary_create_task(Secretary *secretary, const char* description);
-int secretary_count_tasks(Secretary *secretary);
+int secretary_count_tasks(Secretary *secretary, bool archived);
+int secretary_count_all_tasks(Secretary *secretary);
 Task *secretary_get_task(Secretary *secretary, int number);
 Task *secretary_get_nth_task(Secretary *secretary, int n);
 

@@ -77,8 +77,8 @@ static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
         putw(mask, file);
         util_write_string(file, project_get_name(project));
     }
-    putw(secretary_count_tasks(secretary), file);
-    for (int i = 0; i < secretary_count_tasks(secretary); i++) {
+    putw(secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
         Task *task = secretary_get_nth_task(secretary, i);
         int mask = 0;
         if (task_get_project(task)) {
@@ -161,8 +161,8 @@ static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
         putw(mask, file);
         util_write_string(file, project_get_name(project));
     }
-    putw(secretary_count_tasks(secretary), file);
-    for (int i = 0; i < secretary_count_tasks(secretary); i++) {
+    putw(secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
         Task *task = secretary_get_nth_task(secretary, i);
         int mask = 0;
         if (task_get_project(task)) {

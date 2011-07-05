@@ -47,7 +47,19 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     return task;
 }
 
-int secretary_count_tasks(Secretary *secretary) {
+int secretary_count_tasks(Secretary *secretary, bool archived) {
+#warning to optimize (maybe using perspectives)
+    int counter = 0;
+    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
+        Task *task = list_get_nth_item(secretary->tasks, i);
+        if (task_is_archived(task) == archived) { 
+            counter++;
+        }
+    }
+    return counter;
+}
+
+int secretary_count_all_tasks(Secretary *secretary) {
     return list_count_items(secretary->tasks);
 }
 
