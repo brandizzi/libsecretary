@@ -870,8 +870,8 @@ void test_secretary_archive_scheduled_task(CuTest *test) {
 void test_secretary_count_tasks_archived(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_create_task(secretary, "Create first task"),
-         *task2 = secretary_create_task(secretary, "Create snd task"),
-         *task3 = secretary_create_task(secretary, "Create thrid task");
+         *task2 = secretary_create_task(secretary, "Create snd task");
+         /**task3 = */secretary_create_task(secretary, "Create thrid task");
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
@@ -886,8 +886,8 @@ void test_secretary_count_tasks_archived(CuTest *test) {
 void test_secretary_count_all_tasks(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_create_task(secretary, "Create first task"),
-         *task2 = secretary_create_task(secretary, "Create snd task"),
-         *task3 = secretary_create_task(secretary, "Create thrid task");
+         *task2 = secretary_create_task(secretary, "Create snd task");
+         /**task3 = */secretary_create_task(secretary, "Create thrid task");
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
