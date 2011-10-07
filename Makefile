@@ -42,10 +42,6 @@ test_optimization_requisites.o: test/optimization_requisites.c test/optimization
 		${SECRETARY_DEPENDENCY_HEADERS}
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 	
-%.o: %.c %.h
-#	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
-
-
 run_all.o: test/run_all.c test/secretary.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 
