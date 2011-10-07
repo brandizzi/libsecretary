@@ -81,7 +81,7 @@ void task_schedule(Task *task, time_t date) {
     bool was_in_inbox = task_is_in_inbox(task),
         was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
-    task->scheduled_for = date;
+    task->scheduled_for = date-(date%(SECONDS_IN_DAY));
     // For optimization of secretary
     if (was_in_inbox) {
         _secretary_unregister_from_inbox(task->secretary, task);

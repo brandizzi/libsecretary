@@ -24,12 +24,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+
+#define UTIL_SECONDS_IN_DAY (60*60*24)
 
 typedef int (*UtilComparator)(const void *item1, const void *item2);
 
 char *util_copy_string(const char *string);
 char *util_read_string(FILE *file);
 void util_write_string(FILE *file, const char *string);
+time_t util_beginning_of_day(time_t time);
 
 #ifdef DEBUG
 #  define util_log(message) printf(message)

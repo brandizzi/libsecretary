@@ -41,3 +41,6 @@ void util_write_string(FILE *file, const char *string) {
     fputs(string, file);
 }
 
+time_t util_beginning_of_day(time_t time) {
+    return time - (time % UTIL_SECONDS_IN_DAY);
+}

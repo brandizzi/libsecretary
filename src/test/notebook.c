@@ -352,7 +352,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
-    CuAssertIntEquals(test, future_time, task_get_scheduled_date(task));
+    CuAssertIntEquals(test, util_beginning_of_day(future_time), task_get_scheduled_date(task));
 
     task = secretary_get_nth_done_task(secretary, 2, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));

@@ -507,8 +507,8 @@ void test_secretary_mark_task_as_done(CuTest *test) {
     date.tm_mday = 30;
     date.tm_mon = 4;
     date.tm_year = 2002-1900;
-    time_t t = mktime(&date);
-    task_schedule(task1, mktime(&date));
+    time_t t = timegm(&date);
+    task_schedule(task1, timegm(&date));
     project_add_task(project, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
@@ -564,7 +564,7 @@ void test_secretary_unmark_task_as_done(CuTest *test) {
     date.tm_mday = 30;
     date.tm_mon = 4;
     date.tm_year = 2002-1900;
-    time_t t = mktime(&date);
+    time_t t = timegm(&date);
     task_schedule(task1, t);
     project_add_task(project, task2);
 

@@ -53,9 +53,9 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            time_t date;
+            struct tm date;
             fread(&date, sizeof(date), 1, file);
-            task_schedule(task, date);
+            task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
@@ -98,7 +98,7 @@ static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
         }
         if (mask & TASK_IS_SCHEDULED) {
             time_t date = task_get_scheduled_date(task);
-            fwrite(&date, sizeof(date), 1, file);
+            fwrite(gmtime(&date), sizeof(struct tm), 1, file);
         }
     }
 }
@@ -130,9 +130,9 @@ static Secretary *parser_reader_v1_2(FILE *file) {
             project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            time_t date;
+            struct tm date;
             fread(&date, sizeof(date), 1, file);
-            task_schedule(task, date);
+            task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
@@ -186,7 +186,7 @@ static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
         }
         if (mask & TASK_IS_SCHEDULED) {
             time_t date = task_get_scheduled_date(task);
-            fwrite(&date, sizeof(date), 1, file);
+            fwrite(gmtime(&date), sizeof(struct tm), 1, file);
         }
     }
 }

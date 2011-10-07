@@ -18,11 +18,11 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _SECRETARY_TEST_LIST_H
-# define _SECRETARY_TEST_LIST_H
+#ifndef _SECRETARY_TEST_UTIL_H
+# define _SECRETARY_TEST_UTIL_H
 
 #include <CuTest.h>
 
-CuSuite *test_list_suite();
+CuSuite *test_util_suite();
 
 #endif

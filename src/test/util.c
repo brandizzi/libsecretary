@@ -18,11 +18,24 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _SECRETARY_TEST_LIST_H
-# define _SECRETARY_TEST_LIST_H
+#include <secretary/test/util.h>
+#include <secretary/util.h>
+#include <stdlib.h>
 
-#include <CuTest.h>
+static void test_util_beginning_of_day(CuTest *test) {
+    time_t now = time(NULL), stripped = util_beginning_of_day(now);
+    struct tm tm_now = *gmtime(&now), tm_stripped = *gmtime(&stripped);
 
-CuSuite *test_list_suite();
+    CuAssertIntEquals(test, tm_now.tm_mon, tm_stripped.tm_mon);
+    CuAssertIntEquals(test, tm_now.tm_year, tm_stripped.tm_year);
+    CuAssertIntEquals(test, tm_now.tm_mday, tm_stripped.tm_mday);
+    CuAssertIntEquals(test, 0, tm_stripped.tm_hour);
+    CuAssertIntEquals(test, 0, tm_stripped.tm_min);
+    CuAssertIntEquals(test, 0, tm_stripped.tm_sec);
+}
 
-#endif
+CuSuite *test_util_suite() {
+    CuSuite *suite  = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_util_beginning_of_day);
+    return suite;
+}

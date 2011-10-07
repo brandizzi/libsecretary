@@ -21,6 +21,49 @@
 #include <secretary/test/parser.h>
 #include <secretary/parser.h>
 
+static void test_parser_v1_1_saves_struct_tm(CuTest *test) {
+    remove("nofile");
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test parser");
+    struct tm date;
+    date.tm_mday = 31;
+    date.tm_mon = 12;
+    date.tm_year = 2011;
+    task_schedule(task, timegm(&date));
+
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction write = parser_get_writer(1, 1);
+    write(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // See what is saved.
+    file = fopen("nofile", "r");
+    getc(file); // Major version
+    getc(file); // minor version
+    getw(file); // project count
+
+    int task_count = getw(file);
+    CuAssertIntEquals(test, 1, task_count);
+
+    int properties = getw(file);
+    CuAssertTrue(test, properties & 0x2);
+
+    util_read_string(file); // Read string
+
+    struct tm read_date;
+    fread(&read_date, sizeof(read_date), 1, file);
+
+    CuAssertIntEquals(test, date.tm_mday, read_date.tm_mday);
+    CuAssertIntEquals(test, date.tm_mon, read_date.tm_mon);
+    CuAssertIntEquals(test, date.tm_year, read_date.tm_year);
+
+    fclose(file);
+
+    remove("nofile");
+
+}
+
 static void test_parser_v1_2(CuTest *test) {
     Secretary *secretary = secretary_new();
 
@@ -74,7 +117,7 @@ static void test_parser_v1_2(CuTest *test) {
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
-    CuAssertIntEquals(test, future_time, task_get_scheduled_date(task));
+    CuAssertIntEquals(test, util_beginning_of_day(future_time), task_get_scheduled_date(task));
 
     task = secretary_get_nth_done_task(secretary, 2, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
@@ -146,8 +189,50 @@ static void test_parser_v1_2_save_archival(CuTest *test) {
     CuAssertPtrEquals(test, NULL, task_get_project(task));
     CuAssertStrEquals(test, "Create Cocoa interface", task_get_description(task));
 
-
     secretary_free(secretary);
+
+    remove("nofile");
+
+}
+
+static void test_parser_v1_2_saves_struct_tm(CuTest *test) {
+    remove("nofile");
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test parser");
+    struct tm date;
+    date.tm_mday = 31;
+    date.tm_mon = 12;
+    date.tm_year = 2011;
+    task_schedule(task, timegm(&date));
+
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction write = parser_get_writer(1, 2);
+    write(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // See what is saved.
+    file = fopen("nofile", "r");
+    getc(file); // Major version
+    getc(file); // minor version
+    getw(file); // project count
+
+    int task_count = getw(file);
+    CuAssertIntEquals(test, 1, task_count);
+
+    int properties = getw(file);
+    CuAssertTrue(test, properties & 0x2);
+
+    util_read_string(file); // Read string
+
+    struct tm read_date;
+    fread(&read_date, sizeof(read_date), 1, file);
+
+    CuAssertIntEquals(test, date.tm_mday, read_date.tm_mday);
+    CuAssertIntEquals(test, date.tm_mon, read_date.tm_mon);
+    CuAssertIntEquals(test, date.tm_year, read_date.tm_year);
+
+    fclose(file);
 
     remove("nofile");
 
@@ -156,7 +241,9 @@ static void test_parser_v1_2_save_archival(CuTest *test) {
 
 CuSuite *test_parser_suite() {
     CuSuite *suite  = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_parser_v1_1_saves_struct_tm);
     SUITE_ADD_TEST(suite, test_parser_v1_2);
     SUITE_ADD_TEST(suite, test_parser_v1_2_save_archival);
+    SUITE_ADD_TEST(suite, test_parser_v1_2_saves_struct_tm);
     return suite;
 }

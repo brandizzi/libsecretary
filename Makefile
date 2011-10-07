@@ -6,7 +6,8 @@ CPPFLAGS=-Iinclude -Icutest
 
 LIBOBJS=secretary.o project.o task.o notebook.o parser.o util.o list.o
 TESTOBJS=test_secretary.o test_notebook.o test_task.o test_project.o \
-	test_list.o test_optimization_requisites.o test_parser.o CuTest.o
+	test_list.o test_optimization_requisites.o test_parser.o test_util.o \
+	CuTest.o
 
 TASK_DEPENDENCY_HEADERS=task.h util.h
 PROJECT_DEPENDENCY_HEADERS=project.h list.h ${TASK_DEPENDENCY_HEADERS}
@@ -34,6 +35,8 @@ test_task.o: test/task.c test/task.h ${TASK_DEPENDENCY_HEADERS}
 test_parser.o: test/parser.c test/parser.h ${PARSER_DEPENDENCY_HEADERS}
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 test_list.o: test/list.c test/list.h list.h
+	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
+test_util.o: test/util.c test/util.h util.h
 	${CC} -c ${CFLAGS} ${CPPFLAGS} $< -o $@
 test_optimization_requisites.o: test/optimization_requisites.c test/optimization_requisites.h \
 		${SECRETARY_DEPENDENCY_HEADERS}

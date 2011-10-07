@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -27,6 +26,7 @@
 #include <secretary/test/notebook.h>
 #include <secretary/test/task.h>
 #include <secretary/test/project.h>
+#include <secretary/test/util.h>
 #include <secretary/test/list.h>
 #include <secretary/test/parser.h>
 #include <secretary/test/optimization_requisites.h>
@@ -43,7 +43,8 @@ void RunAllTests(void)
     CuSuiteAddSuite(suite, test_task_suite());
     CuSuiteAddSuite(suite, test_secretary_suite());
     CuSuiteAddSuite(suite, test_notebook_suite());    
-    CuSuiteAddSuite(suite, test_list_suite());    
+    CuSuiteAddSuite(suite, test_list_suite());
+    CuSuiteAddSuite(suite, test_util_suite());
     CuSuiteAddSuite(suite, test_parser_suite());
     CuSuiteAddSuite(suite, test_optimization_requisites_suite());
 
