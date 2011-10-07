@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -92,7 +91,7 @@ static void test_optimization_requisites_inbox_perspective(CuTest *test) {
             list_count_items(secretary->inbox_perspective.archived_tasks));
     // Scheduled task not in inbox anymore
     time_t now = time(NULL);
-    task_schedule(task1, *localtime(&now));
+    task_schedule(task1, now);
     CuAssertIntEquals(test, 1, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
     CuAssertPtrEquals(test, task2, 
@@ -142,8 +141,7 @@ static void test_optimization_requisites_scheduled_perspective(CuTest *test) {
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->scheduled_perspective.archived_tasks));
     // Scheduled task not in inbox anymore
-    time_t now = time(NULL);
-    task_schedule(task, *localtime(&now));
+    task_schedule(task, time(NULL));
     CuAssertIntEquals(test, 1, 
             list_count_items(secretary->scheduled_perspective.visible_tasks));
     CuAssertPtrEquals(test, task, 
@@ -185,8 +183,7 @@ static void test_optimization_requisites_do_not_go_to_inbox(CuTest *test) {
             list_get_nth_item(secretary->inbox_perspective.visible_tasks, 0));
 
     // Schedule task...
-    time_t now = time(NULL);
-    task_schedule(task, *localtime(&now));
+    task_schedule(task, time(NULL));
     // ...and put it in project
     Project *project = secretary_create_project(secretary, "project");
     project_add_task(project, task);
@@ -213,7 +210,7 @@ static void test_optimization_requisites_do_not_go_to_inbox(CuTest *test) {
             list_count_items(secretary->scheduled_perspective.visible_tasks));
 
     // Reschedule and put in project again
-    task_schedule(task, *localtime(&now));
+    task_schedule(task, time(NULL));
     project_add_task(project, task);
 
     CuAssertIntEquals(test, 0, 
@@ -300,8 +297,7 @@ static void test_optimization_requisites_register_archived_in_inbox(CuTest *test
             list_count_items(secretary->inbox_perspective.archived_tasks));
             
 
-    time_t now = time(NULL);
-    task->scheduled_for = now;
+    task->scheduled_for = time(NULL);
     task->scheduled = true;
 
     // Should not register to inbox because is scheduled
@@ -487,7 +483,7 @@ static void test_optimization_requisites_switch_list(CuTest *test) {
             list_count_items(secretary->scheduled_perspective.archived_tasks));
     // Scheduled task not in inbox anymore
     time_t now = time(NULL);
-    task_schedule(task1, *localtime(&now));
+    task_schedule(task1, now);
     CuAssertIntEquals(test, 1, 
             list_count_items(secretary->inbox_perspective.visible_tasks));
     CuAssertPtrEquals(test, task2, 
@@ -583,13 +579,12 @@ static void test_optimization_requisites_task_compare_by_date(CuTest *test) {
         *task3 = task_new(0, "task 3");
 
     time_t now = time(NULL);
-    struct tm date = *localtime(&now);
 
-    task_schedule(task1, date);
-    task_schedule(task2, date);
-    date.tm_mday += 5;
+    task_schedule(task1, now);
+    task_schedule(task2, now);
+    now += 60*60*24*4; // Add four days
     // Greater date
-    task_schedule(task3, date);
+    task_schedule(task3, now);
 
     CuAssertIntEquals(test, 0, _task_compare_by_date(&task1, &task2));
     CuAssertTrue(test, _task_compare_by_date(&task1, &task3) < 0);
@@ -608,19 +603,19 @@ static void test_optimization_requisites_scheduled_ordered_by_date(CuTest *test)
         *task4 = secretary_create_task(secretary, "task 4"),
         *task5 = secretary_create_task(secretary, "task 5");
 
-   time_t now = time(NULL);
+    time_t now = time(NULL);
     struct tm date = *localtime(&now);
 
     date.tm_mday = 4;
-    task_schedule(task4, date);
+    task_schedule(task4, mktime(&date));
     date.tm_mday = 1;
-    task_schedule(task1, date);
+    task_schedule(task1, mktime(&date));
     date.tm_mday = 3;
-    task_schedule(task3, date);
+    task_schedule(task3, mktime(&date));
     date.tm_mday = 5;
-    task_schedule(task5, date);
+    task_schedule(task5, mktime(&date));
     date.tm_mday = 2;
-    task_schedule(task2, date);
+    task_schedule(task2, mktime(&date));
 
     CuAssertIntEquals(test, 5, 
             list_count_items(secretary->scheduled_perspective.visible_tasks));
@@ -653,23 +648,23 @@ static void test_optimization_requisites_list_sort_task_by_date(CuTest *test) {
 
     List *list = list_new();
     date.tm_mday = 4;
-    task_schedule(task4, date);
+    task_schedule(task4, mktime(&date));
     list_add_item(list, task4);
 
     date.tm_mday = 1;
-    task_schedule(task1, date);
+    task_schedule(task1, mktime(&date));
     list_add_item(list, task1);
     
     date.tm_mday = 3;
-    task_schedule(task3, date);
+    task_schedule(task3, mktime(&date));
     list_add_item(list, task3);
     
     date.tm_mday = 5;
-    task_schedule(task5, date);
+    task_schedule(task5, mktime(&date));
     list_add_item(list, task5);
     
     date.tm_mday = 2;
-    task_schedule(task2, date);
+    task_schedule(task2, mktime(&date));
     list_add_item(list, task2);
 
     CuAssertPtrEquals(test, task4, list_get_nth_item(list, 0));
@@ -711,19 +706,19 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
 
     List *list = list_new();
     date.tm_mday = 2;
-    task_schedule(task1, date);
+    task_schedule(task1, mktime(&date));
 
     date.tm_mday = 3;
-    task_schedule(task2, date);
+    task_schedule(task2, mktime(&date));
     
     date.tm_mday = 4;
-    task_schedule(task3, date);
+    task_schedule(task3, mktime(&date));
     
     date.tm_mday = 5;
-    task_schedule(task4, date);
+    task_schedule(task4, mktime(&date));
     
     date.tm_mday = 7;
-    task_schedule(task5, date);
+    task_schedule(task5, mktime(&date));
     list_add_item(list, task5);
 
     CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 0, false));
@@ -733,7 +728,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 4, false));
 
     date.tm_mday = 10;
-    task_schedule(task3, date);
+    task_schedule(task3, mktime(&date));
 
     CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 0, false));
     CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));
@@ -742,7 +737,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
 
     date.tm_mday = 1;
-    task_schedule(task5, date);
+    task_schedule(task5, mktime(&date));
 
     CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 0, false));
     CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 1, false));
@@ -751,7 +746,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
 
     date.tm_mday = 6;
-    task_schedule(task1, date);
+    task_schedule(task1, mktime(&date));
 
     CuAssertPtrEquals(test, task5, secretary_get_nth_task_scheduled(secretary, 0, false));
     CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));

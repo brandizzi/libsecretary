@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -207,8 +206,8 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
 
     time_t now = time(NULL), future_time = now+60*60*48;
     struct tm date = *localtime(&future_time);
-    task_schedule(task1, date);
-    task_schedule(task2, *localtime(&now));
+    task_schedule(task1, future_time);
+    task_schedule(task2, now);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -258,8 +257,8 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
 
     time_t now = time(NULL), future_time = now+60*60*48;
     struct tm date = *localtime(&future_time);
-    task_schedule(task2, date);
-    task_schedule(task3, *localtime(&now));
+    task_schedule(task2, future_time);
+    task_schedule(task3, now);
 
     project_add_task(project1, task1);
     project_add_task(project2, task2);
@@ -321,8 +320,8 @@ void test_notebook_save_done_tasks(CuTest *test) {
 
     time_t now = time(NULL), future_time = now+60*60*48;
     struct tm date = *localtime(&future_time);
-    task_schedule(task2, date);
-    task_schedule(task3, *localtime(&now));
+    task_schedule(task2, future_time);
+    task_schedule(task3, now);
 
     project_add_task(project1, task1);
     project_add_task(project2, task2);
@@ -356,8 +355,7 @@ void test_notebook_save_done_tasks(CuTest *test) {
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
-    CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
-    CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
+    CuAssertIntEquals(test, future_time, task_get_scheduled_date(task));
 
     task = secretary_get_nth_done_task(secretary, 2, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));

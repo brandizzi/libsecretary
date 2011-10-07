@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -171,7 +170,8 @@ int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
             secretary->scheduled_perspective, archived);
     for (counter = 0; counter < list_count_items(list); counter++) {
         Task *task = list_get_nth_item(list, counter);
-        if (!task_is_scheduled_for(task, date)) break;
+        #warning inefficient creation of date
+        if (!task_is_scheduled_for(task, mktime(&date))) break;
     }
     return counter;
 }
@@ -196,8 +196,9 @@ void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date)
             secretary->scheduled_perspective, false);
     for (int i = 0; i < list_count_items(list); i++) {
         Task *task = list_get_nth_item(list, i);
+        #warning inefficient creation of dates
         if (task_is_done(task) && 
-                task_is_scheduled_for(task, date)) {
+                task_is_scheduled_for(task, mktime(&date))) {
             task_archive(task);
         }
     }
@@ -220,7 +221,7 @@ Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date,
             secretary->scheduled_perspective, archived);
     Task *task = list_get_nth_item(list, n);
     // Making use of the ordered list
-    if (task && task_is_scheduled_for(task, date)) {
+    if (task && task_is_scheduled_for(task, mktime(&date))) {
         return task;
     } else {
         return NULL;

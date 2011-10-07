@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -78,11 +77,11 @@ bool task_is_in_inbox(Task *task) {
     return task->project == NULL && !task->scheduled;
 }
 
-void task_schedule(Task *task, struct tm date) {
+void task_schedule(Task *task, time_t date) {
     bool was_in_inbox = task_is_in_inbox(task),
         was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
-    task->scheduled_for = mktime(&date);
+    task->scheduled_for = date;
     // For optimization of secretary
     if (was_in_inbox) {
         _secretary_unregister_from_inbox(task->secretary, task);
@@ -94,18 +93,17 @@ void task_schedule(Task *task, struct tm date) {
     }
 }
 
-struct tm task_get_scheduled_date(Task *task) {
-    return *localtime(&task->scheduled_for);
+time_t task_get_scheduled_date(Task *task) {
+    return task->scheduled_for;
 }
 
 bool task_is_scheduled(Task *task) {
     return task->scheduled;
 }
 
-bool task_is_scheduled_for(Task *task, struct tm date) {
-    time_t compared = mktime(&date);
+bool task_is_scheduled_for(Task *task, time_t date) {
     long scheduled_date = task->scheduled_for/SECONDS_IN_DAY, // removing hours, minutes etc.
-         compared_date = compared/SECONDS_IN_DAY;
+         compared_date = date/SECONDS_IN_DAY;
     return task_is_scheduled(task) && scheduled_date <= compared_date;
 }
 

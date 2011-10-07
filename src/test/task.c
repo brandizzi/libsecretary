@@ -87,8 +87,7 @@ static void test_task_is_in_inbox(CuTest *test) {
     task_mark_as_done(task);
     CuAssertTrue(test, (task_is_in_inbox(task) && !task_is_archived(task)));
 
-    time_t t = time(NULL);
-    task_schedule(task, *localtime(&t));
+    task_schedule(task, time(NULL));
     CuAssertTrue(test, !(task_is_in_inbox(task) && !task_is_archived(task)));
     task_unschedule(task);
     CuAssertTrue(test, (task_is_in_inbox(task) && !task_is_archived(task)));
@@ -116,8 +115,7 @@ static void test_task_archived_is_in_inbox(CuTest *test) {
     task_archive(task);
     CuAssertTrue(test, (task_is_in_inbox(task) && task_is_archived(task)));
 
-    time_t t = time(NULL);
-    task_schedule(task, *localtime(&t));
+    task_schedule(task, time(NULL));
     CuAssertTrue(test, !(task_is_in_inbox(task) && task_is_archived(task)));
     task_unschedule(task);
     CuAssertTrue(test, (task_is_in_inbox(task) && task_is_archived(task)));

@@ -61,11 +61,11 @@ bool task_is_in_project(Task *task, struct Project *project);
 
 bool task_is_in_inbox(Task *task);
 
-void task_schedule(Task *task, struct tm date);
-struct tm task_get_scheduled_date(Task *task);
+void task_schedule(Task *task, time_t date);
+time_t task_get_scheduled_date(Task *task);
 void task_unschedule(Task *task);
 bool task_is_scheduled(Task *task);
-bool task_is_scheduled_for(Task *task, struct tm date);
+bool task_is_scheduled_for(Task *task, time_t date);
 
 void task_mark_as_done(Task *task);
 void task_unmark_as_done(Task *task);

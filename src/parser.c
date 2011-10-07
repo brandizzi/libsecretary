@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -54,7 +53,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            struct tm date;
+            time_t date;
             fread(&date, sizeof(date), 1, file);
             task_schedule(task, date);
         }
@@ -98,7 +97,7 @@ static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
                     project_get_name(task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            struct tm date = task_get_scheduled_date(task);
+            time_t date = task_get_scheduled_date(task);
             fwrite(&date, sizeof(date), 1, file);
         }
     }
@@ -131,7 +130,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
             project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            struct tm date;
+            time_t date;
             fread(&date, sizeof(date), 1, file);
             task_schedule(task, date);
         }
@@ -186,7 +185,7 @@ static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
                     project_get_name(task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            struct tm date = task_get_scheduled_date(task);
+            time_t date = task_get_scheduled_date(task);
             fwrite(&date, sizeof(date), 1, file);
         }
     }

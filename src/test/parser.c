@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -34,8 +33,8 @@ static void test_parser_v1_2(CuTest *test) {
 
     time_t now = time(NULL), future_time = now+60*60*48;
     struct tm date = *localtime(&future_time);
-    task_schedule(task2, date);
-    task_schedule(task3, *localtime(&now));
+    task_schedule(task2, future_time);
+    task_schedule(task3, now);
 
     project_add_task(project1, task1);
     project_add_task(project2, task2);
@@ -76,8 +75,7 @@ static void test_parser_v1_2(CuTest *test) {
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
-    CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
-    CuAssertIntEquals(test, date.tm_mday, task_get_scheduled_date(task).tm_mday);
+    CuAssertIntEquals(test, future_time, task_get_scheduled_date(task));
 
     task = secretary_get_nth_done_task(secretary, 2, false);
     CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
