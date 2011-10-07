@@ -32,7 +32,6 @@ static void test_parser_v1_2(CuTest *test) {
          *task3 = secretary_create_task(secretary, "Buy pequi");
 
     time_t now = time(NULL), future_time = now+60*60*48;
-    struct tm date = *localtime(&future_time);
     task_schedule(task2, future_time);
     task_schedule(task3, now);
 
@@ -68,7 +67,7 @@ static void test_parser_v1_2(CuTest *test) {
     CuAssertIntEquals(test, 1, 
             secretary_count_tasks_scheduled_for_today(secretary,false));
     CuAssertIntEquals(test, 2, 
-            secretary_count_tasks_scheduled_for(secretary, date, false));
+            secretary_count_tasks_scheduled_for(secretary, future_time, false));
 
     Task *task = secretary_get_nth_done_task(secretary, 1, false);
     CuAssertTrue(test, task_is_done(task));

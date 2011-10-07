@@ -60,13 +60,13 @@ Project *secretary_get_project(Secretary *secretary, const char *name);
 Project *secretary_get_nth_project(Secretary *secretary, int n);
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived);
-int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date, bool archived);
+int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date, bool archived);
 int secretary_count_tasks_scheduled_for_today(Secretary *secretary, bool archived);
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, bool archived);
-Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, int n, bool archived);
+Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, int n, bool archived);
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n, bool archived);
 void secretary_archive_scheduled_tasks(Secretary *secretary);
-void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date);
+void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date);
 void secretary_archive_tasks_scheduled_for_today(Secretary *secretary);
 
 int secretary_count_done_tasks(Secretary *secretary, bool archived);

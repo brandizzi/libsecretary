@@ -162,7 +162,7 @@ int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
 }
 
 
-int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
+int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date,
             bool archived) {
     // Note that the function assumes an ordered list!
     int counter = 0;
@@ -170,15 +170,13 @@ int secretary_count_tasks_scheduled_for(Secretary *secretary, struct tm date,
             secretary->scheduled_perspective, archived);
     for (counter = 0; counter < list_count_items(list); counter++) {
         Task *task = list_get_nth_item(list, counter);
-        #warning inefficient creation of date
-        if (!task_is_scheduled_for(task, mktime(&date))) break;
+        if (!task_is_scheduled_for(task, date)) break;
     }
     return counter;
 }
 int secretary_count_tasks_scheduled_for_today(Secretary *secretary, 
             bool archived) {
-    time_t now = time(NULL);
-    return secretary_count_tasks_scheduled_for(secretary, *localtime(&now), archived);
+    return secretary_count_tasks_scheduled_for(secretary, time(NULL), archived);
 }
 
 void secretary_archive_scheduled_tasks(Secretary *secretary) {
@@ -191,21 +189,19 @@ void secretary_archive_scheduled_tasks(Secretary *secretary) {
         }
     }
 }
-void secretary_archive_tasks_scheduled_for(Secretary *secretary, struct tm date) {
+void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date) {
     List *list = _secretary_get_list_from_perspective(
             secretary->scheduled_perspective, false);
     for (int i = 0; i < list_count_items(list); i++) {
         Task *task = list_get_nth_item(list, i);
-        #warning inefficient creation of dates
         if (task_is_done(task) && 
-                task_is_scheduled_for(task, mktime(&date))) {
+                task_is_scheduled_for(task, date)) {
             task_archive(task);
         }
     }
 }
 void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
-    time_t now = time(NULL);
-    secretary_archive_tasks_scheduled_for(secretary, *localtime(&now));
+    secretary_archive_tasks_scheduled_for(secretary, time(NULL));
 }
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
@@ -215,13 +211,13 @@ Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n,
     return list_get_nth_item(list, n);
 }
 
-Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date, 
+Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, 
         int n, bool archived) {
     List *list = _secretary_get_list_from_perspective(
             secretary->scheduled_perspective, archived);
     Task *task = list_get_nth_item(list, n);
     // Making use of the ordered list
-    if (task && task_is_scheduled_for(task, mktime(&date))) {
+    if (task && task_is_scheduled_for(task, date)) {
         return task;
     } else {
         return NULL;
@@ -229,10 +225,8 @@ Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, struct tm date,
 }
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
         bool archived) {
-    time_t now = time(NULL);
-    return secretary_get_nth_task_scheduled_for(secretary, *localtime(&now), n, archived);
+    return secretary_get_nth_task_scheduled_for(secretary, time(NULL), n, archived);
 }
-
 
 int secretary_count_done_tasks(Secretary *secretary, bool archived) {
     int counter = 0;
