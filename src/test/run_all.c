@@ -34,7 +34,7 @@
 #include <CuTest.h>
 
 
-void RunAllTests(void) 
+int RunAllTests(void) 
 {
     CuString *output = CuStringNew();
     CuSuite* suite = CuSuiteNew();
@@ -54,11 +54,11 @@ void RunAllTests(void)
     printf("%s\n", output->buffer);
     CuStringDelete(output);
     CuSuiteDelete(suite);
+    return suite->failCount;
 }
 
 int main(void)
 {
-    RunAllTests();
-    return 0;
+    return RunAllTests();
 }
 
