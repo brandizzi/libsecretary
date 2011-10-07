@@ -374,6 +374,39 @@ void test_secretary_schedule(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_schedule_only_day_is_relevant(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "Create first task"),
+         *task2 = secretary_create_task(secretary, "Create snd task"),
+         *task3 = secretary_create_task(secretary, "Create third task");
+         
+    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
+    CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
+
+    time_t today, begining_of_today, end_of_today;
+    today = time(NULL);
+    begining_of_today = today  -  today % (60*60*24); // Beginning of the day
+    end_of_today = begining_of_today + 60*(60*23 + 59) + 59; // End of the day
+    task_schedule(task1, begining_of_today);
+    task_schedule(task2, today);
+    task_schedule(task3, end_of_today);
+
+    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
+    CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
+
+    CuAssertIntEquals(test, 3, secretary_count_tasks_scheduled_for(secretary, today, false));
+    CuAssertIntEquals(test, 3, secretary_count_tasks_scheduled_for_today(secretary, false));
+
+    Task *task = secretary_get_nth_task_scheduled_for(secretary, today, 0, false);
+    CuAssertPtrEquals(test, task1, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, today, 1, false);
+    CuAssertPtrEquals(test, task2, task);
+    task = secretary_get_nth_task_scheduled_for(secretary, today, 2, false);
+    CuAssertPtrEquals(test, task3, task);
+
+    secretary_free(secretary);
+}
+
 void test_secretary_late_scheduled_appears_in_today(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_create_task(secretary, "Create first task"),
@@ -911,6 +944,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_remove_task_with_others);
     SUITE_ADD_TEST(suite, test_secretary_remove_project_with_others);
     SUITE_ADD_TEST(suite, test_secretary_schedule);
+    SUITE_ADD_TEST(suite, test_secretary_schedule_only_day_is_relevant);
     SUITE_ADD_TEST(suite, test_secretary_late_scheduled_appears_in_today);
     SUITE_ADD_TEST(suite, test_secretary_unschedule_task);
     SUITE_ADD_TEST(suite, test_secretary_mark_task_as_done);
