@@ -41,7 +41,7 @@ typedef struct {
     struct Secretary *secretary;
 
     bool scheduled;
-    struct tm scheduled_for;
+    time_t scheduled_for;
 
     bool done;
     bool archived;

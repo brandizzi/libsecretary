@@ -82,7 +82,7 @@ void task_schedule(Task *task, struct tm date) {
     bool was_in_inbox = task_is_in_inbox(task),
         was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
-    task->scheduled_for = date;
+    task->scheduled_for = mktime(&date);
     // For optimization of secretary
     if (was_in_inbox) {
         _secretary_unregister_from_inbox(task->secretary, task);
@@ -95,7 +95,7 @@ void task_schedule(Task *task, struct tm date) {
 }
 
 struct tm task_get_scheduled_date(Task *task) {
-    return task->scheduled_for;
+    return *localtime(&task->scheduled_for);
 }
 
 bool task_is_scheduled(Task *task) {
@@ -103,9 +103,8 @@ bool task_is_scheduled(Task *task) {
 }
 
 bool task_is_scheduled_for(Task *task, struct tm date) {
-    time_t scheduled = mktime(&task->scheduled_for),
-           compared = mktime(&date);
-    long scheduled_date = scheduled/SECONDS_IN_DAY, // removing hours, minutes etc.
+    time_t compared = mktime(&date);
+    long scheduled_date = task->scheduled_for/SECONDS_IN_DAY, // removing hours, minutes etc.
          compared_date = compared/SECONDS_IN_DAY;
     return task_is_scheduled(task) && scheduled_date <= compared_date;
 }
@@ -165,5 +164,5 @@ void task_free(Task *task) {
 
 int _task_compare_by_date(const void *p1, const void* p2) {
     Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;
-    return mktime(&(task1->scheduled_for)) - mktime(&(task2->scheduled_for));
+    return task1->scheduled_for - task2->scheduled_for;
 }

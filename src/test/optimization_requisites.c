@@ -258,7 +258,7 @@ static void test_optimization_requisites_register_in_inbox(CuTest *test) {
             list_count_items(secretary->inbox_perspective.visible_tasks));
 
     time_t now;
-    task->scheduled_for = *localtime(&now);
+    task->scheduled_for = now;
     task->scheduled = true;
 
     // Should not register to inbox because is scheduled
@@ -300,8 +300,8 @@ static void test_optimization_requisites_register_archived_in_inbox(CuTest *test
             list_count_items(secretary->inbox_perspective.archived_tasks));
             
 
-    time_t now;
-    task->scheduled_for = *localtime(&now);
+    time_t now = time(NULL);
+    task->scheduled_for = now;
     task->scheduled = true;
 
     // Should not register to inbox because is scheduled
@@ -332,8 +332,8 @@ static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
     CuAssertIntEquals(test, 0, 
             list_count_items(secretary->scheduled_perspective.visible_tasks));
 
-    time_t now;
-    task->scheduled_for = *localtime(&now);
+    time_t now = time(NULL);
+    task->scheduled_for = now;
     task->scheduled = true;
 
     // Should  register in scheduled
@@ -363,8 +363,8 @@ static void test_optimization_requisites_register_in_scheduled(CuTest *test) {
 static void test_optimization_requisites_register_archived_in_scheduled(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = task_new(0, "task");
-    time_t now;
-    task->scheduled_for = *localtime(&now);
+    time_t now = time(NULL);
+    task->scheduled_for = now;
     task->scheduled = true;
 
     task->done = task->archived = true;
