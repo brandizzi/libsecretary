@@ -108,3 +108,16 @@ void project_free(Project *project) {
     free(project->name);
 free(project);
 }
+
+
+void project_archive(Project *project) {
+    project->archived = true;
+}
+
+void project_unarchive(Project *project) {
+    project->archived = false;
+}
+
+bool project_is_archived(Project *project) {
+    return project->archived;
+}

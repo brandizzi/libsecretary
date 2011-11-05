@@ -32,6 +32,7 @@
 typedef struct Project {
     char *name;
     List *tasks;
+    bool archived;
 } Project;
 
 Project *project_new(const char *name);
@@ -46,6 +47,10 @@ Task *project_get_task(Project *project, int number);
 Task *project_get_nth_task(Project *project, int n, bool archived);
 
 void project_archive_tasks(Project *project);
+
+void project_archive(Project *project);
+void project_unarchive(Project *project);
+bool project_is_archived(Project *project);
 
 void project_free(Project *project);
 

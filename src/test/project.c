@@ -66,7 +66,7 @@ static void test_project_remove_task(CuTest *test) {
     project_free(project);
 }
 
-void test_project_archived(CuTest *test) {
+void test_project_archived_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new(1, "Create first task"),
          *task2 = task_new(2, "Create snd task"),
@@ -129,6 +129,18 @@ void test_project_archive_tasks(CuTest *test) {
 }
 
 
+void test_project_archived(CuTest *test) {
+    Project *project = project_new("libsecretary");
+
+    CuAssertTrue(test, ! project_is_archived(project));
+    project_archive(project);
+    CuAssertTrue(test, project_is_archived(project));
+    project_unarchive(project);
+    CuAssertTrue(test, ! project_is_archived(project));
+
+    project_free(project);
+}
+
 static void test_project_free_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new(1, "Create first task"),
@@ -168,7 +180,8 @@ CuSuite *test_project_suite() {
     SUITE_ADD_TEST(suite, test_project_free_tasks);
     SUITE_ADD_TEST(suite, test_project_free_name);
     SUITE_ADD_TEST(suite, test_project_remove_task);
-    SUITE_ADD_TEST(suite, test_project_archived);
+    SUITE_ADD_TEST(suite, test_project_archived_tasks);
     SUITE_ADD_TEST(suite, test_project_archive_tasks);
+    SUITE_ADD_TEST(suite, test_project_archived);
     return suite;
 }
