@@ -74,6 +74,8 @@ bool task_is_done(Task *task);
 void task_archive(Task *task);
 bool task_is_archived(Task *task);
 
+int task_compare(Task *task1, Task *task2);
+
 void task_free(Task *task);
 
 #endif

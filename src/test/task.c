@@ -156,6 +156,29 @@ static void test_task_created_at(CuTest *test) {
     task_free(task);
 }
 
+void test_task_compare_orders_by_creation_time(CuTest *test) {
+    Task *task1 = task_new("task 1"),
+        *task2 = task_new("task 2"),
+        *task3 = task_new("task 3");
+
+    // A little help...
+    task2->created_at++;
+    task3->created_at += 2;
+    
+    CuAssertTrue(test, task_compare(task1, task2) > 0);
+    CuAssertTrue(test, task_compare(task2, task1) < 0);
+
+    CuAssertTrue(test, task_compare(task2, task3) > 0);
+    CuAssertTrue(test, task_compare(task3, task2) < 0);
+
+    CuAssertTrue(test, task_compare(task1, task3) > 0);
+    CuAssertTrue(test, task_compare(task3, task1) < 0);
+
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+}
+
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
@@ -167,5 +190,6 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_is_in_inbox);
     SUITE_ADD_TEST(suite, test_task_archived_is_in_inbox);
     SUITE_ADD_TEST(suite, test_task_created_at);
+    SUITE_ADD_TEST(suite, test_task_compare_orders_by_creation_time);
     return suite;
 }

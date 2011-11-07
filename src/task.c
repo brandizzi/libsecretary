@@ -158,6 +158,10 @@ void task_free(Task *task) {
     free(task);
 }
 
+int task_compare(Task *task1, Task *task2) {
+    return task2->created_at - task1->created_at;
+}
+
 /* THE FOLLOWING FUNCTIONS SHOULD NOT BE USED BY EXTERNAL CLIENTS */
 
 int _task_compare_by_date(const void *p1, const void* p2) {
