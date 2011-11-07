@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -26,8 +25,6 @@
 #include <secretary/list.h>
 
 #include <stdlib.h>
-
-#define PROJECT_ARRAY_SIZE 128
 
 typedef struct Project {
     char *name;
