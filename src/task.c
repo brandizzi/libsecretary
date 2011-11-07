@@ -29,6 +29,7 @@
 
 Task *task_new(const char *description) {
     Task *task = malloc(sizeof(Task));
+    time(&task->created_at);
     task->description = util_copy_string(description);
     task->project = NULL;
     task->scheduled = false;
@@ -36,6 +37,10 @@ Task *task_new(const char *description) {
     task->done = false;
     task->secretary = NULL;
     return task;
+}
+
+time_t task_get_creation_date(Task *task) {
+    return task->created_at;
 }
 
 const char *task_get_description(Task *task) {

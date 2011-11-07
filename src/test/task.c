@@ -148,8 +148,12 @@ static void test_task_archive(CuTest *test) {
     task_free(task);
 }
 
-static void test_task_creation_date(CuTest *test) {
-    
+static void test_task_created_at(CuTest *test) {
+    Task *task = task_new("Do something" );
+    time_t now = time(NULL);
+    CuAssertTrue(test, now-task_get_creation_date(task) < 2); // Less than 2 seconds
+
+    task_free(task);
 }
 
 CuSuite *test_task_suite() {
@@ -162,5 +166,6 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_archive);
     SUITE_ADD_TEST(suite, test_task_is_in_inbox);
     SUITE_ADD_TEST(suite, test_task_archived_is_in_inbox);
+    SUITE_ADD_TEST(suite, test_task_created_at);
     return suite;
 }

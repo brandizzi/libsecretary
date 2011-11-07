@@ -29,7 +29,7 @@ struct Project;
 struct Secretary;
 
 typedef struct {
-    int number;
+    time_t created_at;
     char *description;
     struct Project *project;
     /**
@@ -48,6 +48,7 @@ typedef struct {
 
 Task *task_new(const char *description);
 
+time_t task_get_creation_date(Task *task);
 const char *task_get_description(Task *task);
 void task_set_description(Task *task, const char *description);
 
