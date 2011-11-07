@@ -25,7 +25,7 @@
 
 #include <secretary/_internal/secretary.h>
 
-#define SECONDS_IN_DAY (60*60*24)
+#define TASK_SCHEDULED_VALUE_FOR_COMPARE(t) ((t)->scheduled_for*(t)->scheduled)
 
 Task *task_new(const char *description) {
     Task *task = malloc(sizeof(Task));
@@ -81,7 +81,7 @@ void task_schedule(Task *task, time_t date) {
     bool was_in_inbox = task_is_in_inbox(task),
         was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
-    task->scheduled_for = date-(date%(SECONDS_IN_DAY));
+    task->scheduled_for = date-(date%(UTIL_SECONDS_IN_DAY));
     // For optimization of secretary
     if (was_in_inbox) {
         _secretary_unregister_from_inbox(task->secretary, task);
@@ -102,8 +102,8 @@ bool task_is_scheduled(Task *task) {
 }
 
 bool task_is_scheduled_for(Task *task, time_t date) {
-    long scheduled_date = task->scheduled_for/SECONDS_IN_DAY, // removing hours, minutes etc.
-         compared_date = date/SECONDS_IN_DAY;
+    long scheduled_date = task->scheduled_for/UTIL_SECONDS_IN_DAY, // removing hours, minutes etc.
+         compared_date = date/UTIL_SECONDS_IN_DAY;
     return task_is_scheduled(task) && scheduled_date <= compared_date;
 }
 
@@ -159,6 +159,10 @@ void task_free(Task *task) {
 }
 
 int task_compare(Task *task1, Task *task2) {
+    int result = task1->scheduled - task2->scheduled;
+    if (result) return result;
+    if (task1->scheduled) result = task2->scheduled_for - task1->scheduled_for;
+    if (result) return result;
     return task2->created_at - task1->created_at;
 }
 

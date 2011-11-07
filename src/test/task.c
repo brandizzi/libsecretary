@@ -179,6 +179,62 @@ void test_task_compare_orders_by_creation_time(CuTest *test) {
     task_free(task3);
 }
 
+void test_task_compare_orders_by_scheduld_time(CuTest *test) {
+    Task *task1 = task_new("task 1"),
+        *task2 = task_new("task 2"),
+        *task3 = task_new("task 3"),
+        *task4 = task_new("task 4"),
+        *task5 = task_new("task 5");
+
+    // A little help...
+    task2->created_at++;
+    task3->created_at += 2;
+    task4->created_at += 3;
+    task5->created_at += 4;
+
+    time_t scheduling_date = time(NULL);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(task2, scheduling_date);
+
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(task5, scheduling_date);
+    task_schedule(task3, scheduling_date);
+
+    // Greater priority: task2
+    CuAssertTrue(test, task_compare(task2, task1) > 0);
+    CuAssertTrue(test, task_compare(task1, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task3) > 0);
+    CuAssertTrue(test, task_compare(task3, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task4) > 0);
+    CuAssertTrue(test, task_compare(task4, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task5) > 0);
+    CuAssertTrue(test, task_compare(task5, task2) < 0);
+
+    // scheduled priority: task3 and task5
+    CuAssertTrue(test, task_compare(task3, task1) > 0);
+    CuAssertTrue(test, task_compare(task1, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task4) > 0);
+    CuAssertTrue(test, task_compare(task4, task3) < 0);
+    CuAssertTrue(test, task_compare(task5, task1) > 0);
+    CuAssertTrue(test, task_compare(task1, task5) < 0);
+    CuAssertTrue(test, task_compare(task5, task4) > 0);
+    CuAssertTrue(test, task_compare(task4, task5) < 0);
+    // Tie break: task3 > task5 because older
+    CuAssertTrue(test, task_compare(task3, task5) > 0);
+    CuAssertTrue(test, task_compare(task5, task3) < 0);
+
+    // Lesser priority: task1 and task4, since not scheduled
+    // Tie break: task1 > task4 because older
+    CuAssertTrue(test, task_compare(task1, task4) > 0);
+    CuAssertTrue(test, task_compare(task4, task1) < 0);
+    
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+    task_free(task4);
+    task_free(task5);
+}
+
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
@@ -191,5 +247,6 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_archived_is_in_inbox);
     SUITE_ADD_TEST(suite, test_task_created_at);
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_creation_time);
+    SUITE_ADD_TEST(suite, test_task_compare_orders_by_scheduld_time);
     return suite;
 }
