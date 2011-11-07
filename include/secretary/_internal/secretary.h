@@ -29,6 +29,8 @@
 #include <secretary/secretary.h>
 
 
+bool _secretary_predicate_task_is_in_inbox(void *task, void **params);
+
 void _secretary_register_in_inbox(Secretary *secretary, Task *task);
 void _secretary_unregister_from_inbox(Secretary *secretary, Task *task);
 

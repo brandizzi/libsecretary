@@ -250,6 +250,12 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
 
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
+/* Predicates */
+bool _secretary_predicate_task_is_in_inbox(void *task, void **params) {
+    return task_is_in_inbox(task);
+}
+
+ 
 void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
     if (secretary) {
         if (task_is_in_inbox(task)) {
