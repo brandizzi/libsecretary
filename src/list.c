@@ -74,6 +74,18 @@ void list_sort(List *list, UtilComparator comparator) {
     qsort(list->items, list->number_of_items, sizeof(void*), comparator);
 }
 
+void *list_get_nth_item_by_criteria(List *list, int index, 
+            ListPredicate predicate) {
+    int counter = 0;
+    for (int i = 0; i < list->number_of_items; i++) {
+        if (predicate(list->items[i])) {
+            if (counter == index) return list->items[i];
+            counter++;
+        }
+    }
+    return NULL;
+}
+
 /* PRIVATE FUNCTIONS */
 
 static void list_expand(List *list) {
