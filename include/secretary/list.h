@@ -65,5 +65,6 @@ void list_sort(List *list, UtilComparator comparator);
 typedef bool (*ListPredicate)(void *item, void **params);
 void *list_get_nth_item_by_criteria(List *list, int index, 
             ListPredicate predicate, void **params);
-
+int list_count_items_by_criteria(List *list, ListPredicate predicate,
+        void **params);
 #endif

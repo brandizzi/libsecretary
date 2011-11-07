@@ -86,6 +86,15 @@ void *list_get_nth_item_by_criteria(List *list, int index,
     return NULL;
 }
 
+int list_count_items_by_criteria(List *list, ListPredicate predicate,
+        void **params) {
+    int counter = 0;
+    for (int i = 0; i < list->number_of_items; i++) {
+        if (predicate(list->items[i], params)) counter++;
+    }
+    return counter;
+}
+
 /* PRIVATE FUNCTIONS */
 
 static void list_expand(List *list) {

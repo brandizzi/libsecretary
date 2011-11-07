@@ -156,6 +156,14 @@ static bool is_odd(void *p, void **params) {
     return *pi % 2;
 }
 
+static bool is_rest_equal(void *item, void **params) {
+    int *pi = item,
+        *pq = params[0], // First parameter: quotient
+        *pr = params[1]; // Scnd  parameter: rest
+    
+    return *pi % *pq == *pr;
+}
+
 static void test_list_get_nth_item_by_criteria(CuTest *test) {
     List *list = list_new();
 
@@ -189,14 +197,6 @@ static void test_list_get_nth_item_by_criteria(CuTest *test) {
     CuAssertPtrEquals(test, p, NULL);
 
     list_free(list);
-}
-
-static bool is_rest_equal(void *item, void **params) {
-    int *pi = item,
-        *pq = params[0], // First parameter: quotient
-        *pr = params[1]; // Scnd  parameter: rest
-    
-    return *pi % *pq == *pr;
 }
 
 static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
@@ -241,6 +241,55 @@ static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
     list_free(list);
 }
 
+static void test_list_count_items_by_criteria(CuTest *test) {
+    List *list = list_new();
+
+    int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
+
+    list_add_item(list, &i1);
+    list_add_item(list, &i2);
+    list_add_item(list, &i3);
+    list_add_item(list, &i4);
+    list_add_item(list, &i5);
+
+    CuAssertIntEquals(test, 2, 
+            list_count_items_by_criteria(list, is_even, NULL));
+    CuAssertIntEquals(test, 3, list_count_items_by_criteria(list, is_odd, NULL));
+            
+    list_free(list);
+}
+
+
+static void test_list_count_items_by_criteria_with_params(CuTest *test) {
+    List *list = list_new();
+
+    int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
+
+    list_add_item(list, &i1);
+    list_add_item(list, &i2);
+    list_add_item(list, &i3);
+    list_add_item(list, &i4);
+    list_add_item(list, &i5);
+
+
+    int quotient, rest;
+    void *params[] = { &quotient, &rest };
+
+    quotient = 3;
+    rest = 2;
+
+    CuAssertIntEquals(test, 2, 
+            list_count_items_by_criteria(list, is_rest_equal, params));
+
+    quotient = 4;
+    rest = 1;
+
+    CuAssertIntEquals(test, 2, 
+            list_count_items_by_criteria(list, is_rest_equal, params));
+
+    list_free(list);
+}
+
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
@@ -251,5 +300,7 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_sort);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria_with_params);
+    SUITE_ADD_TEST(suite, test_list_count_items_by_criteria);
+    SUITE_ADD_TEST(suite, test_list_count_items_by_criteria_with_params);
     return suite;
 }
