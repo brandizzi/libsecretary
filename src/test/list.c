@@ -271,7 +271,6 @@ static void test_list_count_items_by_criteria_with_params(CuTest *test) {
     list_add_item(list, &i4);
     list_add_item(list, &i5);
 
-
     int quotient, rest;
     void *params[] = { &quotient, &rest };
 

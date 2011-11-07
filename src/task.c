@@ -159,7 +159,9 @@ void task_free(Task *task) {
 }
 
 int task_compare(Task *task1, Task *task2) {
-    int result = task1->scheduled - task2->scheduled;
+    int result = task2->archived - task1->archived;
+    if (result) return result;
+    result = task1->scheduled - task2->scheduled;
     if (result) return result;
     if (task1->scheduled) result = task2->scheduled_for - task1->scheduled_for;
     if (result) return result;
