@@ -62,8 +62,8 @@ void list_sort(List *list, UtilComparator comparator);
  * Returns the nth item which satisfies the predicate function. If there is no
  * such item, returns NULL.
  */
-typedef bool (*ListPredicate)(void *item);
+typedef bool (*ListPredicate)(void *item, void **params);
 void *list_get_nth_item_by_criteria(List *list, int index, 
-            ListPredicate predicate);
+            ListPredicate predicate, void **params);
 
 #endif

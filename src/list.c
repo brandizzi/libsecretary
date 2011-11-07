@@ -75,10 +75,10 @@ void list_sort(List *list, UtilComparator comparator) {
 }
 
 void *list_get_nth_item_by_criteria(List *list, int index, 
-            ListPredicate predicate) {
+            ListPredicate predicate, void **params) {
     int counter = 0;
     for (int i = 0; i < list->number_of_items; i++) {
-        if (predicate(list->items[i])) {
+        if (predicate(list->items[i], params)) {
             if (counter == index) return list->items[i];
             counter++;
         }

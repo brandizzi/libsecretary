@@ -146,12 +146,12 @@ static void test_list_sort(CuTest *test) {
     list_free(list);
 }
 
-static bool is_even(void *p) {
+static bool is_even(void *p, void **params) {
     int *pi = p;
     return *pi % 2 == 0;
 }
 
-static bool is_odd(void *p) {
+static bool is_odd(void *p, void **params) {
     int *pi = p;
     return *pi % 2;
 }
@@ -167,25 +167,75 @@ static void test_list_get_nth_item_by_criteria(CuTest *test) {
     list_add_item(list, &i4);
     list_add_item(list, &i5);
 
-    int *p = list_get_nth_item_by_criteria(list, 0, is_even);
+    int *p = list_get_nth_item_by_criteria(list, 0, is_even, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 2);
-    p = list_get_nth_item_by_criteria(list, 1, is_even);
+    p = list_get_nth_item_by_criteria(list, 1, is_even, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 4);
-    p = list_get_nth_item_by_criteria(list, 2, is_even);
+    p = list_get_nth_item_by_criteria(list, 2, is_even, NULL);
     CuAssertPtrEquals(test, p, NULL);
 
-    p = list_get_nth_item_by_criteria(list, 0, is_odd);
+    p = list_get_nth_item_by_criteria(list, 0, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 1);
-    p = list_get_nth_item_by_criteria(list, 1, is_odd);
+    p = list_get_nth_item_by_criteria(list, 1, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 3);
-    p = list_get_nth_item_by_criteria(list, 2, is_odd);
+    p = list_get_nth_item_by_criteria(list, 2, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 5);
-    p = list_get_nth_item_by_criteria(list, 3, is_odd);
+    p = list_get_nth_item_by_criteria(list, 3, is_odd, NULL);
+    CuAssertPtrEquals(test, p, NULL);
+
+    list_free(list);
+}
+
+static bool is_rest_equal(void *item, void **params) {
+    int *pi = item,
+        *pq = params[0], // First parameter: quotient
+        *pr = params[1]; // Scnd  parameter: rest
+    
+    return *pi % *pq == *pr;
+}
+
+static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
+    List *list = list_new();
+
+    int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
+
+    list_add_item(list, &i1);
+    list_add_item(list, &i2);
+    list_add_item(list, &i3);
+    list_add_item(list, &i4);
+    list_add_item(list, &i5);
+
+
+    int quotient, rest;
+    void *params[] = { &quotient, &rest };
+
+    quotient = 3;
+    rest = 2;
+
+    int *p = list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
+    CuAssertTrue(test, p != NULL);
+    CuAssertIntEquals(test, *p, 2);
+    p = list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
+    CuAssertTrue(test, p != NULL);
+    CuAssertIntEquals(test, *p, 5);
+    p = list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
+    CuAssertPtrEquals(test, p, NULL);
+
+    quotient = 4;
+    rest = 1;
+
+    p = list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
+    CuAssertTrue(test, p != NULL);
+    CuAssertIntEquals(test, *p, 1);
+    p = list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
+    CuAssertTrue(test, p != NULL);
+    CuAssertIntEquals(test, *p, 5);
+    p = list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
     CuAssertPtrEquals(test, p, NULL);
 
     list_free(list);
@@ -200,5 +250,6 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_remove_item);
     SUITE_ADD_TEST(suite, test_list_sort);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria);
+    SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria_with_params);
     return suite;
 }
