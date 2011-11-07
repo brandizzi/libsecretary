@@ -40,9 +40,9 @@ static void test_project_alter_name(CuTest *test) {
 
 static void test_project_remove_task(CuTest *test) {
     Project *project = project_new("libsecretary");
-    Task *task1 = task_new(1, "Create first task"),
-         *task2 = task_new(2, "Create snd task"),
-         *task3 = task_new(3, "Create thrid task");
+    Task *task1 = task_new("Create first task"),
+         *task2 = task_new("Create snd task"),
+         *task3 = task_new("Create thrid task");
 
     project_add_task(project, task1);
     project_add_task(project, task2);
@@ -67,9 +67,9 @@ static void test_project_remove_task(CuTest *test) {
 
 void test_project_archived_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
-    Task *task1 = task_new(1, "Create first task"),
-         *task2 = task_new(2, "Create snd task"),
-         *task3 = task_new(3, "Create thrid task");
+    Task *task1 = task_new("Create first task"),
+         *task2 = task_new("Create snd task"),
+         *task3 = task_new("Create thrid task");
 
     project_add_task(project, task1);
     project_add_task(project, task2);
@@ -94,9 +94,9 @@ void test_project_archived_tasks(CuTest *test) {
 
 void test_project_archive_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
-    Task *task1 = task_new(1, "Create first task"),
-         *task2 = task_new(2, "Create snd task"),
-         *task3 = task_new(3, "Create thrid task");
+    Task *task1 = task_new("Create first task"),
+         *task2 = task_new("Create snd task"),
+         *task3 = task_new("Create thrid task");
 
     project_add_task(project, task1);
     project_add_task(project, task2);
@@ -142,9 +142,9 @@ void test_project_archived(CuTest *test) {
 
 static void test_project_free_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
-    Task *task1 = task_new(1, "Create first task"),
-         *task2 = task_new(2, "Create snd task"),
-         *task3 = task_new(3, "Create thrid task");
+    Task *task1 = task_new("Create first task"),
+         *task2 = task_new("Create snd task"),
+         *task3 = task_new("Create thrid task");
 
     project_add_task(project, task1);
     project_add_task(project, task2);

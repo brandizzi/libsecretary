@@ -24,14 +24,14 @@
 #include <stdlib.h>
 
 static void test_task_create(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertStrEquals(test, "Do something", task_get_description(task));
 
     task_free(task);
 }
 
 static void test_task_alter_description(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertStrEquals(test, "Do something", task_get_description(task));
     task_set_description(task, "Do something else");
     CuAssertStrEquals(test, "Do something else", task_get_description(task));
@@ -40,7 +40,7 @@ static void test_task_alter_description(CuTest *test) {
 }
 
 static void test_task_remove_from_project(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     Project *project = project_new("libsecretary");
     CuAssertPtrEquals(test, task_get_project(task), NULL);
 
@@ -54,7 +54,7 @@ static void test_task_remove_from_project(CuTest *test) {
 }
 
 static void test_task_is_in_project(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     Project *project = project_new("libsecretary");
     CuAssertTrue(test, !task_is_in_project(task, project));
 
@@ -66,7 +66,7 @@ static void test_task_is_in_project(CuTest *test) {
 }
 
 static void test_task_switch_done_status(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertTrue(test, !task_is_done(task));
     task_mark_as_done(task);
     CuAssertTrue(test, task_is_done(task));
@@ -81,7 +81,7 @@ static void test_task_switch_done_status(CuTest *test) {
 }
 
 static void test_task_is_in_inbox(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertTrue(test, (task_is_in_inbox(task) && !task_is_archived(task)));
 
     task_mark_as_done(task);
@@ -106,7 +106,7 @@ static void test_task_is_in_inbox(CuTest *test) {
 }
 
 static void test_task_archived_is_in_inbox(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertTrue(test, (task_is_in_inbox(task) && !task_is_archived(task)));
 
     CuAssertTrue(test, !(task_is_in_inbox(task) && task_is_archived(task)));
@@ -131,7 +131,7 @@ static void test_task_archived_is_in_inbox(CuTest *test) {
 }
 
 static void test_task_archive(CuTest *test) {
-    Task *task = task_new(1, "Do something" );
+    Task *task = task_new("Do something" );
     CuAssertTrue(test, !task_is_archived(task));
     task_archive(task); // does nothing, task is not done
     CuAssertTrue(test, !task_is_archived(task));
@@ -148,6 +148,9 @@ static void test_task_archive(CuTest *test) {
     task_free(task);
 }
 
+static void test_task_creation_date(CuTest *test) {
+    
+}
 
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();

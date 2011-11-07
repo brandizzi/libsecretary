@@ -27,9 +27,8 @@
 
 #define SECONDS_IN_DAY (60*60*24)
 
-Task *task_new(int number, const char *description) {
+Task *task_new(const char *description) {
     Task *task = malloc(sizeof(Task));
-    task->number = number;
     task->description = util_copy_string(description);
     task->project = NULL;
     task->scheduled = false;
@@ -37,10 +36,6 @@ Task *task_new(int number, const char *description) {
     task->done = false;
     task->secretary = NULL;
     return task;
-}
-
-int task_get_number(Task *task) {
-    return task->number;
 }
 
 const char *task_get_description(Task *task) {

@@ -38,7 +38,7 @@ Secretary *secretary_new() {
 }
 
 Task *secretary_create_task(Secretary *secretary, const char* description) {
-    Task *task = task_new(list_count_items(secretary->tasks)+1, description);
+    Task *task = task_new(description);
     task->secretary = secretary;
     list_add_item(secretary->tasks, task);
     // Registering in inbox
@@ -133,10 +133,8 @@ void secretary_archive_inbox_tasks(Secretary *secretary) {
 }
 
 Task *secretary_get_task(Secretary *secretary, int number) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        if (task_get_number(list_get_nth_item(secretary->tasks, i)) == number) {
-           return list_get_nth_item(secretary->tasks, i);
-        }
+    if (number < secretary_count_all_tasks(secretary)) {
+        return list_get_nth_item(secretary->tasks, number);
     }
     return NULL;
 }

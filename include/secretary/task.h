@@ -46,9 +46,8 @@ typedef struct {
     bool archived;
 } Task;
 
-Task *task_new(int number, const char *description);
+Task *task_new(const char *description);
 
-int task_get_number(Task *task);
 const char *task_get_description(Task *task);
 void task_set_description(Task *task, const char *description);
 

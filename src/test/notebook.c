@@ -47,7 +47,6 @@ void test_notebook_save_with_task(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
-    CuAssertIntEquals(test, 1, task_get_number(task));
     CuAssertStrEquals(test, "Test task creation", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
@@ -57,13 +56,12 @@ void test_notebook_save_with_task(CuTest *test) {
     // Retrieving it
     notebook = notebook_new("nofile");
     secretary = notebook_get_secretary(notebook);
-    task = secretary_get_task(secretary, 1);
+    task = secretary_get_task(secretary, 0);
 
     CuAssertTrue(test, task != NULL);
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
-    CuAssertIntEquals(test, 1, task_get_number(task));
     CuAssertStrEquals(test, "Test task creation", task_get_description(task));
     CuAssertPtrEquals(test, NULL, task_get_project(task));
 
@@ -93,9 +91,9 @@ void test_notebook_save_many_tasks(CuTest *test) {
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
 
-    task1 = secretary_get_task(secretary, 1);
-    task2 = secretary_get_task(secretary, 2);
-    task3 = secretary_get_task(secretary, 3);
+    task1 = secretary_get_task(secretary, 0);
+    task2 = secretary_get_task(secretary, 1);
+    task3 = secretary_get_task(secretary, 2);
     CuAssertStrEquals(test, "Create first task", task_get_description(task1));
     CuAssertStrEquals(test, "Create snd task", task_get_description(task2));
     CuAssertStrEquals(test, "Create third task", task_get_description(task3));
