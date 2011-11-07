@@ -42,13 +42,9 @@ void project_add_task(Project *project, Task *task) {
     }
 }
 
-Task *project_get_task(Project *project, int number) {
-    for (int i = 0; i < list_count_items(project->tasks); i++) {
-        Task *task = list_get_nth_item(project->tasks, i);
-        if (task->number == number) {
-            return task;
-        }
-    }
+Task *project_get_task(Project *project, int index) {
+    if (index < list_count_items(project->tasks)) 
+        return list_get_nth_item(project->tasks, index);
     return NULL;
 }
 
