@@ -156,16 +156,24 @@ void task_free(Task *task) {
 
 int task_compare(const Task *task1, const Task *task2) {
     int result;
+    // Archived are greater than non archived
     result = task1->archived - task2->archived;
     if (result) return result;
+    // Scheduled are greater than non scheduled`
     result = task2->scheduled - task1->scheduled;
     if (result) return result;
-    if (task1->scheduled) result = task1->scheduled_for - task2->scheduled_for;
-    if (result) return result;
+    // Scheduled for later are greater than scheduled for sooner
+    if (task1->scheduled) {
+        result = task1->scheduled_for - task2->scheduled_for;
+        if (result) return result;
+    }
+    // Created later are greater than created sooner
     result = task1->created_at - task2->created_at;
     if (result) return result;
+    // High numbered are greater than low numbered
     result = task1->number - task2->number;
     if (result) return result;
+    // Ordered by name
     return strcmp(task2->description, task1->description);
 }
 
