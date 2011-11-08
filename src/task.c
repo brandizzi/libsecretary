@@ -155,22 +155,18 @@ void task_free(Task *task) {
 }
 
 int task_compare(const Task *task1, const Task *task2) {
-    if (task2->archived && ! task1->archived) return -1;
-    if (task1->archived && ! task2->archived) return 1;
-    if(task1->scheduled && !task2->scheduled) return -1;
-    if(task2->scheduled && !task1->scheduled) return 1;
-    if(task1->scheduled && task2->scheduled && task1->scheduled_for < task2->scheduled_for) return -1;
-    if(task1->scheduled && task2->scheduled && task1->scheduled_for > task2->scheduled_for) return 1;
-    if( task1->created_at < task2->created_at) return -1;
-    if( task1->created_at > task2->created_at) return 1;
-    if( task1->number < task2->number) return -1;
-    if( task1->number > task2->number) return 1;
+    int result;
+    result = task1->archived - task2->archived;
+    if (result) return result;
+    result = task2->scheduled - task1->scheduled;
+    if (result) return result;
+    if (task1->scheduled) result = task1->scheduled_for - task2->scheduled_for;
+    if (result) return result;
+    result = task1->created_at - task2->created_at;
+    if (result) return result;
+    result = task1->number - task2->number;
+    if (result) return result;
     return strcmp(task2->description, task1->description);
 }
 
-/* THE FOLLOWING FUNCTIONS SHOULD NOT BE USED BY EXTERNAL CLIENTS */
 
-int _task_compare_by_date(const void *p1, const void* p2) {
-    Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;
-    return task1->scheduled_for - task2->scheduled_for;
-}
