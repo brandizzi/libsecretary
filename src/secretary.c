@@ -30,32 +30,24 @@ Secretary *secretary_new() {
     Secretary *secretary = calloc(1, sizeof(Secretary));
     secretary->tasks = list_new();
     secretary->projects = list_new();
-    secretary->inbox_perspective.visible_tasks = list_new();
-    secretary->inbox_perspective.archived_tasks = list_new();
-    secretary->scheduled_perspective.visible_tasks = list_new();
-    secretary->scheduled_perspective.archived_tasks = list_new();
+    secretary->acc = 0;
     return secretary;
 }
 
 Task *secretary_create_task(Secretary *secretary, const char* description) {
     Task *task = task_new(description);
     task->secretary = secretary;
+    task->number = ++secretary->acc;
     list_add_item(secretary->tasks, task);
-    // Registering in inbox
-    list_add_item(secretary->inbox_perspective.visible_tasks, task);
+#warning to optimize
+    secretary_sort_tasks(secretary);
     return task;
 }
 
 int secretary_count_tasks(Secretary *secretary, bool archived) {
-#warning to optimize (maybe using perspectives)
-    int counter = 0;
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_archived(task) == archived) { 
-            counter++;
-        }
-    }
-    return counter;
+    void *params[] = { &archived };
+    return list_count_items_by_criteria(
+            secretary->tasks, _secretary_predicate_task_archival_is, params);
 }
 
 int secretary_count_all_tasks(Secretary *secretary) {
@@ -77,14 +69,9 @@ int secretary_count_projects(Secretary *secretary) {
 }
 
 Project *secretary_get_project(Secretary *secretary, const char *name) {
-    for (int i = 0; i < list_count_items(secretary->projects); i++) {
-        Project *project = list_get_nth_item(secretary->projects, i);
-        if (strcmp(name, project_get_name(project)) == 0) {
-            return project;
-        }
-    }
-    
-    return NULL;
+    void *params[] = { (void*) name };
+    return list_get_nth_item_by_criteria(secretary->projects, 0,
+            _secretary_predicate_project_is_named, params);
 }
 
 Project *secretary_get_nth_project(Secretary *secretary, int n) {
@@ -97,9 +84,8 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
         project_remove_task(project, task);
     }
     list_remove_item(secretary->tasks, task);
-
-    _secretary_unregister_from_inbox(secretary, task);
-    _secretary_unregister_from_scheduled(secretary, task);
+#warning to optimize
+    secretary_sort_tasks(secretary);
 
     task_free(task);
 }
@@ -110,29 +96,31 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->inbox_perspective, archived);
-    return list_count_items(list);
+    void *params[] = { &archived };
+    return list_count_items_by_criteria(secretary->tasks, 
+            _secretary_predicate_task_is_in_inbox, params);
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->inbox_perspective, archived);
-    return list_get_nth_item(list, n);
+    void *params[] = { &archived };
+    return list_get_nth_item_by_criteria(secretary->tasks, n,
+            _secretary_predicate_task_is_in_inbox, params);
 }
 
 void secretary_archive_inbox_tasks(Secretary *secretary) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->inbox_perspective, false);
-    for (int i = 0; i < list_count_items(list); i++) {
-        Task *task = list_get_nth_item(list, i);
-        if (task_is_done(task)) {
-            task_archive(task);
-        }
+    bool archived = false;
+    void *params[] = { &archived };
+    int done_count = list_count_items_by_criteria(secretary->tasks,
+                _secretary_predicate_inbox_task_is_done, params);
+    for (int i = 0; i < done_count; i++) {
+        Task *task = list_get_nth_item_by_criteria(secretary->tasks, 0,
+                _secretary_predicate_inbox_task_is_done, params);
+        task_archive(task);
     }
 }
 
 Task *secretary_get_task(Secretary *secretary, int number) {
+#warning function secretary_get_task to be removed
     if (number < secretary_count_all_tasks(secretary)) {
         return list_get_nth_item(secretary->tasks, number);
     }
@@ -146,31 +134,21 @@ void secretary_free(Secretary *secretary) {
     for (int i = 0; i < list_count_items(secretary->tasks); i++) {
         task_free(list_get_nth_item(secretary->tasks, i));
     }
-    list_free(secretary->inbox_perspective.archived_tasks);
-    list_free(secretary->inbox_perspective.visible_tasks);
-    list_free(secretary->scheduled_perspective.archived_tasks);
-    list_free(secretary->scheduled_perspective.visible_tasks);
     free(secretary);
 }
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, archived);
-    return list_count_items(list);
+    void *params[] = { &archived };
+    return list_count_items_by_criteria(secretary->tasks, 
+            _secretary_predicate_task_is_scheduled, params);
 }
 
 
 int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date,
             bool archived) {
-    // Note that the function assumes an ordered list!
-    int counter = 0;
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, archived);
-    for (counter = 0; counter < list_count_items(list); counter++) {
-        Task *task = list_get_nth_item(list, counter);
-        if (!task_is_scheduled_for(task, date)) break;
-    }
-    return counter;
+    void *params[] = { &archived, &date };
+    return list_count_items_by_criteria(secretary->tasks, 
+            _secretary_predicate_task_is_scheduled_for, params);
 }
 int secretary_count_tasks_scheduled_for_today(Secretary *secretary, 
             bool archived) {
@@ -178,24 +156,22 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary,
 }
 
 void secretary_archive_scheduled_tasks(Secretary *secretary) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, false);
-   for (int i = 0; i < list_count_items(list); i++) {
-        Task *task = list_get_nth_item(list, i);
-        if (task_is_done(task)) {
-            task_archive(task);
-        }
+    int scheduled_count = list_count_items_by_criteria(secretary->tasks, 
+            _secretary_predicate_done_scheduled_task, NULL);
+    for (int i = 0; i < scheduled_count; i++) {
+        Task *task = list_get_nth_item_by_criteria(secretary->tasks, i,
+                _secretary_predicate_done_scheduled_task, NULL);
+        task_archive(task);
     }
 }
 void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, false);
-    for (int i = 0; i < list_count_items(list); i++) {
-        Task *task = list_get_nth_item(list, i);
-        if (task_is_done(task) && 
-                task_is_scheduled_for(task, date)) {
-            task_archive(task);
-        }
+    void *params[] = { &date };
+    int scheduled_count = list_count_items_by_criteria(secretary->tasks, 
+            _secretary_predicate_done_task_scheduled_for, params);
+    for (int i = 0; i < scheduled_count; i++) {
+        Task *task = list_get_nth_item_by_criteria(secretary->tasks, i,
+                _secretary_predicate_done_task_scheduled_for, params);
+        task_archive(task);
     }
 }
 void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
@@ -204,58 +180,94 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, archived);
-    return list_get_nth_item(list, n);
+    void *params[] = { &archived };
+    return list_get_nth_item_by_criteria(secretary->tasks, n,
+                _secretary_predicate_task_is_scheduled, params);
 }
 
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, 
         int n, bool archived) {
-    List *list = _secretary_get_list_from_perspective(
-            secretary->scheduled_perspective, archived);
-    Task *task = list_get_nth_item(list, n);
-    // Making use of the ordered list
-    if (task && task_is_scheduled_for(task, date)) {
-        return task;
-    } else {
-        return NULL;
-    }
+    void *params[] = { &archived, &date };
+    return list_get_nth_item_by_criteria(secretary->tasks, n,
+                _secretary_predicate_task_is_scheduled_for, params);
 }
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
         bool archived) {
     return secretary_get_nth_task_scheduled_for(secretary, time(NULL), n, archived);
 }
 
+// WHY ON EARTH HAS IT AN archived ARGUMENT!?!?!?!
 int secretary_count_done_tasks(Secretary *secretary, bool archived) {
-    int counter = 0;
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_done(task) && task_is_archived(task) == archived) {
-            counter++;
-        }
-    }
-    return counter;
+    void *params[] = { &archived };
+    return list_count_items_by_criteria(secretary->tasks,
+            _secretary_predicate_task_is_done, params);
 }
 
 Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        Task *task = list_get_nth_item(secretary->tasks, i);
-        if (task_is_done(task) && task_is_archived(task) == archived 
-                && n-- == 0) {
-            return task;
-        }
-    }
-    return NULL;
+    void *params[] = { &archived };
+    return list_get_nth_item_by_criteria(secretary->tasks, n,
+            _secretary_predicate_task_is_done, params);
+}
+
+void secretary_sort_tasks(Secretary *secretary) {
+    list_sort(secretary->tasks, _secretary_task_compare);
 }
 
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
-/* Predicates */
-bool _secretary_predicate_task_is_in_inbox(void *task, void **params) {
-    return task_is_in_inbox(task);
+/* UtilComparators */
+int _secretary_task_compare(const void *p1, const void *p2) {
+    const Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;
+    return task_compare(task1, task2);
 }
 
- 
+/* Predicates */
+bool _secretary_predicate_task_is_in_inbox(void *task, void **params) {
+    bool archived = *(bool*)params[0];
+    return task_is_in_inbox(task) && task_is_archived(task) == archived;
+}
+
+bool _secretary_predicate_task_archival_is(void *task, void **params) {
+    bool archived = *(bool*)params[0];
+    return task_is_archived(task) == archived;
+}
+
+bool _secretary_predicate_project_is_named(void *project, void **params) {
+    const char *name = (const char*)params[0];
+    return strcmp(project_get_name(project), name) == 0;
+}
+
+bool _secretary_predicate_task_is_done(void *task, void **params) {
+    bool archived = params ? *(bool*)params[0] : false;
+    return task_is_done(task) && task_is_archived(task) == archived;
+}
+
+bool _secretary_predicate_task_is_scheduled(void *task, void **params) {
+    bool archived = *(bool*)params[0];
+    return task_is_scheduled(task) && task_is_archived(task) == archived;
+}
+
+bool _secretary_predicate_task_is_scheduled_for(void *task, void **params) {
+    bool archived = *(bool*)params[0];
+    time_t date = *(time_t*)params[1];
+    return task_is_scheduled_for(task, date) && task_is_archived(task) == archived;
+}
+
+bool _secretary_predicate_done_scheduled_task(void *task, void **params) {
+    return task_is_done(task) && task_is_scheduled(task);
+}
+
+bool _secretary_predicate_done_task_scheduled_for(void *task, void **params) {
+    time_t date = *(time_t*)params[0];
+    return task_is_done(task) && task_is_scheduled_for(task, date);
+}
+
+bool _secretary_predicate_inbox_task_is_done(void *task, void **params) {
+    bool archived = params ? *(bool*)params[0] : false;
+    return task_is_in_inbox(task) && task_is_done(task) && task_is_archived(task) == archived;
+
+}
+ /*
 void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
     if (secretary) {
         if (task_is_in_inbox(task)) {
@@ -335,4 +347,4 @@ List *_secretary_get_list_from_perspective(_SecretaryPerspective perspective,
         return perspective.visible_tasks;
     }
 }
-
+*/

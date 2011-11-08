@@ -29,6 +29,7 @@ struct Project;
 struct Secretary;
 
 typedef struct {
+    int number; // For internal purposes not really that important...
     time_t created_at;
     char *description;
     struct Project *project;
@@ -74,7 +75,7 @@ bool task_is_done(Task *task);
 void task_archive(Task *task);
 bool task_is_archived(Task *task);
 
-int task_compare(Task *task1, Task *task2);
+int task_compare(const Task *task1, const Task *task2);
 
 void task_free(Task *task);
 

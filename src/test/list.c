@@ -20,6 +20,8 @@
  */
 #include <secretary/test/list.h>
 #include <secretary/list.h>
+#include <secretary/task.h>
+#include <secretary/task.h>
 #include <stdlib.h>
 
 static void test_list_create(CuTest *test) {
@@ -142,6 +144,76 @@ static void test_list_sort(CuTest *test) {
     CuAssertPtrEquals(test, &i3, list_get_nth_item(list, 2));
     CuAssertPtrEquals(test, &i4, list_get_nth_item(list, 3));
     CuAssertPtrEquals(test, &i5, list_get_nth_item(list, 4));
+
+    list_free(list);
+}
+
+static int my_task_compare(const void *p1, const void *p2) {
+    const Task *t1 = *(Task**)p1,
+            *t2 = *(Task**)p2;
+    return task_compare(t1, t2);
+}
+
+static void test_list_sort_tasks(CuTest *test) {
+    List *list = list_new();
+
+    Task *as6_task = task_new("as6_task"),
+        *s6_task = task_new("s6_task"),
+        *as3_task = task_new("as3_task"),
+        *s3_task = task_new("s3_task"),
+        *a_task = task_new("a_task"),
+        *task = task_new("task");
+
+    // Setting it up
+    s6_task->created_at += 1;
+    as6_task->created_at += 2;
+    s3_task->created_at += 3;
+    as3_task->created_at += 4;
+    task->created_at += 5;
+    a_task->created_at += 6;
+
+    time_t scheduling_date = time(NULL);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(s3_task, scheduling_date);
+    task_schedule(as3_task, scheduling_date);
+
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(s6_task, scheduling_date);
+    task_schedule(as6_task, scheduling_date);
+
+    task_mark_as_done(as6_task); 
+    task_archive(as6_task);
+    task_mark_as_done(as3_task); 
+    task_archive(as3_task);
+    task_mark_as_done(a_task); 
+    task_archive(a_task);
+
+    list_add_item(list, as6_task);
+    list_add_item(list, s6_task);
+    list_add_item(list, as3_task);
+    list_add_item(list, s3_task);
+    list_add_item(list, a_task);
+    list_add_item(list, task);
+
+    CuAssertIntEquals(test, list_count_items(list), 6);
+    CuAssertPtrEquals(test, as6_task, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, s6_task, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, as3_task, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, s3_task, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, a_task, list_get_nth_item(list, 4));
+    CuAssertPtrEquals(test, task, list_get_nth_item(list, 5));
+
+    CuAssertIntEquals(test, list_count_items(list), 6);
+    list_sort(list, my_task_compare);
+    
+    CuAssertIntEquals(test, list_count_items(list), 6);
+    CuAssertPtrEquals(test, s3_task, list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, s6_task, list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, task, list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, as3_task, list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, as6_task, list_get_nth_item(list, 4));
+    CuAssertPtrEquals(test, a_task, list_get_nth_item(list, 5));
+
 
     list_free(list);
 }
@@ -297,6 +369,7 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_add_a_lot);
     SUITE_ADD_TEST(suite, test_list_remove_item);
     SUITE_ADD_TEST(suite, test_list_sort);
+    SUITE_ADD_TEST(suite, test_list_sort_tasks);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria_with_params);
     SUITE_ADD_TEST(suite, test_list_count_items_by_criteria);

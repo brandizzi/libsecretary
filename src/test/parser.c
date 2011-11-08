@@ -112,16 +112,27 @@ static void test_parser_v1_2(CuTest *test) {
     CuAssertIntEquals(test, 2, 
             secretary_count_tasks_scheduled_for(secretary, future_time, false));
 
-    Task *task = secretary_get_nth_done_task(secretary, 1, false);
+    Task *task = secretary_get_nth_done_task(secretary, 0, false);
     CuAssertTrue(test, task_is_done(task));
+    CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
+    CuAssertPtrEquals(test, task_get_project(task), NULL);
+    CuAssertIntEquals(test, util_beginning_of_day(now), task_get_scheduled_date(task));
+
+    task = secretary_get_nth_done_task(secretary, 1, false);
+    CuAssertStrEquals(test, "Create Cocoa interface", 
+            task_get_description(task));
     CuAssertTrue(test, task_get_project(task) != NULL);
     CuAssertStrEquals(test, "chocrotary", 
             project_get_name(task_get_project(task)));
-    CuAssertIntEquals(test, util_beginning_of_day(future_time), task_get_scheduled_date(task));
+    CuAssertIntEquals(test, util_beginning_of_day(future_time),
+            task_get_scheduled_date(task));
 
     task = secretary_get_nth_done_task(secretary, 2, false);
-    CuAssertStrEquals(test, "Buy pequi", task_get_description(task));
-    CuAssertPtrEquals(test, NULL, task_get_project(task));
+    CuAssertStrEquals(test, "Test notebook", task_get_description(task));
+    CuAssertTrue(test, task_get_project(task) != NULL);
+    CuAssertStrEquals(test, "libsecretary", 
+            project_get_name(task_get_project(task)));
+    CuAssertTrue(test, ! task_is_scheduled(task));
 
     secretary_free(secretary);
 
@@ -235,7 +246,6 @@ static void test_parser_v1_2_saves_struct_tm(CuTest *test) {
     fclose(file);
 
     remove("nofile");
-
 }
 
 

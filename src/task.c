@@ -22,6 +22,7 @@
 #include <secretary/project.h>
 #include <secretary/util.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <secretary/_internal/secretary.h>
 
@@ -36,6 +37,7 @@ Task *task_new(const char *description) {
     task->archived = false;
     task->done = false;
     task->secretary = NULL;
+    task->number = 0;
     return task;
 }
 
@@ -50,6 +52,9 @@ const char *task_get_description(Task *task) {
 void task_set_description(Task *task, const char *description) {
     free(task->description);
     task->description = util_copy_string(description);
+    if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
+    }
 }
 
 Project *task_get_project(Task *task) {
@@ -58,6 +63,9 @@ Project *task_get_project(Task *task) {
 
 void task_set_project(Task *task, Project *project) {
     project_add_task(project, task);
+    if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
+    }
 }
 
 bool task_has_project(Task *task) {
@@ -71,6 +79,9 @@ bool task_is_in_project(Task *task, struct Project *project) {
 void task_unset_project(Task *task) {
     if (task->project == NULL) return;
     project_remove_task(task->project, task);
+    if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
+    }
 }
 
 bool task_is_in_inbox(Task *task) {
@@ -78,18 +89,11 @@ bool task_is_in_inbox(Task *task) {
 }
 
 void task_schedule(Task *task, time_t date) {
-    bool was_in_inbox = task_is_in_inbox(task),
-        was_scheduled = task_is_scheduled(task);
     task->scheduled = true;
     task->scheduled_for = date-(date%(UTIL_SECONDS_IN_DAY));
-    // For optimization of secretary
-    if (was_in_inbox) {
-        _secretary_unregister_from_inbox(task->secretary, task);
-    }
-    if (!was_scheduled) {
-        _secretary_register_in_scheduled(task->secretary, task);
-    } else {
-        _secretary_sort_scheduled_tasks(task->secretary, task);
+    // Optimization
+    if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
     }
 }
 
@@ -109,9 +113,9 @@ bool task_is_scheduled_for(Task *task, time_t date) {
 
 void task_unschedule(Task *task) {
     task->scheduled = false;
-    // For secretary optimization
-    _secretary_unregister_from_scheduled(task->secretary, task);
-    _secretary_register_in_inbox(task->secretary, task);
+        if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
+    }
 }
 
 void task_mark_as_done(Task *task) {
@@ -119,14 +123,8 @@ void task_mark_as_done(Task *task) {
 }
 
 void task_unmark_as_done(Task *task) {
-    bool was_archived = task->archived;
     task->done = false;
     task->archived = false;
-    // For secretary optimization
-    if (was_archived) {
-        _secretary_switch_list_in_inbox_perspective(task->secretary, task);
-        _secretary_switch_list_in_scheduled_perspective(task->secretary, task);
-    }
 }
 
 void task_switch_done_status(Task *task) {
@@ -138,11 +136,9 @@ bool task_is_done(Task *task) {
 }
 
 void task_archive(Task *task) {
-    bool was_archived = task->archived;
     task->archived = task->done && true;
-    if (!was_archived) {
-        _secretary_switch_list_in_inbox_perspective(task->secretary, task);
-        _secretary_switch_list_in_scheduled_perspective(task->secretary, task);
+    if (task->secretary) {
+        secretary_sort_tasks(task->secretary);
     }
 }
 
@@ -158,14 +154,18 @@ void task_free(Task *task) {
     free(task);
 }
 
-int task_compare(Task *task1, Task *task2) {
-    int result = task2->archived - task1->archived;
-    if (result) return result;
-    result = task1->scheduled - task2->scheduled;
-    if (result) return result;
-    if (task1->scheduled) result = task2->scheduled_for - task1->scheduled_for;
-    if (result) return result;
-    return task2->created_at - task1->created_at;
+int task_compare(const Task *task1, const Task *task2) {
+    if (task2->archived && ! task1->archived) return -1;
+    if (task1->archived && ! task2->archived) return 1;
+    if(task1->scheduled && !task2->scheduled) return -1;
+    if(task2->scheduled && !task1->scheduled) return 1;
+    if(task1->scheduled && task2->scheduled && task1->scheduled_for < task2->scheduled_for) return -1;
+    if(task1->scheduled && task2->scheduled && task1->scheduled_for > task2->scheduled_for) return 1;
+    if( task1->created_at < task2->created_at) return -1;
+    if( task1->created_at > task2->created_at) return 1;
+    if( task1->number < task2->number) return -1;
+    if( task1->number > task2->number) return 1;
+    return strcmp(task2->description, task1->description);
 }
 
 /* THE FOLLOWING FUNCTIONS SHOULD NOT BE USED BY EXTERNAL CLIENTS */

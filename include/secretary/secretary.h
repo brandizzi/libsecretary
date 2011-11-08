@@ -27,20 +27,9 @@
 #include <secretary/list.h>
 #include <time.h>
 
-/**
- * This is a private data type that should not be used by secretary clients
- */ 
-typedef struct _SecretaryPerspective {
-    List *archived_tasks, *visible_tasks;
-} _SecretaryPerspective;
-
 typedef struct Secretary {
+    int acc; // For strange purposes
     List *tasks, *projects;
-    /**
-     * This struct represents some perspectives of the secretary. It allows
-     * secretary to somewhat "cache" inbox and scheduled tasks. 
-     */
-    struct _SecretaryPerspective inbox_perspective, scheduled_perspective;
 } Secretary;
 
 Secretary *secretary_new();
@@ -71,6 +60,8 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary);
 
 int secretary_count_done_tasks(Secretary *secretary, bool archived);
 Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived);
+
+void secretary_sort_tasks(Secretary *secretary);
 
 void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);

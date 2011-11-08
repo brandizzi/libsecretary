@@ -55,7 +55,6 @@ void list_free(List *list);
  * greater than 0 if the second pointed item is respectively smaller than, equal
  * to or greater than the first pointed item.
  */
-
 void list_sort(List *list, UtilComparator comparator);
 
 /**
