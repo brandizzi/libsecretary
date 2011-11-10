@@ -361,6 +361,32 @@ static void test_list_count_items_by_criteria_with_params(CuTest *test) {
     list_free(list);
 }
 
+static void test_list_sublist(CuTest *test) {
+    List *list = list_new();
+
+    int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
+
+    list_add_item(list, &i1);
+    list_add_item(list, &i2);
+    list_add_item(list, &i3);
+    list_add_item(list, &i4);
+    list_add_item(list, &i5);
+
+
+    List *sublist = sublist_new(list, 2, 2);
+
+    CuAssertIntEquals(test, 2, list_count_items(sublist));
+    int *p = list_get_nth_item(sublist, 0);
+    CuAssertIntEquals(test, 3, *p);
+    p = list_get_nth_item(sublist, 1);
+    CuAssertIntEquals(test, 4, *p);
+    p = list_get_nth_item(sublist, 3);
+    CuAssertPtrEquals(test, NULL, p);
+
+    sublist_free(sublist);
+    list_free(list);
+}
+
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
@@ -374,5 +400,6 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_get_nth_item_by_criteria_with_params);
     SUITE_ADD_TEST(suite, test_list_count_items_by_criteria);
     SUITE_ADD_TEST(suite, test_list_count_items_by_criteria_with_params);
+    SUITE_ADD_TEST(suite, test_list_sublist);
     return suite;
 }

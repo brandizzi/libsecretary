@@ -66,4 +66,12 @@ void *list_get_nth_item_by_criteria(List *list, int index,
             ListPredicate predicate, void **params);
 int list_count_items_by_criteria(List *list, ListPredicate predicate,
         void **params);
+
+/**
+ * Creates a sublist - a list which just points to a section of another, greater
+ * list. This is a read only list - you should not update it.
+ */
+List *sublist_new(List *superlist, int start, int count);
+void sublist_free(List *sublist);
+
 #endif

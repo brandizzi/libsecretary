@@ -95,6 +95,19 @@ int list_count_items_by_criteria(List *list, ListPredicate predicate,
     return counter;
 }
 
+List *sublist_new(List *superlist, int start, int count) {
+    List *list = malloc(sizeof(List));
+    list->items = superlist->items+start;
+    list->space = 0;
+    list->number_of_items = count;
+    return list;
+
+}
+void sublist_free(List *sublist) {
+    free(sublist);
+}
+
+
 /* PRIVATE FUNCTIONS */
 
 static void list_expand(List *list) {
