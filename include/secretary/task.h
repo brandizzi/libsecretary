@@ -33,12 +33,6 @@ typedef struct {
     time_t created_at;
     char *description;
     struct Project *project;
-    /**
-     * This secretary reference is only useful for optimizations and should not
-     * be used by any client. (Actually, no struct field should be directly
-     * used by libsecretary clients at all.)
-    struct Secretary *secretary;
-     */
 
     bool scheduled;
     time_t scheduled_for;

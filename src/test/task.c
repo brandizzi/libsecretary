@@ -351,6 +351,57 @@ void test_task_compare_orders_by_description(CuTest *test) {
     task_free(task3);
 }
 
+void test_task_compare_orders_by_project(CuTest *test) {
+    Task *task1 = task_new("task 1"),
+        *task2 = task_new("task 2"),
+        *task3 = task_new("task 3");
+
+    // A little help...
+    task1->number = 1;
+    task2->number = 2;
+    task3->number = 3;
+    // Projecting
+    Project *project = project_new("project");
+    project_add_task(project, task1);
+    project_add_task(project, task3);
+
+    // If scheduled, project does not influence
+    time_t scheduling_date = time(NULL);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(task1, scheduling_date);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(task2, scheduling_date);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    task_schedule(task3, scheduling_date);
+
+    CuAssertTrue(test, task_compare(task1, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task1) > 0);
+
+    CuAssertTrue(test, task_compare(task2, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task2) > 0);
+
+    CuAssertTrue(test, task_compare(task1, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task1) > 0);
+
+    // If scheduled, project should come first:
+    task_unschedule(task1);
+    task_unschedule(task2);
+    task_unschedule(task3);
+
+    CuAssertTrue(test, task_compare(task1, task2) > 0);
+    CuAssertTrue(test, task_compare(task2, task1) < 0);
+
+    CuAssertTrue(test, task_compare(task2, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task2) > 0);
+
+    CuAssertTrue(test, task_compare(task1, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task1) > 0);
+
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+}
+
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
@@ -366,5 +417,6 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_scheduld_time);
     SUITE_ADD_TEST(suite, test_task_compare_archived);
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_number);
+    SUITE_ADD_TEST(suite, test_task_compare_orders_by_project);
     return suite;
 }

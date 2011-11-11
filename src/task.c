@@ -143,8 +143,11 @@ int task_compare(const Task *task1, const Task *task2) {
     // Scheduled for later are greater than scheduled for sooner
     if (task1->scheduled) {
         result = task1->scheduled_for - task2->scheduled_for;
-        if (result) return result;
+    } else {
+        // If not scheduled, tasks in project are smaller than non in project
+        result = (task1->project != NULL) - (task2->project != NULL);
     }
+    if (result) return result;
     // Created later are greater than created sooner
     result = task1->created_at - task2->created_at;
     if (result) return result;
