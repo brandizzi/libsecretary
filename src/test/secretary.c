@@ -480,12 +480,12 @@ void test_secretary_unschedule_task(CuTest *test) {
     task = secretary_get_nth_task_scheduled(secretary, 1, false);
     CuAssertPtrEquals(test, task1, task);
 
-    task_unschedule(task1);
+    secretary_unschedule_task(secretary, task1);
     // One more in inbox, since it returns
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));    
     CuAssertIntEquals(test, 1, secretary_count_tasks_scheduled_for(secretary, now, false));   
 
-    task_unschedule(task2);
+    secretary_unschedule_task(secretary, task2);
     // No one more, since the task2 was in a project
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false)); 
     CuAssertIntEquals(test, 0, secretary_count_tasks_scheduled_for_today(secretary, false));   

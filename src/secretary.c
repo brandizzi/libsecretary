@@ -215,6 +215,11 @@ void secretary_schedule_task(Secretary *secretary, Task *task, time_t time) {
     task_schedule(task, time);
     _secretary_sort_tasks(secretary);
 }
+
+void secretary_unschedule_task(Secretary *secretary, Task *task) {
+    task_unschedule(task);
+    _secretary_sort_tasks(secretary);
+}
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
 
