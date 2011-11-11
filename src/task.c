@@ -24,8 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <secretary/_internal/secretary.h>
-
 #define TASK_SCHEDULED_VALUE_FOR_COMPARE(t) ((t)->scheduled_for*(t)->scheduled)
 
 Task *task_new(const char *description) {
@@ -36,7 +34,6 @@ Task *task_new(const char *description) {
     task->scheduled = false;
     task->archived = false;
     task->done = false;
-    task->secretary = NULL;
     task->number = 0;
     return task;
 }
@@ -52,9 +49,6 @@ const char *task_get_description(Task *task) {
 void task_set_description(Task *task, const char *description) {
     free(task->description);
     task->description = util_copy_string(description);
-    if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 Project *task_get_project(Task *task) {
@@ -63,9 +57,6 @@ Project *task_get_project(Task *task) {
 
 void task_set_project(Task *task, Project *project) {
     project_add_task(project, task);
-    if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 bool task_has_project(Task *task) {
@@ -79,9 +70,6 @@ bool task_is_in_project(Task *task, struct Project *project) {
 void task_unset_project(Task *task) {
     if (task->project == NULL) return;
     project_remove_task(task->project, task);
-    if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 bool task_is_in_inbox(Task *task) {
@@ -91,10 +79,6 @@ bool task_is_in_inbox(Task *task) {
 void task_schedule(Task *task, time_t date) {
     task->scheduled = true;
     task->scheduled_for = date-(date%(UTIL_SECONDS_IN_DAY));
-    // Optimization
-    if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 time_t task_get_scheduled_date(Task *task) {
@@ -113,9 +97,6 @@ bool task_is_scheduled_for(Task *task, time_t date) {
 
 void task_unschedule(Task *task) {
     task->scheduled = false;
-        if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 void task_mark_as_done(Task *task) {
@@ -137,9 +118,6 @@ bool task_is_done(Task *task) {
 
 void task_archive(Task *task) {
     task->archived = task->done && true;
-    if (task->secretary) {
-        secretary_sort_tasks(task->secretary);
-    }
 }
 
 bool task_is_archived(Task *task) {

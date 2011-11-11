@@ -66,6 +66,8 @@ void secretary_sort_tasks(Secretary *secretary);
 void secretary_delete_task(Secretary *secretary, Task *task);
 void secretary_delete_project(Secretary *secretary, Project *project);
 
+void secretary_schedule_task(Secretary *secretary, Task *task, time_t time);
+
 void secretary_free(Secretary *secretary);
 
 #endif

@@ -26,7 +26,7 @@
 #include <stdbool.h>
 
 struct Project;
-struct Secretary;
+//struct Secretary;
 
 typedef struct {
     int number; // For internal purposes not really that important...
@@ -37,8 +37,8 @@ typedef struct {
      * This secretary reference is only useful for optimizations and should not
      * be used by any client. (Actually, no struct field should be directly
      * used by libsecretary clients at all.)
-     */
     struct Secretary *secretary;
+     */
 
     bool scheduled;
     time_t scheduled_for;

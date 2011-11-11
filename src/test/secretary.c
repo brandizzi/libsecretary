@@ -19,6 +19,7 @@
  * http://bitbucket.org/brandizzi/libsecretary/
  */
 #include <secretary/test/secretary.h>
+#include <secretary/_internal/secretary.h>
 #include <stdlib.h>
 
 void test_secretary_create(CuTest *test) {
@@ -349,8 +350,8 @@ void test_secretary_schedule(CuTest *test) {
 
     time_t now = time(NULL), future_time;
     future_time = now+60*60*48;
-    task_schedule(task1, future_time);
-    task_schedule(task2, now);
+    secretary_schedule_task(secretary, task1, future_time);
+    secretary_schedule_task(secretary, task2, now);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -415,9 +416,9 @@ void test_secretary_late_scheduled_appears_in_today(CuTest *test) {
     time_t now = time(NULL), future_time, past_time;
     future_time = now + 60*60*48;
     past_time =   now - 60*60*48;
-    task_schedule(task1, future_time);
-    task_schedule(task2, now);
-    task_schedule(task3, past_time);
+    secretary_schedule_task(secretary, task1, future_time);
+    secretary_schedule_task(secretary, task2, now);
+    secretary_schedule_task(secretary, task3, past_time);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks_scheduled_for(secretary, future_time, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled_for_today(secretary, false));
@@ -450,11 +451,11 @@ void test_secretary_unschedule_task(CuTest *test) {
 
     time_t now = time(NULL), future_time = now+60*60*48;
 
-    task_schedule(task1, future_time);
+    secretary_schedule_task(secretary, task1, future_time);
 
     // One less in inbox
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
-    task_schedule(task2, now);
+    secretary_schedule_task(secretary, task2, now);
     // The SCHEDULE state should be preserved!
     project_add_task(project, task2);
 
@@ -1005,7 +1006,7 @@ static void test_secretary_sort_tasks(CuTest *test) {
     CuAssertPtrEquals(test, a_task, secretary_get_nth_task(secretary, 4));
     CuAssertPtrEquals(test, task, secretary_get_nth_task(secretary, 5));
 
-    secretary_sort_tasks(secretary);
+    _secretary_sort_tasks(secretary);
     
     CuAssertIntEquals(test, secretary_count_all_tasks(secretary), 6);
     CuAssertPtrEquals(test, s3_task, secretary_get_nth_task(secretary, 0));

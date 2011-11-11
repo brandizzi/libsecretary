@@ -36,11 +36,11 @@ Secretary *secretary_new() {
 
 Task *secretary_create_task(Secretary *secretary, const char* description) {
     Task *task = task_new(description);
-    task->secretary = secretary;
+    //task->secretary = secretary;
     task->number = ++secretary->acc;
     list_add_item(secretary->tasks, task);
 #warning to optimize
-    secretary_sort_tasks(secretary);
+    _secretary_sort_tasks(secretary);
     return task;
 }
 
@@ -85,7 +85,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
     }
     list_remove_item(secretary->tasks, task);
 #warning to optimize
-    secretary_sort_tasks(secretary);
+    _secretary_sort_tasks(secretary);
 
     task_free(task);
 }
@@ -209,12 +209,19 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
             _secretary_predicate_task_is_done, params);
 }
 
-void secretary_sort_tasks(Secretary *secretary) {
+
+
+void secretary_schedule_task(Secretary *secretary, Task *task, time_t time) {
+    task_schedule(task, time);
+    _secretary_sort_tasks(secretary);
+}
+/* INTERNAL INTERFACE: functions which should never be used by secretary clients
+ */
+
+void _secretary_sort_tasks(Secretary *secretary) {
     list_sort(secretary->tasks, _secretary_task_compare);
 }
 
-/* INTERNAL INTERFACE: functions which should never be used by secretary clients
- */
 /* UtilComparators */
 int _secretary_task_compare(const void *p1, const void *p2) {
     const Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;
@@ -267,84 +274,3 @@ bool _secretary_predicate_inbox_task_is_done(void *task, void **params) {
     return task_is_in_inbox(task) && task_is_done(task) && task_is_archived(task) == archived;
 
 }
- /*
-void _secretary_register_in_inbox(Secretary *secretary, Task *task) {
-    if (secretary) {
-        if (task_is_in_inbox(task)) {
-            List *list = _secretary_get_list_from_perspective(
-                secretary->inbox_perspective, task->archived);
-            list_add_item(list, task);
-        }
-    }
-}
-
-void _secretary_unregister_from_inbox(Secretary *secretary, Task *task) {
-    if (secretary) {
-        List *list = _secretary_get_list_from_perspective(
-                secretary->inbox_perspective, task->archived);
-        list_remove_item(list, task);
-    }
-}
-
-void _secretary_register_in_scheduled(Secretary *secretary, Task *task) {
-    if (secretary && task_is_scheduled(task)) {
-        List *list = _secretary_get_list_from_perspective(
-                secretary->scheduled_perspective, task->archived);
-        list_add_item(list, task);
-        // The schedule lists should always be sorted
-        _secretary_sort_scheduled_tasks(secretary, task);
-    }
-}
-
-void _secretary_sort_scheduled_tasks(Secretary *secretary, Task *task) {
-    if (secretary && task_is_scheduled(task)) {
-        List *list = _secretary_get_list_from_perspective(
-                secretary->scheduled_perspective, task->archived);
-        // The schedule lists should always be sorted
-        list_sort(list, _task_compare_by_date);
-    }
-}
-
-
-void _secretary_unregister_from_scheduled(Secretary *secretary, Task *task) {
-    if (secretary) {
-        List *list = _secretary_get_list_from_perspective(
-                secretary->scheduled_perspective, task->archived);
-        list_remove_item(list, task);
-    }
-}
-
-void _secretary_switch_list_in_inbox_perspective(Secretary *secretary, Task *task) {
-    if (secretary && task_is_in_inbox(task)) {
-        List *origin = _secretary_get_list_from_perspective(
-                secretary->inbox_perspective, !task->archived),
-             *destination = _secretary_get_list_from_perspective(
-                secretary->inbox_perspective, task->archived);
-        list_remove_item(origin, task);
-        list_add_item(destination, task);
-    }
-}
-
-void _secretary_switch_list_in_scheduled_perspective(Secretary *secretary, Task *task) {
-    if (secretary && task_is_scheduled(task)) {
-        List *origin = _secretary_get_list_from_perspective(
-                secretary->scheduled_perspective, !task->archived),
-             *destination = _secretary_get_list_from_perspective(
-                secretary->scheduled_perspective, task->archived);
-        list_remove_item(origin, task);
-        list_add_item(destination, task);
-        // The schedule lists should always be sorted
-        list_sort(destination, _task_compare_by_date);
-
-    }
-}
-
-List *_secretary_get_list_from_perspective(_SecretaryPerspective perspective,
-        bool archived) {
-    if (archived) {
-        return perspective.archived_tasks;
-    } else {
-        return perspective.visible_tasks;
-    }
-}
-*/
