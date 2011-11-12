@@ -220,6 +220,16 @@ void secretary_unschedule_task(Secretary *secretary, Task *task) {
     task_unschedule(task);
     _secretary_sort_tasks(secretary);
 }
+
+void secretary_add_task_to_project(Secretary *secretary, Project *project, 
+        Task *task) {
+    project_add_task(project, task);
+}
+
+void secretary_archive_task(Secretary *secretary, Task *task) {
+    task_archive(task);
+    _secretary_sort_tasks(secretary);
+}
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
 
