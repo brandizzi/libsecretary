@@ -31,6 +31,9 @@ Secretary *secretary_new() {
     secretary->tasks = list_new();
     secretary->projects = list_new();
     secretary->acc = 0;
+    secretary->visible_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_scheduled_for_today_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_inbox = sublist_new(secretary->tasks, 0, 0);
     return secretary;
 }
 
@@ -40,7 +43,7 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     task->number = ++secretary->acc;
     list_add_item(secretary->tasks, task);
 #warning to optimize
-    _secretary_sort_tasks(secretary);
+    _secretary_update_sublists(secretary);
     return task;
 }
 
@@ -85,7 +88,7 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
     }
     list_remove_item(secretary->tasks, task);
 #warning to optimize
-    _secretary_sort_tasks(secretary);
+    _secretary_update_sublists(secretary);
 
     task_free(task);
 }
@@ -213,12 +216,12 @@ Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
 
 void secretary_schedule_task(Secretary *secretary, Task *task, time_t time) {
     task_schedule(task, time);
-    _secretary_sort_tasks(secretary);
+    _secretary_update_sublists(secretary);
 }
 
 void secretary_unschedule_task(Secretary *secretary, Task *task) {
     task_unschedule(task);
-    _secretary_sort_tasks(secretary);
+    _secretary_update_sublists(secretary);
 }
 
 void secretary_move_task_to_project(Secretary *secretary, Project *project, 
@@ -232,13 +235,88 @@ void secretary_remove_task_from_project(Secretary *secretary, Task *task) {
 
 void secretary_archive_task(Secretary *secretary, Task *task) {
     task_archive(task);
-    _secretary_sort_tasks(secretary);
+    _secretary_update_sublists(secretary);
 }
 /* INTERNAL INTERFACE: functions which should never be used by secretary clients
  */
 
 void _secretary_sort_tasks(Secretary *secretary) {
     list_sort(secretary->tasks, _secretary_task_compare);
+}
+
+void _secretary_update_sublists(Secretary *secretary) {
+    _secretary_sort_tasks(secretary);
+
+    List *tasks = secretary->tasks;
+    int first_scheduled_task, first_scheduled_for_today_task,
+        last_scheduled_for_today_task, last_scheduled_task,
+        first_inbox_task, last_inbox_task;
+
+    first_scheduled_task = first_scheduled_for_today_task =
+        last_scheduled_for_today_task = last_scheduled_task =
+        first_inbox_task = last_inbox_task = LIST_ITEM_NOT_FOUND;
+
+    for (int i = 0; i < list_count_items(tasks); i++) {
+        Task *task = list_get_nth_item(tasks, i);
+        time_t today = util_beginning_of_day(time(NULL));
+        // Is first scheduled?
+        if (task_is_scheduled(task) && !task_is_archived(task)
+                && first_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            first_scheduled_task = i;
+        }
+        // Is first scheduled for today?
+        if (task_is_scheduled_for(task, today) && !task_is_archived(task)
+                && first_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            first_scheduled_for_today_task = i;
+        }
+        // Is first inbox?
+        if (task_is_in_inbox(task) && !task_is_archived(task)
+                && first_inbox_task == LIST_ITEM_NOT_FOUND) {
+            first_inbox_task = i;
+        }
+
+        // Is last scheduled?
+        if ((!task_is_scheduled(task) || task_is_archived(task))
+                && first_scheduled_task != LIST_ITEM_NOT_FOUND 
+                && last_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_scheduled_task = i;
+        }
+        // Is last scheduled for today?
+        if ((!task_is_scheduled_for(task, today) || task_is_archived(task))
+                && first_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
+                && last_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_scheduled_for_today_task = i;
+        }
+        // Is last inbox?
+        if ((!task_is_in_inbox(task) || task_is_archived(task))
+                && first_inbox_task != LIST_ITEM_NOT_FOUND 
+                && last_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_inbox_task = i;
+        }
+    }
+    int start, count;
+    if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
+        start = first_scheduled_task;
+        count = last_scheduled_task-first_scheduled_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->visible_scheduled_tasks, start, count);
+
+    if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
+        start = first_scheduled_for_today_task;
+        count = last_scheduled_for_today_task-first_scheduled_for_today_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->visible_scheduled_for_today_tasks, start, 
+            count);
+    if (first_inbox_task != LIST_ITEM_NOT_FOUND) {
+        start = first_inbox_task;
+        count = last_inbox_task-first_inbox_task;
+    }
+    sublist_update_range(secretary->visible_inbox, start, count);
+
 }
 
 /* UtilComparators */
@@ -278,6 +356,18 @@ bool _secretary_predicate_task_is_scheduled_for(void *task, void **params) {
     time_t date = *(time_t*)params[1];
     return task_is_scheduled_for(task, date) && task_is_archived(task) == archived;
 }
+
+bool _secretary_predicate_task_is_not_scheduled_for_today(void *task, 
+        void **params) {
+    bool archived = *(bool*)params[0];
+    time_t today = util_beginning_of_day(time(NULL));
+    bool not_scheduled = !task_is_scheduled(task);
+    bool scheduled_after_today = task_is_scheduled(task) 
+            && util_beginning_of_day(task_get_scheduled_date(task)) > today;
+    return (not_scheduled || scheduled_after_today) 
+            && task_is_archived(task) == archived;
+}
+
 
 bool _secretary_predicate_done_scheduled_task(void *task, void **params) {
     return task_is_done(task) && task_is_scheduled(task);

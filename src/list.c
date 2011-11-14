@@ -95,14 +95,34 @@ int list_count_items_by_criteria(List *list, ListPredicate predicate,
     return counter;
 }
 
-List *sublist_new(List *superlist, int start, int count) {
-    List *list = malloc(sizeof(List));
-    list->items = superlist->items+start;
-    list->space = 0;
-    list->number_of_items = count;
-    return list;
-
+int list_get_nth_item_index_by_criteria(List *list, int index,
+            ListPredicate predicate, void **params, 
+            int start_search_from_index) {
+    int counter = 0;
+    for (int i = start_search_from_index; i < list->number_of_items; i++) {
+        if (predicate(list->items[i], params)) {
+            if (counter == index) return i;
+            counter++;
+        }
+    }
+    return LIST_ITEM_NOT_FOUND;
 }
+
+
+List *sublist_new(List *superlist, int start, int count) {
+    List *sublist = malloc(sizeof(List));
+    sublist->superlist = superlist;
+    sublist->items = superlist->items+start;
+    sublist->space = 0;
+    sublist->number_of_items = count;
+    return sublist;
+}
+
+void sublist_update_range(List *sublist, int start, int count) {
+    sublist->items = sublist->superlist->items+start;
+    sublist->number_of_items = count;
+}
+
 void sublist_free(List *sublist) {
     free(sublist);
 }

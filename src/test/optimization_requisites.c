@@ -294,6 +294,93 @@ static void test_optimization_requisites_project_sort_tasks(CuTest *test) {
     secretary_free(secretary);
 }
 
+static void test_optimization_requisites_secretary_has_sublists(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    CuAssertTrue(test, secretary->visible_scheduled_tasks != NULL);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->visible_scheduled_tasks));
+    CuAssertTrue(test, secretary->visible_scheduled_for_today_tasks != NULL);
+    CuAssertIntEquals(test, 0, 
+            list_count_items(secretary->visible_scheduled_for_today_tasks));
+    CuAssertTrue(test, secretary->visible_inbox != NULL);
+    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_inbox));
+
+    secretary_free(secretary);
+}
+
+static void test_optimization_requisites_sublists_work(CuTest *test) {
+        Secretary *secretary = secretary_new();
+
+    Task *as6_task = secretary_create_task(secretary, "as6_task"),
+        *s6_task = secretary_create_task(secretary, "s6_task"),
+        *as3_task = secretary_create_task(secretary, "as3_task"),
+        *s3_task = secretary_create_task(secretary, "s3_task"),
+        *a_task = secretary_create_task(secretary, "a_task"),
+        *task = secretary_create_task(secretary, "task"),
+        *s6p_task = secretary_create_task(secretary, "s6p_task"),
+        *as6p_task = secretary_create_task(secretary, "as6p_task"),
+        *p_task = secretary_create_task(secretary, "p_task"),
+        *ap_task = secretary_create_task(secretary, "ap_task");
+
+    // Altering creation order
+    s6_task->created_at += 1;
+    as6_task->created_at += 2;
+    s3_task->created_at += 3;
+    as3_task->created_at += 4;
+    task->created_at += 5;
+    a_task->created_at += 6;
+    s6p_task->created_at += 7;
+    as6p_task->created_at += 8;
+    p_task->created_at += 9;
+    ap_task->created_at += 10;
+
+    // Scheduling by hand
+    time_t scheduling_date = time(NULL);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    secretary_schedule_task(secretary, s3_task, scheduling_date);
+    secretary_schedule_task(secretary, as3_task, scheduling_date);
+
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    s6_task->scheduled = true; s6_task->scheduled_for = scheduling_date;
+    as6_task->scheduled = true; as6_task->scheduled_for = scheduling_date;
+    secretary_schedule_task(secretary, s6_task, scheduling_date);
+    secretary_schedule_task(secretary, as6_task, scheduling_date);
+    secretary_schedule_task(secretary, s6p_task, scheduling_date);
+    secretary_schedule_task(secretary, as6p_task, scheduling_date);
+
+    // Projecting
+    Project *project = project_new("p");
+    secretary_move_task_to_project(secretary, project, s6p_task);
+    secretary_move_task_to_project(secretary, project, as6p_task);
+    secretary_move_task_to_project(secretary, project, p_task);
+    secretary_move_task_to_project(secretary, project, ap_task);
+
+    // Archiving
+    task_mark_as_done(a_task); secretary_archive_task(secretary, a_task);
+    task_mark_as_done(as3_task); secretary_archive_task(secretary, as3_task);
+    task_mark_as_done(as6_task); secretary_archive_task(secretary, as6_task);
+    task_mark_as_done(as6p_task); secretary_archive_task(secretary, as6p_task);
+    task_mark_as_done(ap_task); secretary_archive_task(secretary, ap_task);
+
+    CuAssertIntEquals(test, 1, list_count_items(secretary->visible_inbox));
+    CuAssertPtrEquals(test, task, 
+            list_get_nth_item(secretary->visible_inbox, 0));
+    CuAssertIntEquals(test, 3, 
+            list_count_items(secretary->visible_scheduled_tasks));
+    CuAssertPtrEquals(test, s3_task, 
+            list_get_nth_item(secretary->visible_scheduled_tasks, 0));
+    CuAssertPtrEquals(test, s6_task, 
+            list_get_nth_item(secretary->visible_scheduled_tasks, 1));
+    CuAssertPtrEquals(test, s6p_task, 
+            list_get_nth_item(secretary->visible_scheduled_tasks, 2));
+
+    task_mark_as_done(task); secretary_archive_task(secretary, task);
+    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_inbox));
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
@@ -301,5 +388,7 @@ CuSuite *test_optimization_requisites_suite() {
     SUITE_ADD_TEST(suite, test_optimization_requisites_sort_tasks);
     SUITE_ADD_TEST(suite, test_optimization_requisites_project_sort_tasks);
     SUITE_ADD_TEST(suite, test_optimization_requisites_scheduled_ordered_by_date);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_secretary_has_sublists);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_sublists_work);
     return suite;
 }

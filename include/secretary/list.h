@@ -28,9 +28,12 @@
 #import <stdbool.h>
 #import <secretary/util.h>
 
+#define LIST_ITEM_NOT_FOUND (-1)
+
 typedef struct List {
     int space, number_of_items;
     void **items;
+    struct List *superlist;
 } List;
 
 List *list_new();
@@ -66,12 +69,15 @@ void *list_get_nth_item_by_criteria(List *list, int index,
             ListPredicate predicate, void **params);
 int list_count_items_by_criteria(List *list, ListPredicate predicate,
         void **params);
+int list_get_nth_item_index_by_criteria(List *list, int index,
+            ListPredicate predicate, void **params, int start_search_from_index);
 
 /**
  * Creates a sublist - a list which just points to a section of another, greater
  * list. This is a read only list - you should not update it.
  */
 List *sublist_new(List *superlist, int start, int count);
+void sublist_update_range(List *sublist, int start, int count);
 void sublist_free(List *sublist);
 
 #endif

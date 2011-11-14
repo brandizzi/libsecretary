@@ -31,6 +31,7 @@
 int _secretary_task_compare(const void *p1, const void *p2);
 
 void _secretary_sort_tasks(Secretary *secretary);
+void _secretary_update_sublists(Secretary *secretary);
 
 bool _secretary_predicate_project_is_named(void *project, void **params);
 
@@ -42,6 +43,8 @@ bool _secretary_predicate_task_is_scheduled(void *task, void **params);
 bool _secretary_predicate_task_is_scheduled_for(void *task, void **params);
 bool _secretary_predicate_done_scheduled_task(void *task, void **params);
 bool _secretary_predicate_done_task_scheduled_for(void *task, void **params);
+bool _secretary_predicate_task_is_not_scheduled_for_today(void *task, 
+        void **param);
 bool _secretary_predicate_inbox_task_is_done(void *task, void **params);
 
 #endif
