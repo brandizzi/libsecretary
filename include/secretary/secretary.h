@@ -69,7 +69,7 @@ void secretary_delete_project(Secretary *secretary, Project *project);
 void secretary_schedule_task(Secretary *secretary, Task *task, time_t time);
 void secretary_unschedule_task(Secretary *secretary, Task *task);
 
-void secretary_add_task_to_project(Secretary *secretary, Project *project, Task *task);
+void secretary_move_task_to_project(Secretary *secretary, Project *project, Task *task);
 
 void secretary_archive_task(Secretary *secretary, Task *task);
 

@@ -1075,10 +1075,10 @@ static void test_secretary_project_sort_tasks(CuTest *test) {
 
     // Projecting
     Project *project = project_new("p");
-    secretary_add_task_to_project(secretary, project, s6p_task);
-    secretary_add_task_to_project(secretary, project, as6p_task);
-    secretary_add_task_to_project(secretary, project, p_task);
-    secretary_add_task_to_project(secretary, project, ap_task);
+    secretary_move_task_to_project(secretary, project, s6p_task);
+    secretary_move_task_to_project(secretary, project, as6p_task);
+    secretary_move_task_to_project(secretary, project, p_task);
+    secretary_move_task_to_project(secretary, project, ap_task);
 
     // Archiving
     task_mark_as_done(a_task); secretary_archive_task(secretary, a_task);
@@ -1103,6 +1103,7 @@ static void test_secretary_project_sort_tasks(CuTest *test) {
 
     secretary_free(secretary);
 }
+
 
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();

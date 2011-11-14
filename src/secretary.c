@@ -221,7 +221,7 @@ void secretary_unschedule_task(Secretary *secretary, Task *task) {
     _secretary_sort_tasks(secretary);
 }
 
-void secretary_add_task_to_project(Secretary *secretary, Project *project, 
+void secretary_move_task_to_project(Secretary *secretary, Project *project, 
         Task *task) {
     project_add_task(project, task);
 }
