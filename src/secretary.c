@@ -226,6 +226,10 @@ void secretary_move_task_to_project(Secretary *secretary, Project *project,
     project_add_task(project, task);
 }
 
+void secretary_remove_task_from_project(Secretary *secretary, Task *task) {
+    project_remove_task(task->project, task);
+}
+
 void secretary_archive_task(Secretary *secretary, Task *task) {
     task_archive(task);
     _secretary_sort_tasks(secretary);
