@@ -659,7 +659,7 @@ void test_secretary_archived_scheduled(CuTest *test) {
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
-    task_archive(task2);
+    secretary_archive_task(secretary, task2);
 
     CuAssertIntEquals(test, 2, 
             secretary_count_tasks_scheduled(secretary, false));

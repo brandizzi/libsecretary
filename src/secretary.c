@@ -148,6 +148,9 @@ void secretary_free(Secretary *secretary) {
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
     void *params[] = { &archived };
+    if (!archived) {
+        return list_count_items(secretary->visible_scheduled_tasks);
+    }
     return list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_task_is_scheduled, params);
 }
@@ -156,6 +159,10 @@ int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
 int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date,
             bool archived) {
     void *params[] = { &archived, &date };
+    if (!archived) {
+        return list_count_items_by_criteria(secretary->visible_scheduled_tasks, 
+            _secretary_predicate_task_is_scheduled_for, params);
+    }
     return list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_task_is_scheduled_for, params);
 }
@@ -172,6 +179,7 @@ void secretary_archive_scheduled_tasks(Secretary *secretary) {
                 _secretary_predicate_done_scheduled_task, NULL);
         task_archive(task);
     }
+    _secretary_update_sublists(secretary);
 }
 void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date) {
     void *params[] = { &date };
@@ -182,9 +190,11 @@ void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date) {
                 _secretary_predicate_done_task_scheduled_for, params);
         task_archive(task);
     }
+    _secretary_update_sublists(secretary);
 }
 void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
     secretary_archive_tasks_scheduled_for(secretary, time(NULL));
+    _secretary_update_sublists(secretary);
 }
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
