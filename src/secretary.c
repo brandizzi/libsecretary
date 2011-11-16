@@ -31,14 +31,23 @@ Secretary *secretary_new() {
     secretary->tasks = list_new();
     secretary->projects = list_new();
     secretary->acc = 0;
+
+    /* Optimization sublists */
+    // Visible and archived
+    secretary->visible_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_tasks = sublist_new(secretary->tasks, 0, 0);
+    // Scheduled tasks lists
     secretary->visible_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
+    // Scheduled for today tasks lists
     secretary->visible_scheduled_for_today_tasks = 
             sublist_new(secretary->tasks, 0, 0);
-    secretary->visible_inbox = sublist_new(secretary->tasks, 0, 0);
-    secretary->archived_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
     secretary->archived_scheduled_for_today_tasks = 
             sublist_new(secretary->tasks, 0, 0);
+    // Inbox
+    secretary->visible_inbox = sublist_new(secretary->tasks, 0, 0);
     secretary->archived_inbox = sublist_new(secretary->tasks, 0, 0);
+
     return secretary;
 }
 
@@ -269,19 +278,29 @@ void _secretary_update_sublists(Secretary *secretary) {
         first_visible_inbox_task, last_visible_inbox_task, 
         first_archived_scheduled_task, first_archived_scheduled_for_today_task,
         last_archived_scheduled_for_today_task, last_archived_scheduled_task,
-        first_archived_inbox_task, last_archived_inbox_task;;
+        first_archived_inbox_task, last_archived_inbox_task, first_visible_task,
+        last_visible_task, first_archived_task, last_archived_task;
 
     first_visible_scheduled_task = first_visible_scheduled_for_today_task =
         last_visible_scheduled_for_today_task = last_visible_scheduled_task =
         first_visible_inbox_task = last_visible_inbox_task = 
         first_archived_scheduled_task = first_archived_scheduled_for_today_task =
         last_archived_scheduled_for_today_task = last_archived_scheduled_task =
-        first_archived_inbox_task = last_archived_inbox_task =
-        LIST_ITEM_NOT_FOUND;
+        first_archived_inbox_task = last_archived_inbox_task = 
+        first_visible_task = last_visible_task = first_archived_task = 
+        last_archived_task = LIST_ITEM_NOT_FOUND;
 
     for (int i = 0; i < list_count_items(tasks); i++) {
         Task *task = list_get_nth_item(tasks, i);
         time_t today = util_beginning_of_day(time(NULL));
+        // Is first visible?
+        if (!task_is_archived(task)
+                && first_visible_task == LIST_ITEM_NOT_FOUND) {
+                first_visible_task = i;
+        } else if (task_is_archived(task)         // Is first archived?
+                && first_archived_task == LIST_ITEM_NOT_FOUND) {
+            first_archived_task = i;
+        }
         // Is first scheduled?
         if (task_is_scheduled(task)) {
             if (!task_is_archived(task)
@@ -313,6 +332,16 @@ void _secretary_update_sublists(Secretary *secretary) {
             }
         }
 
+        // Is last visbile?
+        if (task_is_archived(task) 
+                && first_visible_task != LIST_ITEM_NOT_FOUND 
+                && last_visible_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_task = i;
+        } else if (!task_is_archived(task) 
+                && first_archived_task != LIST_ITEM_NOT_FOUND 
+                && last_archived_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_task = i;
+        }
         // Is last scheduled?
         if ((!task_is_scheduled(task) || task_is_archived(task))
                 && first_visible_scheduled_task != LIST_ITEM_NOT_FOUND 
@@ -345,6 +374,33 @@ void _secretary_update_sublists(Secretary *secretary) {
         }
     }
     int start, count;
+    // Updating range of visible/archived lists
+    if (first_visible_task != LIST_ITEM_NOT_FOUND) {
+        if (last_visible_task == LIST_ITEM_NOT_FOUND) {
+            bool archival = false;
+            void *params[] = {&archival};
+            last_visible_task = list_count_items_by_criteria(secretary->tasks,
+                _secretary_predicate_task_archival_is, params);
+        }
+        start = first_visible_task;
+        count = last_visible_task-first_visible_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->visible_tasks, start, count);    
+
+    if (first_archived_task != LIST_ITEM_NOT_FOUND) {
+        if (last_archived_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_task = list_count_items(secretary->tasks);
+        }
+        start = first_archived_task;
+        count = last_archived_task-first_archived_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->archived_tasks, start, count);    
+
+
     // Updating range for visible lists
     if (first_visible_scheduled_task != LIST_ITEM_NOT_FOUND) {
         if (last_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
