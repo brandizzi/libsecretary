@@ -61,9 +61,10 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
 }
 
 int secretary_count_tasks(Secretary *secretary, bool archived) {
-    void *params[] = { &archived };
-    return list_count_items_by_criteria(
-            secretary->tasks, _secretary_predicate_task_archival_is, params);
+    List *list = archived ? 
+            secretary->archived_tasks : 
+            secretary->visible_tasks;
+    return list_count_items(list);
 }
 
 int secretary_count_all_tasks(Secretary *secretary) {

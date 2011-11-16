@@ -898,7 +898,7 @@ void test_secretary_count_tasks_archived(CuTest *test) {
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
-    task_archive(task2);
+    secretary_archive_task(secretary, task2);
 
     CuAssertIntEquals(test, 2, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, true));
@@ -914,7 +914,7 @@ void test_secretary_count_all_tasks(CuTest *test) {
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
-    task_archive(task2);
+    secretary_archive_task(secretary, task2);
 
     CuAssertIntEquals(test, 2, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, true));
