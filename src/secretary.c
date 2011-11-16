@@ -106,6 +106,9 @@ int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
     void *params[] = { &archived };
+    if (!archived) {
+        return list_get_nth_item(secretary->visible_inbox, n);
+    }
     return list_get_nth_item_by_criteria(secretary->tasks, n,
             _secretary_predicate_task_is_in_inbox, params);
 }
@@ -120,6 +123,7 @@ void secretary_archive_inbox_tasks(Secretary *secretary) {
                 _secretary_predicate_inbox_task_is_done, params);
         task_archive(task);
     }
+    _secretary_update_sublists(secretary);
 }
 
 Task *secretary_get_task(Secretary *secretary, int number) {
@@ -227,10 +231,12 @@ void secretary_unschedule_task(Secretary *secretary, Task *task) {
 void secretary_move_task_to_project(Secretary *secretary, Project *project, 
         Task *task) {
     project_add_task(project, task);
+    _secretary_update_sublists(secretary);
 }
 
 void secretary_remove_task_from_project(Secretary *secretary, Task *task) {
     project_remove_task(task->project, task);
+    _secretary_update_sublists(secretary);
 }
 
 void secretary_archive_task(Secretary *secretary, Task *task) {
@@ -296,6 +302,9 @@ void _secretary_update_sublists(Secretary *secretary) {
     }
     int start, count;
     if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
+        if (last_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_scheduled_task = list_count_items(secretary->tasks);
+        }
         start = first_scheduled_task;
         count = last_scheduled_task-first_scheduled_task;
     } else {
@@ -303,7 +312,10 @@ void _secretary_update_sublists(Secretary *secretary) {
     }
     sublist_update_range(secretary->visible_scheduled_tasks, start, count);
 
-    if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
+    if (first_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
+        if (last_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_scheduled_for_today_task = list_count_items(secretary->tasks);
+        }
         start = first_scheduled_for_today_task;
         count = last_scheduled_for_today_task-first_scheduled_for_today_task;
     } else {
@@ -312,8 +324,13 @@ void _secretary_update_sublists(Secretary *secretary) {
     sublist_update_range(secretary->visible_scheduled_for_today_tasks, start, 
             count);
     if (first_inbox_task != LIST_ITEM_NOT_FOUND) {
+        if (last_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_inbox_task = list_count_items(secretary->tasks);
+        }
         start = first_inbox_task;
         count = last_inbox_task-first_inbox_task;
+    } else {
+        start = count = 0;
     }
     sublist_update_range(secretary->visible_inbox, start, count);
 

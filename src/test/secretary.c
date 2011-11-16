@@ -507,7 +507,7 @@ void test_secretary_mark_task_as_done(CuTest *test) {
     date.tm_year = 2002-1900;
     time_t t = timegm(&date);
     secretary_schedule_task(secretary, task1, timegm(&date));
-    project_add_task(project, task2);
+    secretary_move_task_to_project(secretary, project, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -564,7 +564,7 @@ void test_secretary_unmark_task_as_done(CuTest *test) {
     date.tm_year = 2002-1900;
     time_t t = timegm(&date);
     secretary_schedule_task(secretary, task1, t);
-    project_add_task(project, task2);
+    secretary_move_task_to_project(secretary, project, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -630,7 +630,7 @@ void test_secretary_archived_inbox(CuTest *test) {
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);
-    task_archive(task2);
+    secretary_archive_task(secretary, task2);
 
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
     Task *task = secretary_get_nth_inbox_task(secretary, 0, false);
@@ -733,11 +733,11 @@ void test_secretary_archive_inbox_tasks(CuTest *test) {
 
     CuAssertIntEquals(test, 3, secretary_count_inbox_tasks(secretary, false));
     Task *task = secretary_get_nth_inbox_task(secretary, 0, false);
-    CuAssertPtrEquals(test, task, task1);
+    CuAssertPtrEquals(test, task1, task);
     task = secretary_get_nth_inbox_task(secretary, 1, false);
-    CuAssertPtrEquals(test, task, task2);
+    CuAssertPtrEquals(test, task2, task);
     task = secretary_get_nth_inbox_task(secretary, 2, false);
-    CuAssertPtrEquals(test, task, task3);
+    CuAssertPtrEquals(test, task3, task);
 
     secretary_archive_inbox_tasks(secretary);
 
