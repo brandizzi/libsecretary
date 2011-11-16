@@ -42,7 +42,6 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     //task->secretary = secretary;
     task->number = ++secretary->acc;
     list_add_item(secretary->tasks, task);
-#warning to optimize
     _secretary_update_sublists(secretary);
     return task;
 }
