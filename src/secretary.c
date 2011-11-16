@@ -200,6 +200,9 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
     void *params[] = { &archived };
+    if (!archived) {
+        return list_get_nth_item(secretary->visible_scheduled_tasks, n);
+    }
     return list_get_nth_item_by_criteria(secretary->tasks, n,
                 _secretary_predicate_task_is_scheduled, params);
 }
@@ -207,6 +210,10 @@ Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n,
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, 
         int n, bool archived) {
     void *params[] = { &archived, &date };
+    if (!archived) {
+        return list_get_nth_item_by_criteria(secretary->visible_scheduled_tasks,
+                n, _secretary_predicate_task_is_scheduled_for, params);
+    }
     return list_get_nth_item_by_criteria(secretary->tasks, n,
                 _secretary_predicate_task_is_scheduled_for, params);
 }
