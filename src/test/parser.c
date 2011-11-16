@@ -78,8 +78,8 @@ static void test_parser_v1_2(CuTest *test) {
     task_schedule(task2, future_time);
     task_schedule(task3, now);
 
-    project_add_task(project1, task1);
-    project_add_task(project2, task2);
+    secretary_move_task_to_project(secretary, project1, task1);
+    secretary_move_task_to_project(secretary, project2, task2);
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);

@@ -125,7 +125,7 @@ void test_secretary_move_to_project_task_to_project(CuTest *test) {
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
     CuAssertIntEquals(test, 0, project_count_tasks(project, false));
 
-    project_add_task(project, task);
+    secretary_move_task_to_project(secretary, project, task);
 
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
@@ -143,7 +143,7 @@ void test_secretary_move_to_project_task_from_project(CuTest *test) {
     Task *task = secretary_create_task(secretary, "Test task transference");
     Project *project = secretary_create_project(secretary, "libsecretary");
     
-    project_add_task(project, task);
+    secretary_move_task_to_project(secretary, project, task);
 
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
@@ -151,7 +151,7 @@ void test_secretary_move_to_project_task_from_project(CuTest *test) {
     CuAssertIntEquals(test, 1, project_count_tasks(project, false));
     CuAssertPtrEquals(test, task, project_get_nth_task(project, 0, false));
 
-    project_remove_task(project, task);
+    secretary_remove_task_from_project(secretary, task);
 
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -167,7 +167,7 @@ void test_secretary_move_to_project_task_from_project_to_project(CuTest *test) {
     Project *destination = secretary_create_project(secretary, "Chocrotary");
     Project *origin = secretary_create_project(secretary, "libsecretary");
     
-    project_add_task(origin, task);
+    secretary_move_task_to_project(secretary, origin, task);
 
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_projects(secretary));
@@ -179,7 +179,7 @@ void test_secretary_move_to_project_task_from_project_to_project(CuTest *test) {
     CuAssertPtrEquals(test, task, project_get_nth_task(origin, 0, false));
     CuAssertPtrEquals(test, origin, task_get_project(task));
     // move
-    project_add_task(destination, task);
+    secretary_move_task_to_project(secretary, destination, task);
     // Now in project destination
     CuAssertIntEquals(test, 0, project_count_tasks(origin, false));
     CuAssertIntEquals(test, 1, project_count_tasks(destination, false));
@@ -214,7 +214,7 @@ void test_secretary_remove_project_task(CuTest *test) {
     Task *task = secretary_create_task(secretary, "Test task transference");
     Project *project = secretary_create_project(secretary, "libsecretary");
 
-    project_add_task(project, task);
+        secretary_move_task_to_project(secretary, project, task);
     
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertPtrEquals(test, task, secretary_get_task(secretary, 0));
@@ -258,7 +258,7 @@ void test_secretary_remove_project_with_task(CuTest *test) {
     Task *task = secretary_create_task(secretary, "Test task transference");
     Project *project = secretary_create_project(secretary, "libsecretary");
 
-    project_add_task(project, task);
+        secretary_move_task_to_project(secretary, project, task);
     
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, secretary_count_inbox_tasks(secretary, false));
@@ -457,7 +457,7 @@ void test_secretary_unschedule_task(CuTest *test) {
     CuAssertIntEquals(test, 2, secretary_count_inbox_tasks(secretary, false));
     secretary_schedule_task(secretary, task2, now);
     // The SCHEDULE state should be preserved!
-    project_add_task(project, task2);
+        secretary_move_task_to_project(secretary, project, task2);
 
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
 

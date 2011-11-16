@@ -145,8 +145,8 @@ void test_notebook_save_with_project_task(CuTest *test) {
          *task2 = secretary_create_task(secretary, "Create Cocoa interface");
     secretary_create_task(secretary, "Buy coffee");
 
-    project_add_task(project1, task1);
-    project_add_task(project2, task2);
+    secretary_move_task_to_project(secretary, project1, task1);
+    secretary_move_task_to_project(secretary, project2, task2);
     
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_projects(secretary));
@@ -203,8 +203,8 @@ void test_notebook_save_scheduled_tasks(CuTest *test) {
     secretary_create_task(secretary, "Create third task");
 
     time_t now = time(NULL), future_time = now+60*60*48;
-    task_schedule(task1, future_time);
-    task_schedule(task2, now);
+    secretary_schedule_task(secretary, task1, future_time);
+    secretary_schedule_task(secretary, task2, now);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
@@ -253,11 +253,11 @@ void test_notebook_save_scheduled_tasks_with_projects(CuTest *test) {
          *task3 = secretary_create_task(secretary, "Buy pequi");
 
     time_t now = time(NULL), future_time = now+60*60*48;
-    task_schedule(task2, future_time);
-    task_schedule(task3, now);
+    secretary_schedule_task(secretary, task2, future_time);
+    secretary_schedule_task(secretary, task3, now);
 
-    project_add_task(project1, task1);
-    project_add_task(project2, task2);
+    secretary_move_task_to_project(secretary, project1, task1);
+    secretary_move_task_to_project(secretary, project2, task2);
 
     CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 2, secretary_count_tasks_scheduled(secretary, false));
@@ -315,11 +315,11 @@ void test_notebook_save_done_tasks(CuTest *test) {
          *task3 = secretary_create_task(secretary, "Buy pequi");
 
     time_t now = time(NULL), future_time = now+60*60*48;
-    task_schedule(task2, future_time);
-    task_schedule(task3, now);
+    secretary_schedule_task(secretary, task2, future_time);
+    secretary_schedule_task(secretary, task3, now);
 
-    project_add_task(project1, task1);
-    project_add_task(project2, task2);
+    secretary_move_task_to_project(secretary, project1, task1);
+    secretary_move_task_to_project(secretary, project2, task2);
 
     task_mark_as_done(task1);
     task_mark_as_done(task2);

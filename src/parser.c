@@ -50,7 +50,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            project_add_task(project, task);
+            secretary_move_task_to_project(secretary, project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
@@ -127,7 +127,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            project_add_task(project, task);
+            secretary_move_task_to_project(secretary, project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
@@ -138,7 +138,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
             task_mark_as_done(task);
         }
         if (properties & TASK_IS_ARCHIVED) {
-            task_archive(task);
+            secretary_archive_task(secretary, task);
         }
     }
     return secretary;

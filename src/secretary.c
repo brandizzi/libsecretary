@@ -87,19 +87,21 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
         project_remove_task(project, task);
     }
     list_remove_item(secretary->tasks, task);
-#warning to optimize
     _secretary_update_sublists(secretary);
-
     task_free(task);
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
     list_remove_item(secretary->projects, project);
     project_free(project);
+    _secretary_update_sublists(secretary);    
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
     void *params[] = { &archived };
+    if (!archived) {
+        return  list_count_items(secretary->visible_inbox);
+    }
     return list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_task_is_in_inbox, params);
 }
@@ -303,7 +305,7 @@ void _secretary_update_sublists(Secretary *secretary) {
     int start, count;
     if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
         if (last_scheduled_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_task = list_count_items(secretary->tasks);
+            last_scheduled_task = secretary_count_tasks(secretary, false);
         }
         start = first_scheduled_task;
         count = last_scheduled_task-first_scheduled_task;
@@ -314,7 +316,8 @@ void _secretary_update_sublists(Secretary *secretary) {
 
     if (first_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
         if (last_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_for_today_task = list_count_items(secretary->tasks);
+            last_scheduled_for_today_task = secretary_count_tasks(
+                    secretary, false);
         }
         start = first_scheduled_for_today_task;
         count = last_scheduled_for_today_task-first_scheduled_for_today_task;
@@ -325,7 +328,7 @@ void _secretary_update_sublists(Secretary *secretary) {
             count);
     if (first_inbox_task != LIST_ITEM_NOT_FOUND) {
         if (last_inbox_task == LIST_ITEM_NOT_FOUND) {
-            last_inbox_task = list_count_items(secretary->tasks);
+            last_inbox_task = secretary_count_tasks(secretary, false);
         }
         start = first_inbox_task;
         count = last_inbox_task-first_inbox_task;
