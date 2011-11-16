@@ -30,9 +30,10 @@
 typedef struct Secretary {
     int acc; // For strange purposes
     List *tasks, *projects;
-    // Optimization
+    // Sublists of list of tasks, used for optimization
     List *visible_scheduled_tasks, *visible_scheduled_for_today_tasks, 
-            *visible_inbox;
+            *visible_inbox, *archived_scheduled_tasks, 
+            *archived_scheduled_for_today_tasks, *archived_inbox;
 } Secretary;
 
 Secretary *secretary_new();

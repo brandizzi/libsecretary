@@ -32,8 +32,13 @@ Secretary *secretary_new() {
     secretary->projects = list_new();
     secretary->acc = 0;
     secretary->visible_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
-    secretary->visible_scheduled_for_today_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_scheduled_for_today_tasks = 
+            sublist_new(secretary->tasks, 0, 0);
     secretary->visible_inbox = sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_scheduled_for_today_tasks = 
+            sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_inbox = sublist_new(secretary->tasks, 0, 0);
     return secretary;
 }
 
@@ -272,87 +277,157 @@ void _secretary_update_sublists(Secretary *secretary) {
     _secretary_sort_tasks(secretary);
 
     List *tasks = secretary->tasks;
-    int first_scheduled_task, first_scheduled_for_today_task,
-        last_scheduled_for_today_task, last_scheduled_task,
-        first_inbox_task, last_inbox_task;
+    int first_visible_scheduled_task, first_visible_scheduled_for_today_task,
+        last_visible_scheduled_for_today_task, last_visible_scheduled_task,
+        first_visible_inbox_task, last_visible_inbox_task, 
+        first_archived_scheduled_task, first_archived_scheduled_for_today_task,
+        last_archived_scheduled_for_today_task, last_archived_scheduled_task,
+        first_archived_inbox_task, last_archived_inbox_task;;
 
-    first_scheduled_task = first_scheduled_for_today_task =
-        last_scheduled_for_today_task = last_scheduled_task =
-        first_inbox_task = last_inbox_task = LIST_ITEM_NOT_FOUND;
+    first_visible_scheduled_task = first_visible_scheduled_for_today_task =
+        last_visible_scheduled_for_today_task = last_visible_scheduled_task =
+        first_visible_inbox_task = last_visible_inbox_task = 
+        first_archived_scheduled_task = first_archived_scheduled_for_today_task =
+        last_archived_scheduled_for_today_task = last_archived_scheduled_task =
+        first_archived_inbox_task = last_archived_inbox_task =
+        LIST_ITEM_NOT_FOUND;
 
     for (int i = 0; i < list_count_items(tasks); i++) {
         Task *task = list_get_nth_item(tasks, i);
         time_t today = util_beginning_of_day(time(NULL));
         // Is first scheduled?
-        if (task_is_scheduled(task) && !task_is_archived(task)
-                && first_scheduled_task == LIST_ITEM_NOT_FOUND) {
-            first_scheduled_task = i;
+        if (task_is_scheduled(task)) {
+            if (!task_is_archived(task)
+                    && first_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                first_visible_scheduled_task = i;
+            } else if (task_is_archived(task)
+                    && first_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                first_archived_scheduled_task = i;
+            }
         }
         // Is first scheduled for today?
-        if (task_is_scheduled_for(task, today) && !task_is_archived(task)
-                && first_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
-            first_scheduled_for_today_task = i;
+        if (task_is_scheduled_for(task, today)) {
+            if (!task_is_archived(task)
+                    && first_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                first_visible_scheduled_for_today_task = i;
+            } else if (task_is_archived(task)
+                    && first_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                first_archived_scheduled_for_today_task = i;
+            }
         }
         // Is first inbox?
-        if (task_is_in_inbox(task) && !task_is_archived(task)
-                && first_inbox_task == LIST_ITEM_NOT_FOUND) {
-            first_inbox_task = i;
+        if (task_is_in_inbox(task)) { 
+            if (!task_is_archived(task)
+                    && first_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+                first_visible_inbox_task = i;
+            } else if (task_is_archived(task)
+                    && first_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+                first_archived_inbox_task = i;
+            }
         }
 
         // Is last scheduled?
         if ((!task_is_scheduled(task) || task_is_archived(task))
-                && first_scheduled_task != LIST_ITEM_NOT_FOUND 
-                && last_scheduled_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_task = i;
+                && first_visible_scheduled_task != LIST_ITEM_NOT_FOUND 
+                && last_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_scheduled_task = i;
+        } else if (!task_is_scheduled(task) && task_is_archived(task)
+                && first_archived_scheduled_task != LIST_ITEM_NOT_FOUND 
+                && last_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_scheduled_task = i;
         }
         // Is last scheduled for today?
         if ((!task_is_scheduled_for(task, today) || task_is_archived(task))
-                && first_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
-                && last_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_for_today_task = i;
+                && first_visible_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
+                && last_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_scheduled_for_today_task = i;
+        } else if (!task_is_scheduled_for(task, today) && task_is_archived(task)
+                && first_archived_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
+                && last_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_scheduled_for_today_task = i;
         }
         // Is last inbox?
         if ((!task_is_in_inbox(task) || task_is_archived(task))
-                && first_inbox_task != LIST_ITEM_NOT_FOUND 
-                && last_inbox_task == LIST_ITEM_NOT_FOUND) {
-            last_inbox_task = i;
+                && first_visible_inbox_task != LIST_ITEM_NOT_FOUND 
+                && last_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_inbox_task = i;
+        } else if (!task_is_in_inbox(task) && task_is_archived(task)
+                && first_archived_inbox_task != LIST_ITEM_NOT_FOUND 
+                && last_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_inbox_task = i;
         }
     }
     int start, count;
-    if (first_scheduled_task != LIST_ITEM_NOT_FOUND) {
-        if (last_scheduled_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_task = secretary_count_tasks(secretary, false);
+    // Updating range for visible lists
+    if (first_visible_scheduled_task != LIST_ITEM_NOT_FOUND) {
+        if (last_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_scheduled_task = secretary_count_tasks(secretary, false);
         }
-        start = first_scheduled_task;
-        count = last_scheduled_task-first_scheduled_task;
+        start = first_visible_scheduled_task;
+        count = last_visible_scheduled_task-first_visible_scheduled_task;
     } else {
         start = count = 0;
     }
     sublist_update_range(secretary->visible_scheduled_tasks, start, count);
 
-    if (first_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
-        if (last_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
-            last_scheduled_for_today_task = secretary_count_tasks(
+    if (first_visible_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
+        if (last_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_scheduled_for_today_task = secretary_count_tasks(
                     secretary, false);
         }
-        start = first_scheduled_for_today_task;
-        count = last_scheduled_for_today_task-first_scheduled_for_today_task;
+        start = first_visible_scheduled_for_today_task;
+        count = last_visible_scheduled_for_today_task-first_visible_scheduled_for_today_task;
     } else {
         start = count = 0;
     }
     sublist_update_range(secretary->visible_scheduled_for_today_tasks, start, 
             count);
-    if (first_inbox_task != LIST_ITEM_NOT_FOUND) {
-        if (last_inbox_task == LIST_ITEM_NOT_FOUND) {
-            last_inbox_task = secretary_count_tasks(secretary, false);
+    if (first_visible_inbox_task != LIST_ITEM_NOT_FOUND) {
+        if (last_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_visible_inbox_task = secretary_count_all_tasks(secretary);
         }
-        start = first_inbox_task;
-        count = last_inbox_task-first_inbox_task;
+        start = first_visible_inbox_task;
+        count = last_visible_inbox_task-first_visible_inbox_task;
     } else {
         start = count = 0;
     }
     sublist_update_range(secretary->visible_inbox, start, count);
 
+    // Updating range for archived lists
+    if (first_archived_scheduled_task != LIST_ITEM_NOT_FOUND) {
+        if (last_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_scheduled_task = secretary_count_all_tasks(secretary);
+        }
+        start = first_archived_scheduled_task;
+        count = last_archived_scheduled_task-first_archived_scheduled_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->archived_scheduled_tasks, start, count);
+
+    if (first_archived_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
+        if (last_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_scheduled_for_today_task = 
+                    secretary_count_all_tasks(secretary);
+        }
+        start = first_archived_scheduled_for_today_task;
+        count = last_archived_scheduled_for_today_task
+            - first_archived_scheduled_for_today_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->archived_scheduled_for_today_tasks, start, 
+            count);
+    if (first_archived_inbox_task != LIST_ITEM_NOT_FOUND) {
+        if (last_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+            last_archived_inbox_task = secretary_count_all_tasks(secretary);
+        }
+        start = first_archived_inbox_task;
+        count = last_archived_inbox_task-first_archived_inbox_task;
+    } else {
+        start = count = 0;
+    }
+    sublist_update_range(secretary->archived_inbox, start, count);
 }
 
 /* UtilComparators */
