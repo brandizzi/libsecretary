@@ -13,3 +13,9 @@ configure
 depcomp
 install-sh
 missing
+Makefile
+config\.h
+config\.log
+config\.status
+runtests
+stamp-h1
