@@ -1,13 +1,13 @@
 AC_INIT([libsecretary], [0.1.1], [brandizzi+libsecretary@gmail.com])
 AC_CONFIG_SRCDIR([secretary.c])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
-
+LT_INIT
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CC_C99
-AC_PROG_RANLIB
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h])
