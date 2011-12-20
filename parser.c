@@ -208,9 +208,12 @@ static Secretary *parser_reader_v1_3(FILE *file) {
     int task_count = getw(file);
     for (int i = 0; i < task_count; i++) {
         int properties = getw(file);
+        int number = getw(file);
+        secretary->acc = number > secretary->acc ? number : secretary->acc;
         char *description = util_read_string(file);
         Task *task = secretary_create_task(secretary, description);
         free(description);
+        task->number = number;
         if (properties & TASK_HAS_PROJECT) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
@@ -218,7 +221,9 @@ static Secretary *parser_reader_v1_3(FILE *file) {
             secretary_move_task_to_project(secretary, project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            secretary_schedule_task(secretary, task, getw(file));
+            time_t date;
+            fread(&date, sizeof(date), 1, file);
+            secretary_schedule_task(secretary, task, date);
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
@@ -264,6 +269,7 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
         }
 
         putw(mask, file);
+        putw(task->number, file);
         util_write_string(file, task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {
@@ -271,7 +277,8 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
                     project_get_name(task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            putw(task_get_scheduled_date(task), file);
+            time_t date = task_get_scheduled_date(task);
+            fwrite(&date, sizeof(date), 1, file);
         }
     }
 }
