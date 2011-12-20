@@ -191,6 +191,91 @@ static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
     }
 }
 
+/**
+ * This parser saves time_t instead of struct tm.
+ */
+static Secretary *parser_reader_v1_3(FILE *file) {
+    Secretary *secretary  = secretary_new();
+    int project_count = getw(file);
+    for (int i = 0; i < project_count; i++) {
+        //int project_properties = 
+            getw(file);
+        char *name = util_read_string(file);
+        secretary_create_project(secretary, name);
+        free(name);
+    }
+
+    int task_count = getw(file);
+    for (int i = 0; i < task_count; i++) {
+        int properties = getw(file);
+        char *description = util_read_string(file);
+        Task *task = secretary_create_task(secretary, description);
+        free(description);
+        if (properties & TASK_HAS_PROJECT) {
+            char *name  = util_read_string(file);
+            Project *project = secretary_get_project(secretary, name);
+            free(name);
+            secretary_move_task_to_project(secretary, project, task);
+        }
+        if (properties & TASK_IS_SCHEDULED) {
+            secretary_schedule_task(secretary, task, getw(file));
+        }
+        if (properties & TASK_IS_DONE) {
+            task_mark_as_done(task);
+        }
+        if (properties & TASK_IS_ARCHIVED) {
+            secretary_archive_task(secretary, task);
+        }
+    }
+    return secretary;
+}
+
+/**
+ * This parser saves time_t instead of struct tm.
+ */
+
+static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
+    // Saving version
+    putc(1, file);
+    putc(2, file);
+    // Going ahead
+    putw(secretary_count_projects(secretary), file);
+    for (int i = 0; i < secretary_count_projects(secretary); i++) {
+        Project *project = secretary_get_nth_project(secretary, i);
+        int mask = 0;
+        putw(mask, file);
+        util_write_string(file, project_get_name(project));
+    }
+    putw(secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
+        Task *task = secretary_get_nth_task(secretary, i);
+        int mask = 0;
+        if (task_get_project(task)) {
+            mask |= TASK_HAS_PROJECT;
+        }
+        if (task_is_scheduled(task)) {
+            mask |= TASK_IS_SCHEDULED;
+        }
+        if (task_is_done(task)) {
+            mask |= TASK_IS_DONE;
+        }
+        if (task_is_archived(task)) {
+            mask |= TASK_IS_ARCHIVED;
+        }
+
+        putw(mask, file);
+        util_write_string(file, task_get_description(task));
+
+        if (mask & TASK_HAS_PROJECT) {
+            util_write_string(file, 
+                    project_get_name(task_get_project(task)));
+        }
+        if (mask & TASK_IS_SCHEDULED) {
+            putw(task_get_scheduled_date(task), file);
+        }
+    }
+}
+
 // Parser retriever
 typedef struct {
     int major_version;
@@ -206,7 +291,8 @@ typedef struct {
 }
 static ParserRow parsers[] = {
     PARSER_ROW(1, 1),
-    PARSER_ROW(1, 2)
+    PARSER_ROW(1, 2),
+    PARSER_ROW(1, 3)
 };
 
 // Just one search function, since it is non-trivial code

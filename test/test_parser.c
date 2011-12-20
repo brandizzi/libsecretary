@@ -248,6 +248,43 @@ static void test_parser_v1_2_saves_struct_tm(CuTest *test) {
     remove("nofile");
 }
 
+static void test_parser_v1_3_saves_time_t(CuTest *test) {
+    remove("nofile");
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test parser");
+    struct tm date;
+    time_t mytime = time(NULL);
+    task_schedule(task, mytime);
+
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction write = parser_get_writer(1, 3);
+    write(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // See what is saved.
+    file = fopen("nofile", "r");
+    getc(file); // Major version
+    getc(file); // minor version
+    getw(file); // project count
+
+    int task_count = getw(file);
+    CuAssertIntEquals(test, 1, task_count);
+
+    int properties = getw(file);
+    CuAssertTrue(test, properties & 0x2);
+
+    util_read_string(file); // Read string
+
+    time_t read_date;
+    fread(&read_date, sizeof(time_t), 1, file);
+
+    CuAssertIntEquals(test, util_beginning_of_day(mytime), read_date);
+
+    fclose(file);
+
+    remove("nofile");
+}
 
 CuSuite *test_parser_suite() {
     CuSuite *suite  = CuSuiteNew();
@@ -255,5 +292,6 @@ CuSuite *test_parser_suite() {
     SUITE_ADD_TEST(suite, test_parser_v1_2);
     SUITE_ADD_TEST(suite, test_parser_v1_2_save_archival);
     SUITE_ADD_TEST(suite, test_parser_v1_2_saves_struct_tm);
+    SUITE_ADD_TEST(suite, test_parser_v1_3_saves_time_t);
     return suite;
 }
