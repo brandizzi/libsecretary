@@ -255,9 +255,61 @@ static void test_parser_v1_3_saves_task_number(CuTest *test) {
         *task2 = secretary_create_task(secretary, "Test parser with id");
     CuAssertIntEquals(test, 1, task1->number);
     CuAssertIntEquals(test, 2, task2->number);
-    struct tm date;
+
     time_t mytime = time(NULL);
     task_schedule(task1, mytime);
+
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction write = parser_get_writer(1, 3);
+    write(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // See what is saved.
+    file = fopen("nofile", "r");
+    CuAssertIntEquals(test, 1, getc(file)); // Major version
+    CuAssertIntEquals(test, 3, getc(file)); // minor version
+    getw(file); // project count
+
+    int task_count = getw(file);
+    CuAssertIntEquals(test, 2, task_count);
+
+    /*int properties = */getw(file);
+    int number = getw(file);
+    CuAssertIntEquals(test, 1, number);
+    time_t creation_date; /* Scheduled date */
+    fread(&creation_date, sizeof(time_t), 1, file);
+
+
+    util_read_string(file); // Read string
+
+    time_t read_date; /* Scheduled date */
+    fread(&read_date, sizeof(time_t), 1, file);
+
+    /*int properties = */getw(file);
+    number = getw(file);
+    CuAssertIntEquals(test, 2, number);
+    creation_date; /* Scheduled date */
+    fread(&creation_date, sizeof(time_t), 1, file);
+
+
+    util_read_string(file); // Read string
+
+    fclose(file);
+
+    remove("nofile");
+}
+
+static void test_parser_v1_3_saves_creation_date(CuTest *test) {
+    remove("nofile");
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "Test parser"),
+        *task2 = secretary_create_task(secretary, "Test parser");
+    task2->created_at += UTIL_SECONDS_IN_DAY*3;
+    time_t time1 = task_get_creation_date(task1),
+        time2 = task_get_creation_date(task2);
+    task_schedule(task1, time(NULL));
+
     FILE *file = fopen("nofile", "w");
     ParserWriterFunction write = parser_get_writer(1, 3);
     write(secretary, file);
@@ -274,25 +326,27 @@ static void test_parser_v1_3_saves_task_number(CuTest *test) {
     CuAssertIntEquals(test, 2, task_count);
 
     /*int properties = */getw(file);
-    int number = getw(file);
-    CuAssertIntEquals(test, 1, number);
+    /*int number = */getw(file);
+    time_t creation_date; // Read time
+    fread(&creation_date, sizeof(time_t), 1, file);
+    CuAssertIntEquals(test, time1, creation_date);
 
     util_read_string(file); // Read string
 
-    time_t read_date; /* Scheduled date */
+    time_t read_date; // Read time
     fread(&read_date, sizeof(time_t), 1, file);
 
-    /*int properties = */getw(file);
-    number = getw(file);
-    CuAssertIntEquals(test, 2, number);
 
-    util_read_string(file); // Read string
+    /*int properties = */getw(file);
+    /*int number = */getw(file);
+    creation_date; // Read time
+    fread(&creation_date, sizeof(time_t), 1, file);
+    CuAssertIntEquals(test, time2, creation_date);
 
     fclose(file);
 
     remove("nofile");
 }
-
 
 static void test_parser_v1_3_saves_time_t(CuTest *test) {
     remove("nofile");
@@ -319,16 +373,44 @@ static void test_parser_v1_3_saves_time_t(CuTest *test) {
 
     int properties = getw(file);
     CuAssertTrue(test, properties & 0x2);
-
     /*int number = */getw(file);
-
     util_read_string(file); // Read string
 
-    time_t read_date;
-    fread(&read_date, sizeof(time_t), 1, file);
+    fclose(file);
 
-    CuAssertIntEquals(test, util_beginning_of_day(mytime), read_date);
+    remove("nofile");
+}
 
+static void test_parser_v1_3_read(CuTest *test) {
+    remove("nofile");
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test parser");
+    time_t now = task->created_at += UTIL_SECONDS_IN_DAY*12;
+    time_t mytime = time(NULL);
+    task_schedule(task, mytime);
+
+    FILE *file = fopen("nofile", "w");
+    ParserWriterFunction write = parser_get_writer(1, 3);
+    write(secretary, file);
+    fclose(file);
+    secretary_free(secretary);
+
+    // See what is saved.
+    ParserReaderFunction read = parser_get_reader(1, 3);
+    file = fopen("nofile", "r");
+    CuAssertIntEquals(test, 1, getc(file)); // Major version
+    CuAssertIntEquals(test, 3, getc(file)); // minor version
+
+    secretary = read(file);
+    CuAssertIntEquals(test, 1, secretary_count_all_tasks(secretary));
+
+    task = secretary_get_nth_task(secretary, 0);
+    CuAssertTrue(test, task != NULL);
+    CuAssertIntEquals(test, 1, task->number);
+    CuAssertIntEquals(test, now, task_get_creation_date(task));
+    CuAssertIntEquals(test,
+            util_beginning_of_day(mytime), task_get_scheduled_date(task));
+    
     fclose(file);
 
     remove("nofile");
@@ -342,5 +424,7 @@ CuSuite *test_parser_suite() {
     SUITE_ADD_TEST(suite, test_parser_v1_2_saves_struct_tm);
     SUITE_ADD_TEST(suite, test_parser_v1_3_saves_time_t);
     SUITE_ADD_TEST(suite, test_parser_v1_3_saves_task_number);
+    SUITE_ADD_TEST(suite, test_parser_v1_3_saves_creation_date);
+    SUITE_ADD_TEST(suite, test_parser_v1_3_read);
     return suite;
 }

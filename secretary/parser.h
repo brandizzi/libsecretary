@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 #define PARSER_LATEST_MAJOR_VERSION 1
-#define PARSER_LATEST_MINOR_VERSION 2
+#define PARSER_LATEST_MINOR_VERSION 3
 
 typedef Secretary* (*ParserReaderFunction)(FILE *file);
 typedef void (*ParserWriterFunction)(Secretary *secretary, FILE *file);

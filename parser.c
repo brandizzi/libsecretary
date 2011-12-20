@@ -209,11 +209,14 @@ static Secretary *parser_reader_v1_3(FILE *file) {
     for (int i = 0; i < task_count; i++) {
         int properties = getw(file);
         int number = getw(file);
+        time_t creation_date;
+        fread(&creation_date, sizeof(creation_date), 1, file);
         secretary->acc = number > secretary->acc ? number : secretary->acc;
         char *description = util_read_string(file);
         Task *task = secretary_create_task(secretary, description);
         free(description);
         task->number = number;
+        task->created_at = creation_date;
         if (properties & TASK_HAS_PROJECT) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
@@ -242,7 +245,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
 static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
     // Saving version
     putc(1, file);
-    putc(2, file);
+    putc(3, file);
     // Going ahead
     putw(secretary_count_projects(secretary), file);
     for (int i = 0; i < secretary_count_projects(secretary); i++) {
@@ -270,6 +273,9 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
 
         putw(mask, file);
         putw(task->number, file);
+        time_t date = task_get_creation_date(task);
+        fwrite(&date, sizeof(date), 1, file);
+
         util_write_string(file, task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {

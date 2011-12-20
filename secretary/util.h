@@ -33,6 +33,7 @@ typedef int (*UtilComparator)(const void *item1, const void *item2);
 char *util_copy_string(const char *string);
 char *util_read_string(FILE *file);
 void util_write_string(FILE *file, const char *string);
+void util_write_time_t(FILE *file, time_t date);
 time_t util_beginning_of_day(time_t time);
 
 #ifdef DEBUG
