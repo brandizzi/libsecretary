@@ -259,6 +259,11 @@ void secretary_remove_task_from_project(Secretary *secretary, Task *task) {
     _secretary_update_sublists(secretary);
 }
 
+void secretary_archive_tasks_from_project(Secretary *secretary, Project *project) {
+    project_archive_tasks(project);
+    _secretary_update_sublists(secretary);
+}
+
 void secretary_archive_task(Secretary *secretary, Task *task) {
     task_archive(task);
     _secretary_update_sublists(secretary);

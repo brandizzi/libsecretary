@@ -76,6 +76,7 @@ void secretary_unschedule_task(Secretary *secretary, Task *task);
 void secretary_move_task_to_project(Secretary *secretary, Project *project, 
         Task *task);
 void secretary_remove_task_from_project(Secretary *secretary, Task *task);
+void secretary_archive_tasks_from_project(Secretary *secretary, Project *project);
 
 void secretary_archive_task(Secretary *secretary, Task *task);
 

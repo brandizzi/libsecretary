@@ -924,7 +924,6 @@ void test_secretary_count_all_tasks(CuTest *test) {
     secretary_free(secretary);
 }
 
-
 static void test_secretary_remove_from_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task1 = secretary_create_task(secretary, "task 1"),
@@ -953,6 +952,48 @@ static void test_secretary_remove_from_project(CuTest *test) {
             secretary_get_nth_inbox_task(secretary, 0, false));
     CuAssertPtrEquals(test, task2, 
             secretary_get_nth_inbox_task(secretary, 1, false));
+
+    secretary_free(secretary);
+}
+
+static void test_secretary_archive_tasks_from_project(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task1 = secretary_create_task(secretary, "task 1"),
+        *task2 = secretary_create_task(secretary, "task 2"),
+        *task3 = secretary_create_task(secretary, "task 3");
+
+    Project *project = secretary_create_project(secretary, "project");
+    secretary_move_task_to_project(secretary, project, task1);
+    secretary_move_task_to_project(secretary, project, task2);
+    secretary_move_task_to_project(secretary, project, task3);
+
+    CuAssertIntEquals(test, 3, project_count_tasks(project, false));
+    CuAssertPtrEquals(test, task1, project_get_nth_task(project, 0, false));
+    CuAssertPtrEquals(test, task2, project_get_nth_task(project, 1, false));
+    CuAssertPtrEquals(test, task3, project_get_nth_task(project, 2, false));
+    CuAssertIntEquals(test, 0, project_count_tasks(project, true));
+
+    CuAssertIntEquals(test, 3, secretary_count_tasks(secretary, false));
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task(secretary, 0));
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task(secretary, 1));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task(secretary, 2));
+    CuAssertIntEquals(test, 0, secretary_count_tasks(secretary, true));
+
+    task_mark_as_done(task2);
+    secretary_archive_tasks_from_project(secretary, project);
+
+    CuAssertIntEquals(test, 2, project_count_tasks(project, false));
+    CuAssertPtrEquals(test, task1, project_get_nth_task(project, 0, false));
+    CuAssertPtrEquals(test, task3, project_get_nth_task(project, 1, false));
+    CuAssertIntEquals(test, 1, project_count_tasks(project, true));
+    CuAssertPtrEquals(test, task2, project_get_nth_task(project, 0, true));
+
+    CuAssertIntEquals(test, 2, secretary_count_tasks(secretary, false));
+    CuAssertPtrEquals(test, task1, secretary_get_nth_task(secretary, 0));
+    CuAssertPtrEquals(test, task3, secretary_get_nth_task(secretary, 1));
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, true));
+    // It should be the third one because of optimization ordering
+    CuAssertPtrEquals(test, task2, secretary_get_nth_task(secretary, 2));
 
     secretary_free(secretary);
 }
@@ -989,6 +1030,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_count_tasks_archived);
     SUITE_ADD_TEST(suite, test_secretary_count_all_tasks);
     SUITE_ADD_TEST(suite, test_secretary_remove_from_project);
+    SUITE_ADD_TEST(suite, test_secretary_archive_tasks_from_project);
     return suite;
 }
 
