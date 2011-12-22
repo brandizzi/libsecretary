@@ -337,14 +337,14 @@ void test_task_compare_orders_by_description(CuTest *test) {
         *task2 = task_new("JKL"),
         *task1 = task_new("ABC");
 
-    CuAssertTrue(test, task_compare(task1, task2) > 0);
-    CuAssertTrue(test, task_compare(task2, task1) < 0);
+    CuAssertTrue(test, task_compare(task1, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task1) > 0);
 
-    CuAssertTrue(test, task_compare(task2, task3) > 0);
-    CuAssertTrue(test, task_compare(task3, task2) < 0);
+    CuAssertTrue(test, task_compare(task2, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task2) > 0);
 
-    CuAssertTrue(test, task_compare(task1, task3) > 0);
-    CuAssertTrue(test, task_compare(task3, task1) < 0);
+    CuAssertTrue(test, task_compare(task1, task3) < 0);
+    CuAssertTrue(test, task_compare(task3, task1) > 0);
 
     task_free(task1);
     task_free(task2);

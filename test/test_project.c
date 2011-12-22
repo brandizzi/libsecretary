@@ -40,9 +40,9 @@ static void test_project_alter_name(CuTest *test) {
 
 static void test_project_remove_task(CuTest *test) {
     Project *project = project_new("libsecretary");
-    Task *task1 = task_new("Create first task"),
-         *task2 = task_new("Create snd task"),
-         *task3 = task_new("Create thrid task");
+    Task *task1 = task_new("Create 1st task"),
+         *task2 = task_new("Create 2nd task"),
+         *task3 = task_new("Create 3rd task");
 
     project_add_task(project, task1);
     project_add_task(project, task2);

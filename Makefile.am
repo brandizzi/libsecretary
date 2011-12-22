@@ -1,5 +1,5 @@
 LIB_VERSION=0.1.1
-LIB_INTERFACE_VERSION=0:1:0
+LIB_INTERFACE_VERSION=0:2:0
 ACLOCAL_AMFLAGS = -I m4
 lib_LTLIBRARIES = libsecretary.la
 libsecretary_la_SOURCES = list.c notebook.c parser.c project.c secretary.c task.c util.c secretary/list.h \

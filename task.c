@@ -155,7 +155,7 @@ int task_compare(const Task *task1, const Task *task2) {
     result = task1->number - task2->number;
     if (result) return result;
     // Ordered by name
-    return strcmp(task2->description, task1->description);
+    return strcmp(task1->description, task2->description);
 }
 
 

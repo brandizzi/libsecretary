@@ -35,6 +35,7 @@ void project_add_task(Project *project, Task *task) {
     task_unset_project(task);
     list_add_item(project->tasks, task);
     task->project = project;
+    _project_sort_tasks(project);
 }
 
 Task *project_get_task(Project *project, int index) {
@@ -67,6 +68,7 @@ int project_count_tasks(Project *project, bool archived) {
 void project_remove_task(Project *project, Task *task) {
     list_remove_item(project->tasks, task);
     task->project = NULL;
+    _project_sort_tasks(project);
 }
 
 const char* project_get_name(Project *project) {
@@ -84,6 +86,7 @@ void project_archive_tasks(Project *project) {
             task_archive(task);
         }
     }
+    _project_sort_tasks(project);
 }
 
 void project_free(Project *project) {
@@ -106,4 +109,9 @@ void project_unarchive(Project *project) {
 
 bool project_is_archived(Project *project) {
     return project->archived;
+}
+
+/** INTERNAL FUNCTIONS */
+void _project_sort_tasks(Project *project) {
+    list_sort(project->tasks, _secretary_task_compare);
 }

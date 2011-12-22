@@ -23,24 +23,6 @@
 #include <secretary/_internal/task.h>
 
 /**
- * Ensures that each task knows its secretary.
- */
-static void test_optimization_requisites_task_points_secretary(CuTest *test) {
-    Secretary *secretary = secretary_new();
-    Task *task = secretary_create_task(secretary, "Test task creation");
-    
-    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
-    CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
-    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
-
-    CuAssertStrEquals(test, "Test task creation", task_get_description(task));
-    CuAssertPtrEquals(test, NULL, task_get_project(task));
-    //CuAssertPtrEquals(test, secretary, task->secretary);
-    
-    secretary_free(secretary);
-}
-
-/**
  * Assures that the list of scheduled tasks is sorted when a task has its date
  * changed.
  */
@@ -552,9 +534,74 @@ static void test_optimization_requisites_sublists_work_for_archived_and_visible(
     secretary_free(secretary);
 }
 
+// PROJ
+static void test_optimization_requisites_sort_tasks_in_projects(CuTest *test) {
+    Secretary *secretary = secretary_new();
+
+    Task *as6_task = secretary_create_task(secretary, "as6_task"),
+        *s6_task = secretary_create_task(secretary, "s6_task"),
+        *as3_task = secretary_create_task(secretary, "as3_task"),
+        *s3_task = secretary_create_task(secretary, "s3_task"),
+        *a_task = secretary_create_task(secretary, "a_task"),
+        *task = secretary_create_task(secretary, "task");
+
+    Project *project = project_new("project");
+    project_add_task(project, as6_task);
+    project_add_task(project, s6_task);
+    project_add_task(project, as3_task);
+    project_add_task(project, s3_task);
+    project_add_task(project, a_task);
+    project_add_task(project, task);
+
+    // Altering creation order
+    s6_task->created_at += 1;
+    as6_task->created_at += 2;
+    s3_task->created_at += 3;
+    as3_task->created_at += 4;
+    task->created_at += 5;
+    a_task->created_at += 6;
+    
+    // Scheduling by hand
+    time_t scheduling_date = time(NULL);
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    s3_task->scheduled = true; s3_task->scheduled_for = scheduling_date;
+    as3_task->scheduled = true; as3_task->scheduled_for = scheduling_date;
+
+    scheduling_date += UTIL_SECONDS_IN_DAY*3;
+    s6_task->scheduled = true; s6_task->scheduled_for = scheduling_date;
+    as6_task->scheduled = true; as6_task->scheduled_for = scheduling_date;
+
+    as6_task->done = as6_task->archived = true;
+    as3_task->done = as3_task->archived = true;
+    a_task->done = a_task->archived = true;
+
+
+    CuAssertIntEquals(test, 3, project_count_tasks(project, false));
+    CuAssertIntEquals(test, 3, project_count_tasks(project, true));
+    CuAssertPtrEquals(test, as6_task, list_get_nth_item(project->tasks, 0));
+    CuAssertPtrEquals(test, s6_task, list_get_nth_item(project->tasks, 1));
+    CuAssertPtrEquals(test, as3_task, list_get_nth_item(project->tasks, 2));
+    CuAssertPtrEquals(test, s3_task, list_get_nth_item(project->tasks, 3));
+    CuAssertPtrEquals(test, a_task, list_get_nth_item(project->tasks, 4));
+    CuAssertPtrEquals(test, task, list_get_nth_item(project->tasks, 5));
+
+    _project_sort_tasks(project);
+    
+    CuAssertIntEquals(test, 3, project_count_tasks(project, false));
+    CuAssertIntEquals(test, 3, project_count_tasks(project, true));
+    CuAssertPtrEquals(test, s3_task, list_get_nth_item(project->tasks, 0));
+    CuAssertPtrEquals(test, s6_task, list_get_nth_item(project->tasks, 1));
+    CuAssertPtrEquals(test, task, list_get_nth_item(project->tasks, 2));
+    CuAssertPtrEquals(test, as3_task, list_get_nth_item(project->tasks, 3));
+    CuAssertPtrEquals(test, as6_task, list_get_nth_item(project->tasks, 4));
+    CuAssertPtrEquals(test, a_task, list_get_nth_item(project->tasks, 5));
+
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_optimization_requisites_suite() {
     CuSuite *suite  = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_optimization_requisites_task_points_secretary);
     SUITE_ADD_TEST(suite, test_optimization_requisites_task_set_date_sort_list);
     SUITE_ADD_TEST(suite, test_optimization_requisites_sort_tasks);
     SUITE_ADD_TEST(suite, test_optimization_requisites_project_sort_tasks);
@@ -569,6 +616,8 @@ CuSuite *test_optimization_requisites_suite() {
             test_optimization_requisites_secretary_has_archived_and_visible_sublists);
     SUITE_ADD_TEST(suite, 
             test_optimization_requisites_sublists_work_for_archived_and_visible);
+    SUITE_ADD_TEST(suite, test_optimization_requisites_sort_tasks_in_projects);
+
     return suite;
 }
 
