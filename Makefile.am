@@ -1,11 +1,11 @@
 LIB_VERSION=0.1.1
-LIB_INTERFACE_VERSION=0:2:0
+LIB_INTERFACE_VERSION=1:3:1
 ACLOCAL_AMFLAGS = -I m4
 lib_LTLIBRARIES = libsecretary.la
 libsecretary_la_SOURCES = list.c notebook.c parser.c project.c secretary.c task.c util.c secretary/list.h \
 		secretary/notebook.h secretary/parser.h secretary/project.h secretary/secretary.h secretary/task.h \
 		secretary/util.h secretary/_internal/secretary.h secretary/_internal/task.h
-libsecretary_la_includedir = $(includedir)/secretary-$(LIB_VERSION)/secretary
+libsecretary_la_includedir = $(includedir)/secretary
 libsecretary_la_include_HEADERS = secretary/list.h secretary/notebook.h secretary/parser.h secretary/project.h\
 		 secretary/secretary.h secretary/task.h secretary/util.h
 
