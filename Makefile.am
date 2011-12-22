@@ -19,6 +19,7 @@ runtests_SOURCES = test/runtests.c test/test_list.c test/test_notebook.c test/te
 		secretary/test/util.h
 
 runtests_LDADD = libsecretary.la
+runtests_LDFLAGS = -static
     
 
 TESTS = runtests
