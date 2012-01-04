@@ -78,7 +78,7 @@ bool task_is_in_inbox(Task *task) {
 
 void task_schedule(Task *task, time_t date) {
     task->scheduled = true;
-    task->scheduled_for = date-(date%(UTIL_SECONDS_IN_DAY));
+    task->scheduled_for = util_beginning_of_day(date);
 }
 
 time_t task_get_scheduled_date(Task *task) {
