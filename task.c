@@ -90,9 +90,7 @@ bool task_is_scheduled(Task *task) {
 }
 
 bool task_is_scheduled_for(Task *task, time_t date) {
-    long scheduled_date = task->scheduled_for/UTIL_SECONDS_IN_DAY, // removing hours, minutes etc.
-         compared_date = date/UTIL_SECONDS_IN_DAY;
-    return task_is_scheduled(task) && scheduled_date <= compared_date;
+    return task->scheduled && task->scheduled_for <= util_beginning_of_day(date);
 }
 
 void task_unschedule(Task *task) {

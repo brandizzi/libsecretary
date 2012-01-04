@@ -402,6 +402,13 @@ void test_task_compare_orders_by_project(CuTest *test) {
     task_free(task3);
 }
 
+static void test_task_unscheduled_is_not_scheduled_for_day(CuTest *test) {
+    Task *task = task_new("Do something" );
+    task->scheduled_for = 7021781903232692837; /* This value is invalid */
+    CuAssertTrue(test, !task_is_scheduled_for(task, time(NULL)));
+    task_free(task);
+}
+
 CuSuite *test_task_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_task_create);
@@ -419,5 +426,6 @@ CuSuite *test_task_suite() {
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_number);
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_description);
     SUITE_ADD_TEST(suite, test_task_compare_orders_by_project);
+    SUITE_ADD_TEST(suite, test_task_unscheduled_is_not_scheduled_for_day);
     return suite;
 }
