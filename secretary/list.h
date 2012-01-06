@@ -45,6 +45,8 @@ void list_add_item(List *list, void *item);
 void *list_get_nth_item(List *list, int index);
 void list_remove_item(List *list, void *item);
 
+void list_extend(List *dest_list, List *source_list);
+
 /**
  * Frees the memory used by the list. It does not free the memory used by
  * the list items, however.

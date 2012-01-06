@@ -65,6 +65,12 @@ void list_remove_item(List *list, void *item) {
     }
 }
 
+void list_extend(List *dest_list, List *source_list) {
+    for (int i = 0; i < list_count_items(source_list); i++) {   
+        list_add_item(dest_list, list_get_nth_item(source_list, i));
+    }
+}
+
 void list_free(List *list) {
     free(list->items);
     free(list);

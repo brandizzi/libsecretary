@@ -513,6 +513,57 @@ static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
     list_free(list);
 }
 
+static void test_list_extend(CuTest *test) {
+    List *list1 = list_new();
+    int i0 = 0, i1 = 1, i2 = 2, i3 = 3, i4 = 4;
+
+    list_add_item(list1, &i0);
+    list_add_item(list1, &i1);
+    list_add_item(list1, &i2);
+    list_add_item(list1, &i3);
+    list_add_item(list1, &i4);
+
+    CuAssertIntEquals(test, list_count_items(list1), 5);
+    CuAssertPtrEquals(test, &i0, list_get_nth_item(list1, 0));
+    CuAssertPtrEquals(test, &i1, list_get_nth_item(list1, 1));
+    CuAssertPtrEquals(test, &i2, list_get_nth_item(list1, 2));
+    CuAssertPtrEquals(test, &i3, list_get_nth_item(list1, 3));
+    CuAssertPtrEquals(test, &i4, list_get_nth_item(list1, 4));
+
+    List *list2 = list_new();
+    int i5 = 0, i6 = 1, i7 = 2, i8 = 3, i9 = 4;
+
+    list_add_item(list2, &i5);
+    list_add_item(list2, &i6);
+    list_add_item(list2, &i7);
+    list_add_item(list2, &i8);
+    list_add_item(list2, &i9);
+
+    CuAssertPtrEquals(test, &i5, list_get_nth_item(list2, 0));
+    CuAssertPtrEquals(test, &i6, list_get_nth_item(list2, 1));
+    CuAssertPtrEquals(test, &i7, list_get_nth_item(list2, 2));
+    CuAssertPtrEquals(test, &i8, list_get_nth_item(list2, 3));
+    CuAssertPtrEquals(test, &i9, list_get_nth_item(list2, 4));
+
+    list_extend(list1, list2);
+
+    CuAssertIntEquals(test, list_count_items(list1), 10);
+    CuAssertPtrEquals(test, &i0, list_get_nth_item(list1, 0));
+    CuAssertPtrEquals(test, &i1, list_get_nth_item(list1, 1));
+    CuAssertPtrEquals(test, &i2, list_get_nth_item(list1, 2));
+    CuAssertPtrEquals(test, &i3, list_get_nth_item(list1, 3));
+    CuAssertPtrEquals(test, &i4, list_get_nth_item(list1, 4));
+    CuAssertPtrEquals(test, &i5, list_get_nth_item(list1, 5));
+    CuAssertPtrEquals(test, &i6, list_get_nth_item(list1, 6));
+    CuAssertPtrEquals(test, &i7, list_get_nth_item(list1, 7));
+    CuAssertPtrEquals(test, &i8, list_get_nth_item(list1, 8));
+    CuAssertPtrEquals(test, &i9, list_get_nth_item(list1, 9));
+
+    list_free(list1);
+    list_free(list2);
+}
+
+
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
@@ -530,5 +581,6 @@ CuSuite *test_list_suite() {
     SUITE_ADD_TEST(suite, test_list_sublist_update_range);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_index_by_criteria);
     SUITE_ADD_TEST(suite, test_list_get_nth_item_index_by_criteria_start);
+    SUITE_ADD_TEST(suite, test_list_extend);
     return suite;
 }
