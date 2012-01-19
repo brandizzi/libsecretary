@@ -1,4 +1,4 @@
-AC_INIT([libsecretary], [0.1.4], [brandizzi+libsecretary@gmail.com])
+AC_INIT([libsecretary], [0.1.5], [brandizzi+libsecretary@gmail.com])
 AC_CONFIG_SRCDIR([secretary.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])

@@ -479,6 +479,13 @@ void _secretary_update_sublists(Secretary *secretary) {
     sublist_update_range(secretary->archived_inbox, start, count);
 }
 
+void _secretary_add_task(Secretary *secretary, Task *task) {
+    list_add_item(secretary->tasks, task);
+    if (task->number > secretary->acc) {
+        secretary->acc = task->number;
+    }
+}
+
 /* UtilComparators */
 int _secretary_task_compare(const void *p1, const void *p2) {
     const Task *task1 = *(Task**)p1, *task2 = *(Task**)p2;

@@ -214,9 +214,8 @@ static Secretary *parser_reader_v1_3(FILE *file) {
         int number = getw(file);
         time_t creation_date;
         fread(&creation_date, sizeof(creation_date), 1, file);
-        secretary->acc = number > secretary->acc ? number : secretary->acc;
         char *description = util_read_string(file);
-        Task *task = secretary_create_task(secretary, description);
+        Task *task = task_new(description);
         free(description);
         task->number = number;
         task->created_at = creation_date;
@@ -237,6 +236,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
         if (properties & TASK_IS_ARCHIVED) {
             task_archive(task);
         }
+        _secretary_add_task(secretary, task);
     }
     _secretary_update_sublists(secretary);
     return secretary;

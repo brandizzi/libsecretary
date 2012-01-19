@@ -32,6 +32,8 @@ int _secretary_task_compare(const void *p1, const void *p2);
 void _secretary_sort_tasks(Secretary *secretary);
 void _secretary_update_sublists(Secretary *secretary);
 
+void _secretary_add_task(Secretary *secretary, Task *task);
+
 bool _secretary_predicate_project_is_named(void *project, void **params);
 
 bool _secretary_predicate_task_is_in_inbox(void *task, void **params);
