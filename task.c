@@ -119,7 +119,8 @@ void task_archive(Task *task) {
 }
 
 bool task_is_archived(Task *task) {
-    return task->archived;
+    Project *project = task->project;
+    return task->archived || (project != NULL && project_is_archived(project));
 }
 
 void task_free(Task *task) {

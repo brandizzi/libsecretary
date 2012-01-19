@@ -214,7 +214,7 @@ void test_secretary_remove_project_task(CuTest *test) {
     Task *task = secretary_create_task(secretary, "Test task transference");
     Project *project = secretary_create_project(secretary, "libsecretary");
 
-        secretary_move_task_to_project(secretary, project, task);
+    secretary_move_task_to_project(secretary, project, task);
     
     CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
     CuAssertPtrEquals(test, task, secretary_get_task(secretary, 0));

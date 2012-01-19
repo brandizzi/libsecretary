@@ -28,6 +28,7 @@ Project *project_new(const char *name) {
     Project *project = malloc(sizeof(Project));
     project->name = util_copy_string(name);
     project->tasks = list_new();
+    project->archived = false;
     return project;
 }
 

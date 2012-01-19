@@ -48,16 +48,16 @@ static void test_project_remove_task(CuTest *test) {
     project_add_task(project, task2);
     project_add_task(project, task3);
 
-    CuAssertIntEquals(test, project_count_tasks(project, false), 3);
-    CuAssertPtrEquals(test, project_get_nth_task(project, 0, false), task1);
-    CuAssertPtrEquals(test, project_get_nth_task(project, 1, false), task2);
-    CuAssertPtrEquals(test, project_get_nth_task(project, 2, false), task3);
+    CuAssertIntEquals(test, 3, project_count_tasks(project, false));
+    CuAssertPtrEquals(test, task1, project_get_nth_task(project, 0, false));
+    CuAssertPtrEquals(test, task2, project_get_nth_task(project, 1, false));
+    CuAssertPtrEquals(test, task3, project_get_nth_task(project, 2, false));
 
     project_remove_task(project, task2);
 
-    CuAssertIntEquals(test, project_count_tasks(project, false), 2);
-    CuAssertPtrEquals(test, project_get_nth_task(project, 0, false), task1);
-    CuAssertPtrEquals(test, project_get_nth_task(project, 1, false), task3);
+    CuAssertIntEquals(test, 2, project_count_tasks(project, false));
+    CuAssertPtrEquals(test, task1, project_get_nth_task(project, 0, false));
+    CuAssertPtrEquals(test, task3, project_get_nth_task(project, 1, false));
 
     task_free(task1);
     task_free(task2);
@@ -140,6 +140,37 @@ void test_project_archived(CuTest *test) {
     project_free(project);
 }
 
+void test_project_archival_also_apply_for_tasks(CuTest *test) {
+    Task *task1 = task_new("Create first task"),
+         *task2 = task_new("Create snd task"),
+         *task3 = task_new("Create thrid task");
+
+    Project *project1 = project_new("fst proj"),
+        *project2 = project_new("snd proj");
+
+    project_add_task(project1, task1);
+    project_add_task(project2, task2);
+    project_add_task(project1, task3);
+
+    project_archive(project1);
+    CuAssertTrue(test, task_is_archived(task1));
+    CuAssertTrue(test, ! task_is_archived(task2));
+    CuAssertTrue(test, task_is_archived(task3));
+
+    project_unarchive(project1);
+    CuAssertTrue(test, ! task_is_archived(task1));
+    CuAssertTrue(test, ! task_is_archived(task2));
+    CuAssertTrue(test, ! task_is_archived(task3));
+
+    task_free(task1);
+    task_free(task2);
+    task_free(task3);
+
+    project_free(project1);
+    project_free(project2);
+}
+
+
 static void test_project_free_tasks(CuTest *test) {
     Project *project = project_new("libsecretary");
     Task *task1 = task_new("Create first task"),
@@ -182,5 +213,6 @@ CuSuite *test_project_suite() {
     SUITE_ADD_TEST(suite, test_project_archived_tasks);
     SUITE_ADD_TEST(suite, test_project_archive_tasks);
     SUITE_ADD_TEST(suite, test_project_archived);
+    SUITE_ADD_TEST(suite, test_project_archival_also_apply_for_tasks);
     return suite;
 }
