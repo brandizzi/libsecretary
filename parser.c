@@ -20,6 +20,7 @@
  */
 #include <secretary/parser.h>
 #include <secretary/util.h>
+#include <secretary/_internal/secretary.h>
 
 #define BUFFER_SIZE 2048
 #define TASK_HAS_PROJECT 0x1
@@ -50,17 +51,18 @@ static Secretary *parser_reader_v1_1(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            secretary_move_task_to_project(secretary, project, task);
+            project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             fread(&date, sizeof(date), 1, file);
-            secretary_schedule_task(secretary, task, timegm(&date));
+            task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
         }
     }
+    _secretary_update_sublists(secretary);
     return secretary;
 }
 
@@ -127,20 +129,21 @@ static Secretary *parser_reader_v1_2(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            secretary_move_task_to_project(secretary, project, task);
+            project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             fread(&date, sizeof(date), 1, file);
-            secretary_schedule_task(secretary, task, timegm(&date));
+            task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
         }
         if (properties & TASK_IS_ARCHIVED) {
-            secretary_archive_task(secretary, task);
+            task_archive(task);
         }
     }
+    _secretary_update_sublists(secretary);
     return secretary;
 }
 
@@ -221,20 +224,21 @@ static Secretary *parser_reader_v1_3(FILE *file) {
             char *name  = util_read_string(file);
             Project *project = secretary_get_project(secretary, name);
             free(name);
-            secretary_move_task_to_project(secretary, project, task);
+            project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             time_t date;
             fread(&date, sizeof(date), 1, file);
-            secretary_schedule_task(secretary, task, date);
+            task_schedule(task, date);
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
         }
         if (properties & TASK_IS_ARCHIVED) {
-            secretary_archive_task(secretary, task);
+            task_archive(task);
         }
     }
+    _secretary_update_sublists(secretary);
     return secretary;
 }
 

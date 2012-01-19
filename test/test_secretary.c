@@ -998,6 +998,20 @@ static void test_secretary_archive_tasks_from_project(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_add_tasks(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Task *task = secretary_create_task(secretary, "Test task creation");
+    
+    CuAssertIntEquals(test, 1, secretary_count_tasks(secretary, false));
+    CuAssertIntEquals(test, 0, secretary_count_projects(secretary));
+    CuAssertIntEquals(test, 1, secretary_count_inbox_tasks(secretary, false));
+
+    CuAssertStrEquals(test, "Test task creation", task_get_description(task));
+    CuAssertPtrEquals(test, NULL, task_get_project(task));
+
+    secretary_free(secretary);
+}
+
 CuSuite *test_secretary_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_secretary_create);

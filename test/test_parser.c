@@ -75,8 +75,8 @@ static void test_parser_v1_2(CuTest *test) {
          *task3 = secretary_create_task(secretary, "Buy pequi");
 
     time_t now = time(NULL), future_time = now+60*60*48;
-    task_schedule(task2, future_time);
-    task_schedule(task3, now);
+    secretary_schedule_task(secretary, task2, future_time);
+    secretary_schedule_task(secretary, task3, now);
 
     secretary_move_task_to_project(secretary, project1, task1);
     secretary_move_task_to_project(secretary, project2, task2);
