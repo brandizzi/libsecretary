@@ -77,6 +77,26 @@ void test_secretary_create_project(CuTest *test) {
     secretary_free(secretary);
 }
 
+void test_secretary_archive_project(CuTest *test) {
+    Secretary *secretary = secretary_new();
+    Project *project1 = secretary_create_project(secretary, "libsecretary"),
+            *project2 = secretary_create_project(secretary, "secretary-cocoa");
+
+    
+    CuAssertIntEquals(test, 2, secretary_count_projects(secretary));
+    CuAssertPtrEquals(test, project1, secretary_get_nth_project(secretary, 0));
+    CuAssertPtrEquals(test, project2, secretary_get_nth_project(secretary, 1));
+
+    secretary_archive_project(secretary, project2);
+    
+    CuAssertIntEquals(test, 1, secretary_count_projects(secretary));
+    CuAssertPtrEquals(test, project1, secretary_get_nth_project(secretary, 0));
+    CuAssertPtrEquals(test, NULL, secretary_get_nth_project(secretary, 1));
+
+    secretary_free(secretary);
+}
+
+
 void test_secretary_get_project(CuTest *test) {
     Secretary *secretary = secretary_new();
     Project *project1 = secretary_create_project(secretary, "libsecretary"),
@@ -1045,6 +1065,7 @@ CuSuite *test_secretary_suite() {
     SUITE_ADD_TEST(suite, test_secretary_count_all_tasks);
     SUITE_ADD_TEST(suite, test_secretary_remove_from_project);
     SUITE_ADD_TEST(suite, test_secretary_archive_tasks_from_project);
+    SUITE_ADD_TEST(suite, test_secretary_archive_project);
     return suite;
 }
 

@@ -48,4 +48,6 @@ bool _secretary_predicate_task_is_not_scheduled_for_today(void *task,
         void **param);
 bool _secretary_predicate_inbox_task_is_done(void *task, void **params);
 
+bool _secretary_project_is_not_archived(void *project, void **params);
+
 #endif

@@ -96,7 +96,7 @@ void project_free(Project *project) {
         task->project = NULL;
     }
     free(project->name);
-free(project);
+    free(project);
 }
 
 

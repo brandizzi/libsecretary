@@ -51,6 +51,8 @@ Project *secretary_create_project(Secretary *secretary, const char* name);
 int secretary_count_projects(Secretary *secretary);
 Project *secretary_get_project(Secretary *secretary, const char *name);
 Project *secretary_get_nth_project(Secretary *secretary, int n);
+void secretary_archive_project(Secretary *secretary, Project *project);
+
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived);
 int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date, bool archived);

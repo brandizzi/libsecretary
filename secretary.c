@@ -82,7 +82,8 @@ Project *secretary_create_project(Secretary *secretary, const char* name) {
 }
 
 int secretary_count_projects(Secretary *secretary) {
-    return list_count_items(secretary->projects);
+    return list_count_items_by_criteria(secretary->projects, 
+            _secretary_project_is_not_archived, NULL);
 }
 
 Project *secretary_get_project(Secretary *secretary, const char *name) {
@@ -92,8 +93,15 @@ Project *secretary_get_project(Secretary *secretary, const char *name) {
 }
 
 Project *secretary_get_nth_project(Secretary *secretary, int n) {
-    return list_get_nth_item(secretary->projects, n);
+    Project *p = list_get_nth_item_by_criteria(secretary->projects, n,
+            _secretary_project_is_not_archived, NULL);
 }
+
+void secretary_archive_project(Secretary *secretary, Project *project) {
+    project_archive(project);
+    _secretary_update_sublists(secretary);
+}
+
 
 void secretary_delete_task(Secretary *secretary, Task *task) {
     Project *project = task_get_project(task);
@@ -548,5 +556,8 @@ bool _secretary_predicate_done_task_scheduled_for(void *task, void **params) {
 bool _secretary_predicate_inbox_task_is_done(void *task, void **params) {
     bool archived = params ? *(bool*)params[0] : false;
     return task_is_in_inbox(task) && task_is_done(task) && task_is_archived(task) == archived;
+}
 
+bool _secretary_project_is_not_archived(void *project, void **params) {
+    return ! project_is_archived(project);
 }
