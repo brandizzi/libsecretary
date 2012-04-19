@@ -20,6 +20,7 @@
  */
 #include <secretary/test/optimization_requisites.h>
 #include <secretary/_internal/secretary.h>
+#include <secretary/_internal/project.h>
 #include <secretary/_internal/task.h>
 
 /**

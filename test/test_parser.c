@@ -21,6 +21,7 @@
 #include <secretary/test/parser.h>
 #include <secretary/parser.h>
 
+
 static void test_parser_v1_1_saves_struct_tm(CuTest *test) {
     remove("nofile");
     Secretary *secretary = secretary_new();
@@ -52,7 +53,8 @@ static void test_parser_v1_1_saves_struct_tm(CuTest *test) {
     util_read_string(file); // Read string
 
     struct tm read_date;
-    fread(&read_date, sizeof(read_date), 1, file);
+    if (fread(&read_date, sizeof(read_date), 1, file) < 1)
+        CuAssertTrue(test, false);
 
     CuAssertIntEquals(test, date.tm_mday, read_date.tm_mday);
     CuAssertIntEquals(test, date.tm_mon, read_date.tm_mon);
@@ -237,7 +239,8 @@ static void test_parser_v1_2_saves_struct_tm(CuTest *test) {
     util_read_string(file); // Read string
 
     struct tm read_date;
-    fread(&read_date, sizeof(read_date), 1, file);
+    if (fread(&read_date, sizeof(read_date), 1, file) < 1)
+        CuAssertTrue(test, false);
 
     CuAssertIntEquals(test, date.tm_mday, read_date.tm_mday);
     CuAssertIntEquals(test, date.tm_mon, read_date.tm_mon);
@@ -278,19 +281,22 @@ static void test_parser_v1_3_saves_task_number(CuTest *test) {
     int number = getw(file);
     CuAssertIntEquals(test, 1, number);
     time_t creation_date; /* Scheduled date */
-    fread(&creation_date, sizeof(time_t), 1, file);
+    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
 
 
     util_read_string(file); // Read string
 
     time_t read_date; /* Scheduled date */
-    fread(&read_date, sizeof(time_t), 1, file);
+    if (fread(&read_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
 
     /*int properties = */getw(file);
     number = getw(file);
     CuAssertIntEquals(test, 2, number);
     creation_date; /* Scheduled date */
-    fread(&creation_date, sizeof(time_t), 1, file);
+    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
 
 
     util_read_string(file); // Read string
@@ -328,19 +334,22 @@ static void test_parser_v1_3_saves_creation_date(CuTest *test) {
     /*int properties = */getw(file);
     /*int number = */getw(file);
     time_t creation_date; // Read time
-    fread(&creation_date, sizeof(time_t), 1, file);
+    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
     CuAssertIntEquals(test, time1, creation_date);
 
     util_read_string(file); // Read string
 
     time_t read_date; // Read time
-    fread(&read_date, sizeof(time_t), 1, file);
+    if (fread(&read_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
 
 
     /*int properties = */getw(file);
     /*int number = */getw(file);
     creation_date; // Read time
-    fread(&creation_date, sizeof(time_t), 1, file);
+    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
+        CuAssertTrue(test, false);
     CuAssertIntEquals(test, time2, creation_date);
 
     fclose(file);

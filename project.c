@@ -21,6 +21,7 @@
 #include <secretary/project.h>
 #include <secretary/util.h>
 #include <secretary/_internal/secretary.h>
+#include <secretary/_internal/project.h>
 #include <stdlib.h>
 #include <string.h>
 

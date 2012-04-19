@@ -1,4 +1,3 @@
-
 /**
  * libsecretary: a C library for managing to-do lists
  * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
@@ -25,8 +24,8 @@
 #ifndef _LIST_H
 # define _LIST_H
 
-#import <stdbool.h>
-#import <secretary/util.h>
+#include <stdbool.h>
+#include <secretary/util.h>
 
 #define LIST_ITEM_NOT_FOUND (-1)
 

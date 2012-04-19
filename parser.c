@@ -55,7 +55,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
-            fread(&date, sizeof(date), 1, file);
+            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
             task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
@@ -64,6 +64,9 @@ static Secretary *parser_reader_v1_1(FILE *file) {
     }
     _secretary_update_sublists(secretary);
     return secretary;
+    ERROR:
+    secretary_free(secretary);
+    return NULL;
 }
 
 static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
@@ -133,7 +136,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
-            fread(&date, sizeof(date), 1, file);
+            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
             task_schedule(task, timegm(&date));
         }
         if (properties & TASK_IS_DONE) {
@@ -145,6 +148,9 @@ static Secretary *parser_reader_v1_2(FILE *file) {
     }
     _secretary_update_sublists(secretary);
     return secretary;
+    ERROR:
+    secretary_free(secretary);
+    return NULL;
 }
 
 /**
@@ -213,7 +219,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
         int properties = getw(file);
         int number = getw(file);
         time_t creation_date;
-        fread(&creation_date, sizeof(creation_date), 1, file);
+        if (fread(&creation_date, sizeof(creation_date), 1, file) < 1) goto ERROR;
         char *description = util_read_string(file);
         Task *task = task_new(description);
         free(description);
@@ -227,7 +233,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
         }
         if (properties & TASK_IS_SCHEDULED) {
             time_t date;
-            fread(&date, sizeof(date), 1, file);
+            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
             task_schedule(task, date);
         }
         if (properties & TASK_IS_DONE) {
@@ -240,6 +246,9 @@ static Secretary *parser_reader_v1_3(FILE *file) {
     }
     _secretary_update_sublists(secretary);
     return secretary;
+    ERROR:
+    secretary_free(secretary);
+    return NULL;
 }
 
 /**

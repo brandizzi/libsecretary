@@ -33,8 +33,11 @@ char *util_copy_string(const char *string) {
 char *util_read_string(FILE *file) {
     int length = getw(file);
     char *string = malloc((length+2)*sizeof(char));
-    fgets(string, length+1, file);
+    if (fgets(string, length+1, file) == NULL) goto ERROR;
     return string;
+    ERROR:
+    free(string);
+    return NULL;
 }
 void util_write_string(FILE *file, const char *string) {
     putw(strlen(string), file);
