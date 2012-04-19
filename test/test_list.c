@@ -114,7 +114,8 @@ static void test_list_remove_item(CuTest *test) {
 }
 
 static int intcomp(const void *i1, const void *i2) {
-    return *(int*)i2 - *(int*)i1;
+    int **ppi1 = i1, **ppi2 = i2;
+    return **ppi1 - **ppi2;
 }
 
 static void test_list_sort(CuTest *test) {
