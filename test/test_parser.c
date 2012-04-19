@@ -1,6 +1,6 @@
 /**
  * libsecretary: a C library for managing to-do lists
- * Copyright (C) 2011  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
+ * Copyright (C) 111  Adam Victor Nazareth Brandizzi <brandizzi@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,10 +27,11 @@ static void test_parser_v1_1_saves_struct_tm(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_create_task(secretary, "Test parser");
     struct tm date;
+    memset(&date, 0, sizeof(date));
     date.tm_mday = 31;
-    date.tm_mon = 12;
-    date.tm_year = 2011;
-    task_schedule(task, timegm(&date));
+    date.tm_mon = 11;
+    date.tm_year = 111;
+    task_schedule(task, mktime(&date));
 
     FILE *file = fopen("nofile", "w");
     ParserWriterFunction write = parser_get_writer(1, 1);
@@ -213,10 +214,12 @@ static void test_parser_v1_2_saves_struct_tm(CuTest *test) {
     Secretary *secretary = secretary_new();
     Task *task = secretary_create_task(secretary, "Test parser");
     struct tm date;
+    memset(&date, 0, sizeof(date));
     date.tm_mday = 31;
-    date.tm_mon = 12;
-    date.tm_year = 2011;
-    task_schedule(task, timegm(&date));
+    date.tm_mon = 11;
+    date.tm_year = 111;
+    task_schedule(task, mktime(&date));
+    
 
     FILE *file = fopen("nofile", "w");
     ParserWriterFunction write = parser_get_writer(1, 2);

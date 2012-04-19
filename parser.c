@@ -56,7 +56,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
-            task_schedule(task, timegm(&date));
+            task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
@@ -137,7 +137,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
-            task_schedule(task, timegm(&date));
+            task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
             task_mark_as_done(task);
