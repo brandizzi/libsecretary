@@ -20,6 +20,7 @@
  */
 #include <secretary/test/parser.h>
 #include <secretary/parser.h>
+#include <string.h>
 
 
 static void test_parser_v1_1_saves_struct_tm(CuTest *test) {
