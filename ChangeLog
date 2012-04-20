@@ -1,0 +1,10 @@
+2012-04-20  Adam Victor Nazareth Brandizzi <brandizzi+libsecretary@gmail.com>
+
+	* Updated version to 0.1.7
+	
+	* Repaired a series of bugs which made the compilation impossible on Linux
+	  with GCC 4.1.6
+	
+    * Now can be found through pkg-config
+    
+    * Also, has an ChangeLog file :)
