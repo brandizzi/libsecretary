@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
 
 #define UTIL_SECONDS_IN_DAY (60*60*24)
 
@@ -35,6 +36,8 @@ char *util_read_string(FILE *file);
 void util_write_string(FILE *file, const char *string);
 void util_write_time_t(FILE *file, time_t date);
 time_t util_beginning_of_day(time_t time);
+void util_write_number(FILE *file, uint_least64_t number, size_t size);
+uint_least64_t util_read_number(FILE *file, size_t size);
 
 #ifdef DEBUG
 #  define util_log(message) printf(message)

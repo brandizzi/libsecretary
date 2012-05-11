@@ -46,8 +46,34 @@ static void test_util_beginning_of_day_verify_if_scheduled(CuTest *test) {
     CuAssertIntEquals(test, 0, tm_stripped.tm_sec);
 }
 
+static void test_util_read_write_number(CuTest *test) {
+    uint_least64_t value = 0x1122334455667788;
+    FILE *file = fopen("myfile", "w");
+    util_write_number(file, value, 8);
+    
+    fclose(file);
+    file = fopen("myfile", "r");
+    
+    value = util_read_number(file, 8);
+    CuAssertIntEquals(test, 0x1122334455667788, value);
+    
+    fclose(file);
+    file = fopen("myfile", "w");
+    
+    util_write_number(file, value, 4);    
+
+    fclose(file);
+    file = fopen("myfile", "r");
+    
+    value = util_read_number(file, 4);
+    CuAssertIntEquals(test, value, 0x55667788);
+
+}
+
 CuSuite *test_util_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_util_beginning_of_day);
+    SUITE_ADD_TEST(suite, test_util_beginning_of_day_verify_if_scheduled);
+    SUITE_ADD_TEST(suite, test_util_read_write_number);
     return suite;
 }
