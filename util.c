@@ -49,3 +49,25 @@ time_t util_beginning_of_day(time_t mytime) {
     date.tm_hour = date.tm_min = date.tm_sec = 0;
     return mktime(&date);
 }
+
+void util_write_number(FILE *file, uint_least64_t number, size_t size) {
+    uint8_t buffer[size];
+    memset(buffer, '\0', size);
+    for (int i = 0; i < size; i++) {
+        buffer[i] = number & 0xFF;
+        number >>= 8;
+    }
+    fwrite(buffer, sizeof(uint8_t), size, file);
+}
+uint_least64_t util_read_number(FILE *file, size_t size) {
+    uint8_t buffer[size];
+    memset(buffer, '\0', size);
+    uint_least64_t number = 0;
+    fread(buffer, sizeof(uint8_t), size, file);
+    for (int i = size; i > 0; i--) {
+        number <<= 8;
+        number += buffer[i-1];
+    }
+    return number;
+}
+

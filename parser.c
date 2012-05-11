@@ -18,9 +18,13 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
+#include "config.h" 
+
 #include <secretary/parser.h>
 #include <secretary/util.h>
 #include <secretary/_internal/secretary.h>
+
+#include "string.h"
 
 #define BUFFER_SIZE 2048
 #define TASK_HAS_PROJECT 0x1
@@ -55,7 +59,7 @@ static Secretary *parser_reader_v1_1(FILE *file) {
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
-            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
+            if (fread(&date, sizeof(struct tm), 1, file) < 1) goto ERROR;
             task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
@@ -136,7 +140,7 @@ static Secretary *parser_reader_v1_2(FILE *file) {
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
-            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
+            if (fread(&date, sizeof(struct tm), 1, file) < 1) goto ERROR;
             task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
@@ -218,8 +222,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
     for (int i = 0; i < task_count; i++) {
         int properties = getw(file);
         int number = getw(file);
-        time_t creation_date;
-        if (fread(&creation_date, sizeof(creation_date), 1, file) < 1) goto ERROR;
+        time_t creation_date = util_read_number(file, 8);
         char *description = util_read_string(file);
         Task *task = task_new(description);
         free(description);
@@ -232,8 +235,7 @@ static Secretary *parser_reader_v1_3(FILE *file) {
             project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            time_t date;
-            if (fread(&date, sizeof(date), 1, file) < 1) goto ERROR;
+            time_t date = util_read_number(file, 8);
             task_schedule(task, date);
         }
         if (properties & TASK_IS_DONE) {
@@ -287,7 +289,8 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
         putw(mask, file);
         putw(task->number, file);
         time_t date = task_get_creation_date(task);
-        fwrite(&date, sizeof(date), 1, file);
+
+        util_write_number(file, date, 8);
 
         util_write_string(file, task_get_description(task));
 
@@ -297,7 +300,7 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
         }
         if (mask & TASK_IS_SCHEDULED) {
             time_t date = task_get_scheduled_date(task);
-            fwrite(&date, sizeof(date), 1, file);
+            util_write_number(file, date, 8);
         }
     }
 }

@@ -18,6 +18,8 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
+
+#include "config.h"
 #include <secretary/test/parser.h>
 #include <secretary/parser.h>
 #include <string.h>
@@ -284,23 +286,17 @@ static void test_parser_v1_3_saves_task_number(CuTest *test) {
     /*int properties = */getw(file);
     int number = getw(file);
     CuAssertIntEquals(test, 1, number);
-    time_t creation_date; /* Scheduled date */
-    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    time_t creation_date = util_read_number(file, 8); /* Scheduled date */
 
 
     util_read_string(file); // Read string
 
-    time_t read_date; /* Scheduled date */
-    if (fread(&read_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    time_t read_date = util_read_number(file, 8); /* Scheduled date */
 
     /*int properties = */getw(file);
     number = getw(file);
     CuAssertIntEquals(test, 2, number);
-    creation_date; /* Scheduled date */
-    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    creation_date = util_read_number(file, 8); /* Scheduled date */
 
 
     util_read_string(file); // Read string
@@ -337,23 +333,17 @@ static void test_parser_v1_3_saves_creation_date(CuTest *test) {
 
     /*int properties = */getw(file);
     /*int number = */getw(file);
-    time_t creation_date; // Read time
-    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    time_t creation_date = util_read_number(file, 8); // Read time
     CuAssertIntEquals(test, time1, creation_date);
 
     util_read_string(file); // Read string
 
-    time_t read_date; // Read time
-    if (fread(&read_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    time_t read_date = util_read_number(file, 8); // Read time
 
 
     /*int properties = */getw(file);
     /*int number = */getw(file);
-    creation_date; // Read time
-    if (fread(&creation_date, sizeof(time_t), 1, file) < 1)
-        CuAssertTrue(test, false);
+    creation_date = util_read_number(file, 8); // Read time
     CuAssertIntEquals(test, time2, creation_date);
 
     fclose(file);

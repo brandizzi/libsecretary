@@ -67,7 +67,7 @@ static void test_util_read_write_number(CuTest *test) {
     
     value = util_read_number(file, 4);
     CuAssertIntEquals(test, value, 0x55667788);
-
+    remove("myfile");
 }
 
 CuSuite *test_util_suite() {

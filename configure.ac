@@ -1,4 +1,4 @@
-AC_INIT([libsecretary], [0.1.7], [brandizzi+libsecretary@gmail.com])
+AC_INIT([libsecretary], [0.1.8], [brandizzi+libsecretary@gmail.com])
 AC_CONFIG_SRCDIR([secretary.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -24,7 +24,7 @@ AC_FUNC_REALLOC
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memmove memset])
 AC_SUBST([API_VERSION], [0.1])
-AC_SUBST([INTERFACE_VERSION], [2:1:2])
+AC_SUBST([INTERFACE_VERSION], [2:2:2])
 
 
 AC_CONFIG_FILES([Makefile 
