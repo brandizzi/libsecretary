@@ -21,13 +21,13 @@
 /**
  * A simple array-based list for our internal purposes.
  */
-#ifndef _LIST_H
-# define _LIST_H
+#ifndef _SCT_LIST_H
+# define _SCT_LIST_H
 
 #include <stdbool.h>
 #include <secretary/util.h>
 
-#define LIST_ITEM_NOT_FOUND (-1)
+#define SCT_LIST_ITEM_NOT_FOUND (-1)
 
 typedef struct SctList {
     int space, number_of_items;
@@ -35,22 +35,22 @@ typedef struct SctList {
     struct SctList *superlist;
 } SctList;
 
-SctList *list_new();
-int list_count_items(SctList *list);
+SctList *sct_list_new();
+int sct_list_count_items(SctList *list);
 /**
  * Removes the first occurence of item in the list.
  */
-void list_add_item(SctList *list, void *item);
-void *list_get_nth_item(SctList *list, int index);
-void list_remove_item(SctList *list, void *item);
+void sct_list_add_item(SctList *list, void *item);
+void *sct_list_get_nth_item(SctList *list, int index);
+void sct_list_remove_item(SctList *list, void *item);
 
-void list_extend(SctList *dest_list, SctList *source_list);
+void sct_list_extend(SctList *dest_list, SctList *source_list);
 
 /**
  * Frees the memory used by the list. It does not free the memory used by
  * the list items, however.
  */
-void list_free(SctList *list);
+void sct_list_free(SctList *list);
 
 /**
  * Sorts the list using the comparator function. This function should behave 
@@ -59,26 +59,26 @@ void list_free(SctList *list);
  * greater than 0 if the second pointed item is respectively smaller than, equal
  * to or greater than the first pointed item.
  */
-void list_sort(SctList *list, UtilComparator comparator);
+void sct_list_sort(SctList *list, UtilComparator comparator);
 
 /**
  * Returns the nth item which satisfies the predicate function. If there is no
  * such item, returns NULL.
  */
-typedef bool (*ListPredicate)(void *item, void **params);
-void *list_get_nth_item_by_criteria(SctList *list, int index, 
-            ListPredicate predicate, void **params);
-int list_count_items_by_criteria(SctList *list, ListPredicate predicate,
+typedef bool (*SctListPredicate)(void *item, void **params);
+void *sct_list_get_nth_item_by_criteria(SctList *list, int index, 
+            SctListPredicate predicate, void **params);
+int sct_list_count_items_by_criteria(SctList *list, SctListPredicate predicate,
         void **params);
-int list_get_nth_item_index_by_criteria(SctList *list, int index,
-            ListPredicate predicate, void **params, int start_search_from_index);
+int sct_list_get_nth_item_index_by_criteria(SctList *list, int index,
+            SctListPredicate predicate, void **params, int start_search_from_index);
 
 /**
  * Creates a sublist - a list which just points to a section of another, greater
  * list. This is a read only list - you should not update it.
  */
-SctList *sublist_new(SctList *superlist, int start, int count);
-void sublist_update_range(SctList *sublist, int start, int count);
-void sublist_free(SctList *sublist);
+SctList *sct_sublist_new(SctList *superlist, int start, int count);
+void sct_sublist_update_range(SctList *sublist, int start, int count);
+void sct_sublist_free(SctList *sublist);
 
 #endif

@@ -28,27 +28,27 @@
 Project *project_new(const char *name) {
     Project *project = malloc(sizeof(Project));
     project->name = util_copy_string(name);
-    project->tasks = list_new();
+    project->tasks = sct_list_new();
     project->archived = false;
     return project;
 }
 
 void project_add_task(Project *project, Task *task) {
     task_unset_project(task);
-    list_add_item(project->tasks, task);
+    sct_list_add_item(project->tasks, task);
     task->project = project;
     _project_sort_tasks(project);
 }
 
 Task *project_get_task(Project *project, int index) {
-    if (index < list_count_items(project->tasks)) 
-        return list_get_nth_item(project->tasks, index);
+    if (index < sct_list_count_items(project->tasks)) 
+        return sct_list_get_nth_item(project->tasks, index);
     return NULL;
 }
 
 Task *project_get_nth_task(Project *project, int n, bool archived) {
-    for (int i = 0; i < list_count_items(project->tasks); i++) {
-        Task *task = list_get_nth_item(project->tasks, i);
+    for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
+        Task *task = sct_list_get_nth_item(project->tasks, i);
         if (task_is_archived(task) == archived && n-- == 0) {
             return task;
         }
@@ -58,8 +58,8 @@ Task *project_get_nth_task(Project *project, int n, bool archived) {
 
 int project_count_tasks(Project *project, bool archived) {
     int counter = 0;
-    for (int i = 0; i < list_count_items(project->tasks); i++) {
-        Task *task = list_get_nth_item(project->tasks, i);
+    for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
+        Task *task = sct_list_get_nth_item(project->tasks, i);
         if (task_is_archived(task) == archived) {
             counter++;
         }
@@ -68,7 +68,7 @@ int project_count_tasks(Project *project, bool archived) {
 }
 
 void project_remove_task(Project *project, Task *task) {
-    list_remove_item(project->tasks, task);
+    sct_list_remove_item(project->tasks, task);
     task->project = NULL;
     _project_sort_tasks(project);
 }
@@ -82,8 +82,8 @@ void project_set_name(Project *project, const char *name) {
 }
 
 void project_archive_tasks(Project *project) {
-   for (int i = 0; i < list_count_items(project->tasks); i++) {
-        Task *task = list_get_nth_item(project->tasks, i);
+   for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
+        Task *task = sct_list_get_nth_item(project->tasks, i);
         if (task_is_done(task)) {
             task_archive(task);
         }
@@ -92,8 +92,8 @@ void project_archive_tasks(Project *project) {
 }
 
 void project_free(Project *project) {
-    for (int i = 0; i < list_count_items(project->tasks); i++) {
-        Task *task = list_get_nth_item(project->tasks, i);
+    for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
+        Task *task = sct_list_get_nth_item(project->tasks, i);
         task->project = NULL;
     }
     free(project->name);
@@ -115,5 +115,5 @@ bool project_is_archived(Project *project) {
 
 /** INTERNAL FUNCTIONS */
 void _project_sort_tasks(Project *project) {
-    list_sort(project->tasks, _secretary_task_compare);
+    sct_list_sort(project->tasks, _secretary_task_compare);
 }

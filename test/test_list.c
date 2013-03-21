@@ -25,92 +25,92 @@
 #include <stdlib.h>
 
 static void test_list_create(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     CuAssertTrue(test, list!=NULL);
-    CuAssertIntEquals(test, list_count_items(list), 0);
+    CuAssertIntEquals(test, sct_list_count_items(list), 0);
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_get_invalid_item(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
 
     CuAssertTrue(test, list!=NULL);
-    CuAssertIntEquals(test, list_count_items(list), 0);
+    CuAssertIntEquals(test, sct_list_count_items(list), 0);
 
-    CuAssertPtrEquals(test, NULL, list_get_nth_item(list, 8000));
+    CuAssertPtrEquals(test, NULL, sct_list_get_nth_item(list, 8000));
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_add_items(CuTest *test) {
-    SctList *list = list_new();
-    CuAssertIntEquals(test, list_count_items(list), 0);
+    SctList *list = sct_list_new();
+    CuAssertIntEquals(test, sct_list_count_items(list), 0);
 
     int i = 4;
     int *ipointer = &i;
     char *name = "Adam";
     void *null = NULL;
-    list_add_item(list, ipointer);
-    list_add_item(list, name);
-    list_add_item(list, null);
+    sct_list_add_item(list, ipointer);
+    sct_list_add_item(list, name);
+    sct_list_add_item(list, null);
 
-    CuAssertIntEquals(test, list_count_items(list), 3);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 0), ipointer);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 1), name);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 2), null);
+    CuAssertIntEquals(test, sct_list_count_items(list), 3);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 0), ipointer);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 1), name);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 2), null);
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_add_a_lot(CuTest *test) {
-    SctList *list = list_new();
-    CuAssertIntEquals(test, list_count_items(list), 0);
+    SctList *list = sct_list_new();
+    CuAssertIntEquals(test, sct_list_count_items(list), 0);
 
     char *name = "Adam";
     for (int i = 0; i < 1024; i++) {
-        list_add_item(list, name);
+        sct_list_add_item(list, name);
     }
 
-    CuAssertIntEquals(test, list_count_items(list), 1024);
+    CuAssertIntEquals(test, sct_list_count_items(list), 1024);
     for (int i = 0; i < 1024; i++) {
-        CuAssertPtrEquals(test, list_get_nth_item(list, i), name);
+        CuAssertPtrEquals(test, sct_list_get_nth_item(list, i), name);
     }
 
-    list_free(list);
+    sct_list_free(list);
 
 }
 
 static void test_list_remove_item(CuTest *test) {
-    SctList *list = list_new();
-    CuAssertIntEquals(test, list_count_items(list), 0);
+    SctList *list = sct_list_new();
+    CuAssertIntEquals(test, sct_list_count_items(list), 0);
 
     char *item1 = "item 1", *item2 = "item 2", *item3 = "item 3", 
             *item4 = "item 4", *item5 = "item 5";
-    list_add_item(list, item1);
-    list_add_item(list, item2);
-    list_add_item(list, item3);
-    list_add_item(list, item4);
-    list_add_item(list, item5);
+    sct_list_add_item(list, item1);
+    sct_list_add_item(list, item2);
+    sct_list_add_item(list, item3);
+    sct_list_add_item(list, item4);
+    sct_list_add_item(list, item5);
 
-    CuAssertIntEquals(test, list_count_items(list), 5);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 0), item1);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 1), item2);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 2), item3);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 3), item4);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 4), item5);
+    CuAssertIntEquals(test, sct_list_count_items(list), 5);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 0), item1);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 1), item2);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 2), item3);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 3), item4);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 4), item5);
 
-    list_remove_item(list, item2);
-    list_remove_item(list, item4);
+    sct_list_remove_item(list, item2);
+    sct_list_remove_item(list, item4);
 
-    CuAssertIntEquals(test, list_count_items(list), 3);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 0), item1);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 1), item3);
-    CuAssertPtrEquals(test, list_get_nth_item(list, 2), item5);
+    CuAssertIntEquals(test, sct_list_count_items(list), 3);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 0), item1);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 1), item3);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 2), item5);
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static int intcomp(const void *i1, const void *i2) {
@@ -118,34 +118,34 @@ static int intcomp(const void *i1, const void *i2) {
 }
 
 static void test_list_sort(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i4);
-    list_add_item(list, &i3);
-    list_add_item(list, &i5);
-    list_add_item(list, &i2);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i5);
+    sct_list_add_item(list, &i2);
 
-    CuAssertIntEquals(test, list_count_items(list), 5);
-    CuAssertPtrEquals(test, &i1, list_get_nth_item(list, 0));
-    CuAssertPtrEquals(test, &i4, list_get_nth_item(list, 1));
-    CuAssertPtrEquals(test, &i3, list_get_nth_item(list, 2));
-    CuAssertPtrEquals(test, &i5, list_get_nth_item(list, 3));
-    CuAssertPtrEquals(test, &i2, list_get_nth_item(list, 4));
+    CuAssertIntEquals(test, sct_list_count_items(list), 5);
+    CuAssertPtrEquals(test, &i1, sct_list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, &i4, sct_list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, &i3, sct_list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, &i5, sct_list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, &i2, sct_list_get_nth_item(list, 4));
 
 
-    list_sort(list, intcomp);
+    sct_list_sort(list, intcomp);
 
-    CuAssertIntEquals(test, list_count_items(list), 5);
-    CuAssertPtrEquals(test, &i1, list_get_nth_item(list, 0));
-    CuAssertPtrEquals(test, &i2, list_get_nth_item(list, 1));
-    CuAssertPtrEquals(test, &i3, list_get_nth_item(list, 2));
-    CuAssertPtrEquals(test, &i4, list_get_nth_item(list, 3));
-    CuAssertPtrEquals(test, &i5, list_get_nth_item(list, 4));
+    CuAssertIntEquals(test, sct_list_count_items(list), 5);
+    CuAssertPtrEquals(test, &i1, sct_list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, &i2, sct_list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, &i3, sct_list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, &i4, sct_list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, &i5, sct_list_get_nth_item(list, 4));
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static int my_task_compare(const void *p1, const void *p2) {
@@ -155,7 +155,7 @@ static int my_task_compare(const void *p1, const void *p2) {
 }
 
 static void test_list_sort_tasks(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     Task *as6_task = task_new("as6_task"),
         *s6_task = task_new("s6_task"),
@@ -188,34 +188,34 @@ static void test_list_sort_tasks(CuTest *test) {
     task_mark_as_done(a_task); 
     task_archive(a_task);
 
-    list_add_item(list, as6_task);
-    list_add_item(list, s6_task);
-    list_add_item(list, as3_task);
-    list_add_item(list, s3_task);
-    list_add_item(list, a_task);
-    list_add_item(list, task);
+    sct_list_add_item(list, as6_task);
+    sct_list_add_item(list, s6_task);
+    sct_list_add_item(list, as3_task);
+    sct_list_add_item(list, s3_task);
+    sct_list_add_item(list, a_task);
+    sct_list_add_item(list, task);
 
-    CuAssertIntEquals(test, list_count_items(list), 6);
-    CuAssertPtrEquals(test, as6_task, list_get_nth_item(list, 0));
-    CuAssertPtrEquals(test, s6_task, list_get_nth_item(list, 1));
-    CuAssertPtrEquals(test, as3_task, list_get_nth_item(list, 2));
-    CuAssertPtrEquals(test, s3_task, list_get_nth_item(list, 3));
-    CuAssertPtrEquals(test, a_task, list_get_nth_item(list, 4));
-    CuAssertPtrEquals(test, task, list_get_nth_item(list, 5));
+    CuAssertIntEquals(test, sct_list_count_items(list), 6);
+    CuAssertPtrEquals(test, as6_task, sct_list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, s6_task, sct_list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, as3_task, sct_list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, s3_task, sct_list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, a_task, sct_list_get_nth_item(list, 4));
+    CuAssertPtrEquals(test, task, sct_list_get_nth_item(list, 5));
 
-    CuAssertIntEquals(test, list_count_items(list), 6);
-    list_sort(list, my_task_compare);
+    CuAssertIntEquals(test, sct_list_count_items(list), 6);
+    sct_list_sort(list, my_task_compare);
     
-    CuAssertIntEquals(test, list_count_items(list), 6);
-    CuAssertPtrEquals(test, s3_task, list_get_nth_item(list, 0));
-    CuAssertPtrEquals(test, s6_task, list_get_nth_item(list, 1));
-    CuAssertPtrEquals(test, task, list_get_nth_item(list, 2));
-    CuAssertPtrEquals(test, as3_task, list_get_nth_item(list, 3));
-    CuAssertPtrEquals(test, as6_task, list_get_nth_item(list, 4));
-    CuAssertPtrEquals(test, a_task, list_get_nth_item(list, 5));
+    CuAssertIntEquals(test, sct_list_count_items(list), 6);
+    CuAssertPtrEquals(test, s3_task, sct_list_get_nth_item(list, 0));
+    CuAssertPtrEquals(test, s6_task, sct_list_get_nth_item(list, 1));
+    CuAssertPtrEquals(test, task, sct_list_get_nth_item(list, 2));
+    CuAssertPtrEquals(test, as3_task, sct_list_get_nth_item(list, 3));
+    CuAssertPtrEquals(test, as6_task, sct_list_get_nth_item(list, 4));
+    CuAssertPtrEquals(test, a_task, sct_list_get_nth_item(list, 5));
 
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static bool is_even(void *p, void **params) {
@@ -237,50 +237,50 @@ static bool is_rest_equal(void *item, void **params) {
 }
 
 static void test_list_get_nth_item_by_criteria(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
-    int *p = list_get_nth_item_by_criteria(list, 0, is_even, NULL);
+    int *p = sct_list_get_nth_item_by_criteria(list, 0, is_even, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 2);
-    p = list_get_nth_item_by_criteria(list, 1, is_even, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 1, is_even, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 4);
-    p = list_get_nth_item_by_criteria(list, 2, is_even, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 2, is_even, NULL);
     CuAssertPtrEquals(test, p, NULL);
 
-    p = list_get_nth_item_by_criteria(list, 0, is_odd, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 0, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 1);
-    p = list_get_nth_item_by_criteria(list, 1, is_odd, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 1, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 3);
-    p = list_get_nth_item_by_criteria(list, 2, is_odd, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 2, is_odd, NULL);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 5);
-    p = list_get_nth_item_by_criteria(list, 3, is_odd, NULL);
+    p = sct_list_get_nth_item_by_criteria(list, 3, is_odd, NULL);
     CuAssertPtrEquals(test, p, NULL);
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
 
     int quotient, rest;
@@ -289,59 +289,59 @@ static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
     quotient = 3;
     rest = 2;
 
-    int *p = list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
+    int *p = sct_list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 2);
-    p = list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
+    p = sct_list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 5);
-    p = list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
+    p = sct_list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
     CuAssertPtrEquals(test, p, NULL);
 
     quotient = 4;
     rest = 1;
 
-    p = list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
+    p = sct_list_get_nth_item_by_criteria(list, 0, is_rest_equal, params);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 1);
-    p = list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
+    p = sct_list_get_nth_item_by_criteria(list, 1, is_rest_equal, params);
     CuAssertTrue(test, p != NULL);
     CuAssertIntEquals(test, *p, 5);
-    p = list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
+    p = sct_list_get_nth_item_by_criteria(list, 2, is_rest_equal, params);
     CuAssertPtrEquals(test, p, NULL);
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_count_items_by_criteria(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
     CuAssertIntEquals(test, 2, 
-            list_count_items_by_criteria(list, is_even, NULL));
-    CuAssertIntEquals(test, 3, list_count_items_by_criteria(list, is_odd, NULL));
+            sct_list_count_items_by_criteria(list, is_even, NULL));
+    CuAssertIntEquals(test, 3, sct_list_count_items_by_criteria(list, is_odd, NULL));
             
-    list_free(list);
+    sct_list_free(list);
 }
 
 
 static void test_list_count_items_by_criteria_with_params(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
     int quotient, rest;
     void *params[] = { &quotient, &rest };
@@ -350,89 +350,89 @@ static void test_list_count_items_by_criteria_with_params(CuTest *test) {
     rest = 2;
 
     CuAssertIntEquals(test, 2, 
-            list_count_items_by_criteria(list, is_rest_equal, params));
+            sct_list_count_items_by_criteria(list, is_rest_equal, params));
 
     quotient = 4;
     rest = 1;
 
     CuAssertIntEquals(test, 2, 
-            list_count_items_by_criteria(list, is_rest_equal, params));
+            sct_list_count_items_by_criteria(list, is_rest_equal, params));
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_sublist(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
 
-    SctList *sublist = sublist_new(list, 2, 2);
+    SctList *sublist = sct_sublist_new(list, 2, 2);
 
-    CuAssertIntEquals(test, 2, list_count_items(sublist));
-    int *p = list_get_nth_item(sublist, 0);
+    CuAssertIntEquals(test, 2, sct_list_count_items(sublist));
+    int *p = sct_list_get_nth_item(sublist, 0);
     CuAssertIntEquals(test, 3, *p);
-    p = list_get_nth_item(sublist, 1);
+    p = sct_list_get_nth_item(sublist, 1);
     CuAssertIntEquals(test, 4, *p);
-    p = list_get_nth_item(sublist, 3);
+    p = sct_list_get_nth_item(sublist, 3);
     CuAssertPtrEquals(test, NULL, p);
 
-    sublist_free(sublist);
-    list_free(list);
+    sct_sublist_free(sublist);
+    sct_list_free(list);
 }
 
 static void test_list_sublist_update_range(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
 
-    SctList *sublist = sublist_new(list, 2, 2);
+    SctList *sublist = sct_sublist_new(list, 2, 2);
 
-    CuAssertIntEquals(test, 2, list_count_items(sublist));
-    int *p = list_get_nth_item(sublist, 0);
+    CuAssertIntEquals(test, 2, sct_list_count_items(sublist));
+    int *p = sct_list_get_nth_item(sublist, 0);
     CuAssertIntEquals(test, 3, *p);
-    p = list_get_nth_item(sublist, 1);
+    p = sct_list_get_nth_item(sublist, 1);
     CuAssertIntEquals(test, 4, *p);
-    p = list_get_nth_item(sublist, 3);
+    p = sct_list_get_nth_item(sublist, 3);
     CuAssertPtrEquals(test, NULL, p);
 
-    sublist_update_range(sublist, 3, 2);
+    sct_sublist_update_range(sublist, 3, 2);
 
-    CuAssertIntEquals(test, 2, list_count_items(sublist));
-    p = list_get_nth_item(sublist, 0);
+    CuAssertIntEquals(test, 2, sct_list_count_items(sublist));
+    p = sct_list_get_nth_item(sublist, 0);
     CuAssertIntEquals(test, 4, *p);
-    p = list_get_nth_item(sublist, 1);
+    p = sct_list_get_nth_item(sublist, 1);
     CuAssertIntEquals(test, 5, *p);
-    p = list_get_nth_item(sublist, 3);
+    p = sct_list_get_nth_item(sublist, 3);
     CuAssertPtrEquals(test, NULL, p);
 
-    sublist_free(sublist);
-    list_free(list);
+    sct_sublist_free(sublist);
+    sct_list_free(list);
 }
 
 static void test_list_get_nth_item_index_by_criteria(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
 
     int quotient, rest;
@@ -441,42 +441,42 @@ static void test_list_get_nth_item_index_by_criteria(CuTest *test) {
     quotient = 3;
     rest = 2;
 
-    int i = list_get_nth_item_index_by_criteria(
+    int i = sct_list_get_nth_item_index_by_criteria(
             list, 0, is_rest_equal, params, 0);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 1);
-    i = list_get_nth_item_index_by_criteria(list, 1, is_rest_equal, params, 0);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 1, is_rest_equal, params, 0);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 4);
-    i = list_get_nth_item_index_by_criteria(list, 2, is_rest_equal, params, 0);
-    CuAssertIntEquals(test, LIST_ITEM_NOT_FOUND, i);
+    i = sct_list_get_nth_item_index_by_criteria(list, 2, is_rest_equal, params, 0);
+    CuAssertIntEquals(test, SCT_LIST_ITEM_NOT_FOUND, i);
 
     quotient = 4;
     rest = 1;
 
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, 0);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, 0);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 0);
-    i = list_get_nth_item_index_by_criteria(list, 1, is_rest_equal, params, 0);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 1, is_rest_equal, params, 0);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 4);
-    i = list_get_nth_item_index_by_criteria(list, 2, is_rest_equal, params, 0);
-    CuAssertIntEquals(test, LIST_ITEM_NOT_FOUND, i);
+    i = sct_list_get_nth_item_index_by_criteria(list, 2, is_rest_equal, params, 0);
+    CuAssertIntEquals(test, SCT_LIST_ITEM_NOT_FOUND, i);
 
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
-    list_add_item(list, &i1);
-    list_add_item(list, &i2);
-    list_add_item(list, &i3);
-    list_add_item(list, &i4);
-    list_add_item(list, &i5);
+    sct_list_add_item(list, &i1);
+    sct_list_add_item(list, &i2);
+    sct_list_add_item(list, &i3);
+    sct_list_add_item(list, &i4);
+    sct_list_add_item(list, &i5);
 
 
     int quotient, rest;
@@ -486,81 +486,81 @@ static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
     rest = 2;
 
     int i = 0;
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 1);
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 4);
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
-    CuAssertIntEquals(test, LIST_ITEM_NOT_FOUND, i);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
+    CuAssertIntEquals(test, SCT_LIST_ITEM_NOT_FOUND, i);
 
 
     quotient = 4;
     rest = 1;
 
     i = 0;
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 0);
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
-    CuAssertTrue(test, i != LIST_ITEM_NOT_FOUND);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
+    CuAssertTrue(test, i != SCT_LIST_ITEM_NOT_FOUND);
     CuAssertIntEquals(test, i, 4);
-    i = list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
-    CuAssertIntEquals(test, LIST_ITEM_NOT_FOUND, i);
+    i = sct_list_get_nth_item_index_by_criteria(list, 0, is_rest_equal, params, i+1);
+    CuAssertIntEquals(test, SCT_LIST_ITEM_NOT_FOUND, i);
 
 
-    list_free(list);
+    sct_list_free(list);
 }
 
 static void test_list_extend(CuTest *test) {
-    SctList *list1 = list_new();
+    SctList *list1 = sct_list_new();
     int i0 = 0, i1 = 1, i2 = 2, i3 = 3, i4 = 4;
 
-    list_add_item(list1, &i0);
-    list_add_item(list1, &i1);
-    list_add_item(list1, &i2);
-    list_add_item(list1, &i3);
-    list_add_item(list1, &i4);
+    sct_list_add_item(list1, &i0);
+    sct_list_add_item(list1, &i1);
+    sct_list_add_item(list1, &i2);
+    sct_list_add_item(list1, &i3);
+    sct_list_add_item(list1, &i4);
 
-    CuAssertIntEquals(test, list_count_items(list1), 5);
-    CuAssertPtrEquals(test, &i0, list_get_nth_item(list1, 0));
-    CuAssertPtrEquals(test, &i1, list_get_nth_item(list1, 1));
-    CuAssertPtrEquals(test, &i2, list_get_nth_item(list1, 2));
-    CuAssertPtrEquals(test, &i3, list_get_nth_item(list1, 3));
-    CuAssertPtrEquals(test, &i4, list_get_nth_item(list1, 4));
+    CuAssertIntEquals(test, sct_list_count_items(list1), 5);
+    CuAssertPtrEquals(test, &i0, sct_list_get_nth_item(list1, 0));
+    CuAssertPtrEquals(test, &i1, sct_list_get_nth_item(list1, 1));
+    CuAssertPtrEquals(test, &i2, sct_list_get_nth_item(list1, 2));
+    CuAssertPtrEquals(test, &i3, sct_list_get_nth_item(list1, 3));
+    CuAssertPtrEquals(test, &i4, sct_list_get_nth_item(list1, 4));
 
-    SctList *list2 = list_new();
+    SctList *list2 = sct_list_new();
     int i5 = 0, i6 = 1, i7 = 2, i8 = 3, i9 = 4;
 
-    list_add_item(list2, &i5);
-    list_add_item(list2, &i6);
-    list_add_item(list2, &i7);
-    list_add_item(list2, &i8);
-    list_add_item(list2, &i9);
+    sct_list_add_item(list2, &i5);
+    sct_list_add_item(list2, &i6);
+    sct_list_add_item(list2, &i7);
+    sct_list_add_item(list2, &i8);
+    sct_list_add_item(list2, &i9);
 
-    CuAssertPtrEquals(test, &i5, list_get_nth_item(list2, 0));
-    CuAssertPtrEquals(test, &i6, list_get_nth_item(list2, 1));
-    CuAssertPtrEquals(test, &i7, list_get_nth_item(list2, 2));
-    CuAssertPtrEquals(test, &i8, list_get_nth_item(list2, 3));
-    CuAssertPtrEquals(test, &i9, list_get_nth_item(list2, 4));
+    CuAssertPtrEquals(test, &i5, sct_list_get_nth_item(list2, 0));
+    CuAssertPtrEquals(test, &i6, sct_list_get_nth_item(list2, 1));
+    CuAssertPtrEquals(test, &i7, sct_list_get_nth_item(list2, 2));
+    CuAssertPtrEquals(test, &i8, sct_list_get_nth_item(list2, 3));
+    CuAssertPtrEquals(test, &i9, sct_list_get_nth_item(list2, 4));
 
-    list_extend(list1, list2);
+    sct_list_extend(list1, list2);
 
-    CuAssertIntEquals(test, list_count_items(list1), 10);
-    CuAssertPtrEquals(test, &i0, list_get_nth_item(list1, 0));
-    CuAssertPtrEquals(test, &i1, list_get_nth_item(list1, 1));
-    CuAssertPtrEquals(test, &i2, list_get_nth_item(list1, 2));
-    CuAssertPtrEquals(test, &i3, list_get_nth_item(list1, 3));
-    CuAssertPtrEquals(test, &i4, list_get_nth_item(list1, 4));
-    CuAssertPtrEquals(test, &i5, list_get_nth_item(list1, 5));
-    CuAssertPtrEquals(test, &i6, list_get_nth_item(list1, 6));
-    CuAssertPtrEquals(test, &i7, list_get_nth_item(list1, 7));
-    CuAssertPtrEquals(test, &i8, list_get_nth_item(list1, 8));
-    CuAssertPtrEquals(test, &i9, list_get_nth_item(list1, 9));
+    CuAssertIntEquals(test, sct_list_count_items(list1), 10);
+    CuAssertPtrEquals(test, &i0, sct_list_get_nth_item(list1, 0));
+    CuAssertPtrEquals(test, &i1, sct_list_get_nth_item(list1, 1));
+    CuAssertPtrEquals(test, &i2, sct_list_get_nth_item(list1, 2));
+    CuAssertPtrEquals(test, &i3, sct_list_get_nth_item(list1, 3));
+    CuAssertPtrEquals(test, &i4, sct_list_get_nth_item(list1, 4));
+    CuAssertPtrEquals(test, &i5, sct_list_get_nth_item(list1, 5));
+    CuAssertPtrEquals(test, &i6, sct_list_get_nth_item(list1, 6));
+    CuAssertPtrEquals(test, &i7, sct_list_get_nth_item(list1, 7));
+    CuAssertPtrEquals(test, &i8, sct_list_get_nth_item(list1, 8));
+    CuAssertPtrEquals(test, &i9, sct_list_get_nth_item(list1, 9));
 
-    list_free(list1);
-    list_free(list2);
+    sct_list_free(list1);
+    sct_list_free(list2);
 }
 
 

@@ -28,25 +28,25 @@
 
 Secretary *secretary_new() {
     Secretary *secretary = calloc(1, sizeof(Secretary));
-    secretary->tasks = list_new();
-    secretary->projects = list_new();
+    secretary->tasks = sct_list_new();
+    secretary->projects = sct_list_new();
     secretary->acc = 0;
 
     /* Optimization sublists */
     // Visible and archived
-    secretary->visible_tasks = sublist_new(secretary->tasks, 0, 0);
-    secretary->archived_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_tasks = sct_sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_tasks = sct_sublist_new(secretary->tasks, 0, 0);
     // Scheduled tasks lists
-    secretary->visible_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
-    secretary->archived_scheduled_tasks = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_scheduled_tasks = sct_sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_scheduled_tasks = sct_sublist_new(secretary->tasks, 0, 0);
     // Scheduled for today tasks lists
     secretary->visible_scheduled_for_today_tasks = 
-            sublist_new(secretary->tasks, 0, 0);
+            sct_sublist_new(secretary->tasks, 0, 0);
     secretary->archived_scheduled_for_today_tasks = 
-            sublist_new(secretary->tasks, 0, 0);
+            sct_sublist_new(secretary->tasks, 0, 0);
     // Inbox
-    secretary->visible_inbox = sublist_new(secretary->tasks, 0, 0);
-    secretary->archived_inbox = sublist_new(secretary->tasks, 0, 0);
+    secretary->visible_inbox = sct_sublist_new(secretary->tasks, 0, 0);
+    secretary->archived_inbox = sct_sublist_new(secretary->tasks, 0, 0);
 
     return secretary;
 }
@@ -55,7 +55,7 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
     Task *task = task_new(description);
     //task->secretary = secretary;
     task->number = ++secretary->acc;
-    list_add_item(secretary->tasks, task);
+    sct_list_add_item(secretary->tasks, task);
     _secretary_update_sublists(secretary);
     return task;
 }
@@ -64,36 +64,36 @@ int secretary_count_tasks(Secretary *secretary, bool archived) {
     SctList *list = archived ? 
             secretary->archived_tasks : 
             secretary->visible_tasks;
-    return list_count_items(list);
+    return sct_list_count_items(list);
 }
 
 int secretary_count_all_tasks(Secretary *secretary) {
-    return list_count_items(secretary->tasks);
+    return sct_list_count_items(secretary->tasks);
 }
 
 Task *secretary_get_nth_task(Secretary *secretary, int n) {
-    return list_get_nth_item(secretary->tasks, n);
+    return sct_list_get_nth_item(secretary->tasks, n);
 }
 
 Project *secretary_create_project(Secretary *secretary, const char* name) {
     Project *project = project_new(name);
-    list_add_item(secretary->projects, project);
+    sct_list_add_item(secretary->projects, project);
     return project;
 }
 
 int secretary_count_projects(Secretary *secretary) {
-    return list_count_items_by_criteria(secretary->projects, 
+    return sct_list_count_items_by_criteria(secretary->projects, 
             _secretary_project_is_not_archived, NULL);
 }
 
 Project *secretary_get_project(Secretary *secretary, const char *name) {
     void *params[] = { (void*) name };
-    return list_get_nth_item_by_criteria(secretary->projects, 0,
+    return sct_list_get_nth_item_by_criteria(secretary->projects, 0,
             _secretary_predicate_project_is_named, params);
 }
 
 Project *secretary_get_nth_project(Secretary *secretary, int n) {
-    Project *p = list_get_nth_item_by_criteria(secretary->projects, n,
+    Project *p = sct_list_get_nth_item_by_criteria(secretary->projects, n,
             _secretary_project_is_not_archived, NULL);
 }
 
@@ -108,13 +108,13 @@ void secretary_delete_task(Secretary *secretary, Task *task) {
     if (project) {
         project_remove_task(project, task);
     }
-    list_remove_item(secretary->tasks, task);
+    sct_list_remove_item(secretary->tasks, task);
     _secretary_update_sublists(secretary);
     task_free(task);
 }
 
 void secretary_delete_project(Secretary *secretary, Project *project) {
-    list_remove_item(secretary->projects, project);
+    sct_list_remove_item(secretary->projects, project);
     project_free(project);
     _secretary_update_sublists(secretary);    
 }
@@ -122,22 +122,22 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
     SctList *list = archived ? 
             secretary->archived_inbox : secretary->visible_inbox;
-    return  list_count_items(list);
+    return  sct_list_count_items(list);
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
     SctList *list = archived ? 
             secretary->archived_inbox : secretary->visible_inbox;
-    return list_get_nth_item(list, n);
+    return sct_list_get_nth_item(list, n);
 }
 
 void secretary_archive_inbox_tasks(Secretary *secretary) {
     bool archived = false;
     void *params[] = { &archived };
-    int done_count = list_count_items_by_criteria(secretary->tasks,
+    int done_count = sct_list_count_items_by_criteria(secretary->tasks,
                 _secretary_predicate_inbox_task_is_done, params);
     for (int i = 0; i < done_count; i++) {
-        Task *task = list_get_nth_item_by_criteria(secretary->tasks, 0,
+        Task *task = sct_list_get_nth_item_by_criteria(secretary->tasks, 0,
                 _secretary_predicate_inbox_task_is_done, params);
         task_archive(task);
     }
@@ -147,17 +147,17 @@ void secretary_archive_inbox_tasks(Secretary *secretary) {
 Task *secretary_get_task(Secretary *secretary, int number) {
 #warning function secretary_get_task to be removed
     if (number < secretary_count_all_tasks(secretary)) {
-        return list_get_nth_item(secretary->tasks, number);
+        return sct_list_get_nth_item(secretary->tasks, number);
     }
     return NULL;
 }
 
 void secretary_free(Secretary *secretary) {
-    for (int i = 0; i < list_count_items(secretary->projects); i++) {
-        project_free(list_get_nth_item(secretary->projects, i));
+    for (int i = 0; i < sct_list_count_items(secretary->projects); i++) {
+        project_free(sct_list_get_nth_item(secretary->projects, i));
     }
-    for (int i = 0; i < list_count_items(secretary->tasks); i++) {
-        task_free(list_get_nth_item(secretary->tasks, i));
+    for (int i = 0; i < sct_list_count_items(secretary->tasks); i++) {
+        task_free(sct_list_get_nth_item(secretary->tasks, i));
     }
     free(secretary);
 }
@@ -166,7 +166,7 @@ int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
-    return list_count_items(list);
+    return sct_list_count_items(list);
 }
 
 
@@ -176,7 +176,7 @@ int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date,
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
-    return list_count_items_by_criteria(list,
+    return sct_list_count_items_by_criteria(list,
         _secretary_predicate_task_is_scheduled_for, params);
 }
 
@@ -186,10 +186,10 @@ int secretary_count_tasks_scheduled_for_today(Secretary *secretary,
 }
 
 void secretary_archive_scheduled_tasks(Secretary *secretary) {
-    int scheduled_count = list_count_items_by_criteria(secretary->tasks, 
+    int scheduled_count = sct_list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_done_scheduled_task, NULL);
     for (int i = 0; i < scheduled_count; i++) {
-        Task *task = list_get_nth_item_by_criteria(secretary->tasks, i,
+        Task *task = sct_list_get_nth_item_by_criteria(secretary->tasks, i,
                 _secretary_predicate_done_scheduled_task, NULL);
         task_archive(task);
     }
@@ -197,10 +197,10 @@ void secretary_archive_scheduled_tasks(Secretary *secretary) {
 }
 void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date) {
     void *params[] = { &date };
-    int scheduled_count = list_count_items_by_criteria(secretary->tasks, 
+    int scheduled_count = sct_list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_done_task_scheduled_for, params);
     for (int i = 0; i < scheduled_count; i++) {
-        Task *task = list_get_nth_item_by_criteria(secretary->tasks, i,
+        Task *task = sct_list_get_nth_item_by_criteria(secretary->tasks, i,
                 _secretary_predicate_done_task_scheduled_for, params);
         task_archive(task);
     }
@@ -216,7 +216,7 @@ Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n,
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
-    return list_get_nth_item(list, n);
+    return sct_list_get_nth_item(list, n);
 }
 
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, 
@@ -225,7 +225,7 @@ Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date,
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
-    return list_get_nth_item_by_criteria(list,
+    return sct_list_get_nth_item_by_criteria(list,
                 n, _secretary_predicate_task_is_scheduled_for, params);
 }
 Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
@@ -236,13 +236,13 @@ Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n,
 // WHY ON EARTH HAS IT AN archived ARGUMENT!?!?!?!
 int secretary_count_done_tasks(Secretary *secretary, bool archived) {
     void *params[] = { &archived };
-    return list_count_items_by_criteria(secretary->tasks,
+    return sct_list_count_items_by_criteria(secretary->tasks,
             _secretary_predicate_task_is_done, params);
 }
 
 Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived) {
     void *params[] = { &archived };
-    return list_get_nth_item_by_criteria(secretary->tasks, n,
+    return sct_list_get_nth_item_by_criteria(secretary->tasks, n,
             _secretary_predicate_task_is_done, params);
 }
 
@@ -280,7 +280,7 @@ void secretary_archive_task(Secretary *secretary, Task *task) {
  */
 
 void _secretary_sort_tasks(Secretary *secretary) {
-    list_sort(secretary->tasks, _secretary_task_compare);
+    sct_list_sort(secretary->tasks, _secretary_task_compare);
 }
 
 void _secretary_update_sublists(Secretary *secretary) {
@@ -302,98 +302,98 @@ void _secretary_update_sublists(Secretary *secretary) {
         last_archived_scheduled_for_today_task = last_archived_scheduled_task =
         first_archived_inbox_task = last_archived_inbox_task = 
         first_visible_task = last_visible_task = first_archived_task = 
-        last_archived_task = LIST_ITEM_NOT_FOUND;
+        last_archived_task = SCT_LIST_ITEM_NOT_FOUND;
 
-    for (int i = 0; i < list_count_items(tasks); i++) {
-        Task *task = list_get_nth_item(tasks, i);
+    for (int i = 0; i < sct_list_count_items(tasks); i++) {
+        Task *task = sct_list_get_nth_item(tasks, i);
         time_t today = util_beginning_of_day(time(NULL));
         // Is first visible?
         if (!task_is_archived(task)
-                && first_visible_task == LIST_ITEM_NOT_FOUND) {
+                && first_visible_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_visible_task = i;
         } else if (task_is_archived(task)         // Is first archived?
-                && first_archived_task == LIST_ITEM_NOT_FOUND) {
+                && first_archived_task == SCT_LIST_ITEM_NOT_FOUND) {
             first_archived_task = i;
         }
         // Is first scheduled?
         if (task_is_scheduled(task)) {
             if (!task_is_archived(task)
-                    && first_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                    && first_visible_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_visible_scheduled_task = i;
             } else if (task_is_archived(task)
-                    && first_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                    && first_archived_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_archived_scheduled_task = i;
             }
         }
         // Is first scheduled for today?
         if (task_is_scheduled_for(task, today)) {
             if (!task_is_archived(task)
-                    && first_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                    && first_visible_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_visible_scheduled_for_today_task = i;
             } else if (task_is_archived(task)
-                    && first_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                    && first_archived_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_archived_scheduled_for_today_task = i;
             }
         }
         // Is first inbox?
         if (task_is_in_inbox(task)) { 
             if (!task_is_archived(task)
-                    && first_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+                    && first_visible_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_visible_inbox_task = i;
             } else if (task_is_archived(task)
-                    && first_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+                    && first_archived_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
                 first_archived_inbox_task = i;
             }
         }
 
         // Is last visbile?
         if (task_is_archived(task) 
-                && first_visible_task != LIST_ITEM_NOT_FOUND 
-                && last_visible_task == LIST_ITEM_NOT_FOUND) {
+                && first_visible_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_visible_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_task = i;
         } else if (!task_is_archived(task) 
-                && first_archived_task != LIST_ITEM_NOT_FOUND 
-                && last_archived_task == LIST_ITEM_NOT_FOUND) {
+                && first_archived_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_archived_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_task = i;
         }
         // Is last scheduled?
         if ((!task_is_scheduled(task) || task_is_archived(task))
-                && first_visible_scheduled_task != LIST_ITEM_NOT_FOUND 
-                && last_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                && first_visible_scheduled_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_visible_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_scheduled_task = i;
         } else if (!task_is_scheduled(task) && task_is_archived(task)
-                && first_archived_scheduled_task != LIST_ITEM_NOT_FOUND 
-                && last_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+                && first_archived_scheduled_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_archived_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_scheduled_task = i;
         }
         // Is last scheduled for today?
         if ((!task_is_scheduled_for(task, today) || task_is_archived(task))
-                && first_visible_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
-                && last_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                && first_visible_scheduled_for_today_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_visible_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_scheduled_for_today_task = i;
         } else if (!task_is_scheduled_for(task, today) && task_is_archived(task)
-                && first_archived_scheduled_for_today_task != LIST_ITEM_NOT_FOUND 
-                && last_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+                && first_archived_scheduled_for_today_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_archived_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_scheduled_for_today_task = i;
         }
         // Is last inbox?
         if ((!task_is_in_inbox(task) || task_is_archived(task))
-                && first_visible_inbox_task != LIST_ITEM_NOT_FOUND 
-                && last_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+                && first_visible_inbox_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_visible_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_inbox_task = i;
         } else if (!task_is_in_inbox(task) && task_is_archived(task)
-                && first_archived_inbox_task != LIST_ITEM_NOT_FOUND 
-                && last_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+                && first_archived_inbox_task != SCT_LIST_ITEM_NOT_FOUND 
+                && last_archived_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_inbox_task = i;
         }
     }
     int start, count;
     // Updating range of visible/archived lists
-    if (first_visible_task != LIST_ITEM_NOT_FOUND) {
-        if (last_visible_task == LIST_ITEM_NOT_FOUND) {
+    if (first_visible_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_visible_task == SCT_LIST_ITEM_NOT_FOUND) {
             bool archival = false;
             void *params[] = {&archival};
-            last_visible_task = list_count_items_by_criteria(secretary->tasks,
+            last_visible_task = sct_list_count_items_by_criteria(secretary->tasks,
                 _secretary_predicate_task_archival_is, params);
         }
         start = first_visible_task;
@@ -401,23 +401,23 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->visible_tasks, start, count);    
+    sct_sublist_update_range(secretary->visible_tasks, start, count);    
 
-    if (first_archived_task != LIST_ITEM_NOT_FOUND) {
-        if (last_archived_task == LIST_ITEM_NOT_FOUND) {
-            last_archived_task = list_count_items(secretary->tasks);
+    if (first_archived_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_archived_task == SCT_LIST_ITEM_NOT_FOUND) {
+            last_archived_task = sct_list_count_items(secretary->tasks);
         }
         start = first_archived_task;
         count = last_archived_task-first_archived_task;
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->archived_tasks, start, count);    
+    sct_sublist_update_range(secretary->archived_tasks, start, count);    
 
 
     // Updating range for visible lists
-    if (first_visible_scheduled_task != LIST_ITEM_NOT_FOUND) {
-        if (last_visible_scheduled_task == LIST_ITEM_NOT_FOUND) {
+    if (first_visible_scheduled_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_visible_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_scheduled_task = secretary_count_tasks(secretary, false);
         }
         start = first_visible_scheduled_task;
@@ -425,10 +425,10 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->visible_scheduled_tasks, start, count);
+    sct_sublist_update_range(secretary->visible_scheduled_tasks, start, count);
 
-    if (first_visible_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
-        if (last_visible_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+    if (first_visible_scheduled_for_today_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_visible_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_scheduled_for_today_task = secretary_count_tasks(
                     secretary, false);
         }
@@ -437,10 +437,10 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->visible_scheduled_for_today_tasks, start, 
+    sct_sublist_update_range(secretary->visible_scheduled_for_today_tasks, start, 
             count);
-    if (first_visible_inbox_task != LIST_ITEM_NOT_FOUND) {
-        if (last_visible_inbox_task == LIST_ITEM_NOT_FOUND) {
+    if (first_visible_inbox_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_visible_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_visible_inbox_task = secretary_count_all_tasks(secretary);
         }
         start = first_visible_inbox_task;
@@ -448,11 +448,11 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->visible_inbox, start, count);
+    sct_sublist_update_range(secretary->visible_inbox, start, count);
 
     // Updating range for archived lists
-    if (first_archived_scheduled_task != LIST_ITEM_NOT_FOUND) {
-        if (last_archived_scheduled_task == LIST_ITEM_NOT_FOUND) {
+    if (first_archived_scheduled_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_archived_scheduled_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_scheduled_task = secretary_count_all_tasks(secretary);
         }
         start = first_archived_scheduled_task;
@@ -460,10 +460,10 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->archived_scheduled_tasks, start, count);
+    sct_sublist_update_range(secretary->archived_scheduled_tasks, start, count);
 
-    if (first_archived_scheduled_for_today_task != LIST_ITEM_NOT_FOUND) {
-        if (last_archived_scheduled_for_today_task == LIST_ITEM_NOT_FOUND) {
+    if (first_archived_scheduled_for_today_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_archived_scheduled_for_today_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_scheduled_for_today_task = 
                     secretary_count_all_tasks(secretary);
         }
@@ -473,10 +473,10 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->archived_scheduled_for_today_tasks, start, 
+    sct_sublist_update_range(secretary->archived_scheduled_for_today_tasks, start, 
             count);
-    if (first_archived_inbox_task != LIST_ITEM_NOT_FOUND) {
-        if (last_archived_inbox_task == LIST_ITEM_NOT_FOUND) {
+    if (first_archived_inbox_task != SCT_LIST_ITEM_NOT_FOUND) {
+        if (last_archived_inbox_task == SCT_LIST_ITEM_NOT_FOUND) {
             last_archived_inbox_task = secretary_count_all_tasks(secretary);
         }
         start = first_archived_inbox_task;
@@ -484,11 +484,11 @@ void _secretary_update_sublists(Secretary *secretary) {
     } else {
         start = count = 0;
     }
-    sublist_update_range(secretary->archived_inbox, start, count);
+    sct_sublist_update_range(secretary->archived_inbox, start, count);
 }
 
 void _secretary_add_task(Secretary *secretary, Task *task) {
-    list_add_item(secretary->tasks, task);
+    sct_list_add_item(secretary->tasks, task);
     if (task->number > secretary->acc) {
         secretary->acc = task->number;
     }

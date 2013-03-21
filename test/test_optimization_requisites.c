@@ -38,7 +38,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     time_t now = time(NULL);
     struct tm date = *localtime(&now);
 
-    SctList *list = list_new();
+    SctList *list = sct_list_new();
     date.tm_mday = 2;
     secretary_schedule_task(secretary, task1, timegm(&date));
 
@@ -53,7 +53,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     
     date.tm_mday = 7;
     secretary_schedule_task(secretary, task5, timegm(&date));
-    list_add_item(list, task5);
+    sct_list_add_item(list, task5);
 
     CuAssertPtrEquals(test, task1, secretary_get_nth_task_scheduled(secretary, 0, false));
     CuAssertPtrEquals(test, task2, secretary_get_nth_task_scheduled(secretary, 1, false));
@@ -89,7 +89,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     CuAssertPtrEquals(test, task3, secretary_get_nth_task_scheduled(secretary, 4, false));
 
 
-    list_free(list);
+    sct_list_free(list);
     task_free(task1);
     task_free(task2);
     task_free(task3);
@@ -282,12 +282,12 @@ static void test_optimization_requisites_secretary_has_sublists(CuTest *test) {
 
     CuAssertTrue(test, secretary->visible_scheduled_tasks != NULL);
     CuAssertIntEquals(test, 0, 
-            list_count_items(secretary->visible_scheduled_tasks));
+            sct_list_count_items(secretary->visible_scheduled_tasks));
     CuAssertTrue(test, secretary->visible_scheduled_for_today_tasks != NULL);
     CuAssertIntEquals(test, 0, 
-            list_count_items(secretary->visible_scheduled_for_today_tasks));
+            sct_list_count_items(secretary->visible_scheduled_for_today_tasks));
     CuAssertTrue(test, secretary->visible_inbox != NULL);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_inbox));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->visible_inbox));
 
     secretary_free(secretary);
 }
@@ -297,12 +297,12 @@ static void test_optimization_requisites_secretary_has_archived_sublists(CuTest 
 
     CuAssertTrue(test, secretary->archived_scheduled_tasks != NULL);
     CuAssertIntEquals(test, 0, 
-            list_count_items(secretary->archived_scheduled_tasks));
+            sct_list_count_items(secretary->archived_scheduled_tasks));
     CuAssertTrue(test, secretary->archived_scheduled_for_today_tasks != NULL);
     CuAssertIntEquals(test, 0, 
-            list_count_items(secretary->archived_scheduled_for_today_tasks));
+            sct_list_count_items(secretary->archived_scheduled_for_today_tasks));
     CuAssertTrue(test, secretary->archived_inbox != NULL);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->archived_inbox));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->archived_inbox));
 
     secretary_free(secretary);
 }
@@ -311,9 +311,9 @@ static void test_optimization_requisites_secretary_has_archived_and_visible_subl
     Secretary *secretary = secretary_new();
 
     CuAssertTrue(test, secretary->archived_tasks != NULL);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->archived_tasks));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->archived_tasks));
     CuAssertTrue(test, secretary->visible_tasks != NULL);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_tasks));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->visible_tasks));
 
     secretary_free(secretary);
 }
@@ -372,20 +372,20 @@ static void test_optimization_requisites_sublists_work(CuTest *test) {
     task_mark_as_done(as6p_task); secretary_archive_task(secretary, as6p_task);
     task_mark_as_done(ap_task); secretary_archive_task(secretary, ap_task);
 
-    CuAssertIntEquals(test, 1, list_count_items(secretary->visible_inbox));
+    CuAssertIntEquals(test, 1, sct_list_count_items(secretary->visible_inbox));
     CuAssertPtrEquals(test, task, 
-            list_get_nth_item(secretary->visible_inbox, 0));
+            sct_list_get_nth_item(secretary->visible_inbox, 0));
     CuAssertIntEquals(test, 3, 
-            list_count_items(secretary->visible_scheduled_tasks));
+            sct_list_count_items(secretary->visible_scheduled_tasks));
     CuAssertPtrEquals(test, s3_task, 
-            list_get_nth_item(secretary->visible_scheduled_tasks, 0));
+            sct_list_get_nth_item(secretary->visible_scheduled_tasks, 0));
     CuAssertPtrEquals(test, s6_task, 
-            list_get_nth_item(secretary->visible_scheduled_tasks, 1));
+            sct_list_get_nth_item(secretary->visible_scheduled_tasks, 1));
     CuAssertPtrEquals(test, s6p_task, 
-            list_get_nth_item(secretary->visible_scheduled_tasks, 2));
+            sct_list_get_nth_item(secretary->visible_scheduled_tasks, 2));
 
     task_mark_as_done(task); secretary_archive_task(secretary, task);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_inbox));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->visible_inbox));
 
     secretary_free(secretary);
 }
@@ -444,20 +444,20 @@ static void test_optimization_requisites_sublists_work_for_archived(CuTest *test
     task_mark_as_done(as6p_task); secretary_archive_task(secretary, as6p_task);
     task_mark_as_done(ap_task); secretary_archive_task(secretary, ap_task);
 
-    CuAssertIntEquals(test, 1, list_count_items(secretary->archived_inbox));
+    CuAssertIntEquals(test, 1, sct_list_count_items(secretary->archived_inbox));
     CuAssertPtrEquals(test, a_task, 
-            list_get_nth_item(secretary->archived_inbox, 0));
+            sct_list_get_nth_item(secretary->archived_inbox, 0));
     CuAssertIntEquals(test, 3, 
-            list_count_items(secretary->archived_scheduled_tasks));
+            sct_list_count_items(secretary->archived_scheduled_tasks));
     CuAssertPtrEquals(test, as3_task, 
-            list_get_nth_item(secretary->archived_scheduled_tasks, 0));
+            sct_list_get_nth_item(secretary->archived_scheduled_tasks, 0));
     CuAssertPtrEquals(test, as6_task, 
-            list_get_nth_item(secretary->archived_scheduled_tasks, 1));
+            sct_list_get_nth_item(secretary->archived_scheduled_tasks, 1));
     CuAssertPtrEquals(test, as6p_task, 
-            list_get_nth_item(secretary->archived_scheduled_tasks, 2));
+            sct_list_get_nth_item(secretary->archived_scheduled_tasks, 2));
 
     task_mark_as_done(task); secretary_archive_task(secretary, task);
-    CuAssertIntEquals(test, 0, list_count_items(secretary->visible_inbox));
+    CuAssertIntEquals(test, 0, sct_list_count_items(secretary->visible_inbox));
 
     secretary_free(secretary);
 }
@@ -516,21 +516,21 @@ static void test_optimization_requisites_sublists_work_for_archived_and_visible(
     task_mark_as_done(as6p_task); secretary_archive_task(secretary, as6p_task);
     task_mark_as_done(ap_task); secretary_archive_task(secretary, ap_task);
 
-    CuAssertIntEquals(test, 5, list_count_items(secretary->visible_tasks));
+    CuAssertIntEquals(test, 5, sct_list_count_items(secretary->visible_tasks));
     CuAssertPtrEquals(test, s3_task, 
-            list_get_nth_item(secretary->visible_tasks, 0));
-    CuAssertPtrEquals(test, s6_task, list_get_nth_item(secretary->visible_tasks,  1));
+            sct_list_get_nth_item(secretary->visible_tasks, 0));
+    CuAssertPtrEquals(test, s6_task, sct_list_get_nth_item(secretary->visible_tasks,  1));
     // Because was created later. Project does not influence
-    CuAssertPtrEquals(test, s6p_task, list_get_nth_item(secretary->visible_tasks,  2));
-    CuAssertPtrEquals(test, p_task, list_get_nth_item(secretary->visible_tasks,  3));
-    CuAssertPtrEquals(test, task, list_get_nth_item(secretary->visible_tasks,  4));
+    CuAssertPtrEquals(test, s6p_task, sct_list_get_nth_item(secretary->visible_tasks,  2));
+    CuAssertPtrEquals(test, p_task, sct_list_get_nth_item(secretary->visible_tasks,  3));
+    CuAssertPtrEquals(test, task, sct_list_get_nth_item(secretary->visible_tasks,  4));
 
-    CuAssertIntEquals(test, 5, list_count_items(secretary->archived_tasks));
-    CuAssertPtrEquals(test, as3_task, list_get_nth_item(secretary->archived_tasks,  0));
-    CuAssertPtrEquals(test, as6_task, list_get_nth_item(secretary->archived_tasks,  1));
-    CuAssertPtrEquals(test, as6p_task, list_get_nth_item(secretary->archived_tasks,  2));
-    CuAssertPtrEquals(test, ap_task, list_get_nth_item(secretary->archived_tasks,  3));
-    CuAssertPtrEquals(test, a_task, list_get_nth_item(secretary->archived_tasks,  4));
+    CuAssertIntEquals(test, 5, sct_list_count_items(secretary->archived_tasks));
+    CuAssertPtrEquals(test, as3_task, sct_list_get_nth_item(secretary->archived_tasks,  0));
+    CuAssertPtrEquals(test, as6_task, sct_list_get_nth_item(secretary->archived_tasks,  1));
+    CuAssertPtrEquals(test, as6p_task, sct_list_get_nth_item(secretary->archived_tasks,  2));
+    CuAssertPtrEquals(test, ap_task, sct_list_get_nth_item(secretary->archived_tasks,  3));
+    CuAssertPtrEquals(test, a_task, sct_list_get_nth_item(secretary->archived_tasks,  4));
 
     secretary_free(secretary);
 }
@@ -579,23 +579,23 @@ static void test_optimization_requisites_sort_tasks_in_projects(CuTest *test) {
 
     CuAssertIntEquals(test, 3, project_count_tasks(project, false));
     CuAssertIntEquals(test, 3, project_count_tasks(project, true));
-    CuAssertPtrEquals(test, as6_task, list_get_nth_item(project->tasks, 0));
-    CuAssertPtrEquals(test, s6_task, list_get_nth_item(project->tasks, 1));
-    CuAssertPtrEquals(test, as3_task, list_get_nth_item(project->tasks, 2));
-    CuAssertPtrEquals(test, s3_task, list_get_nth_item(project->tasks, 3));
-    CuAssertPtrEquals(test, a_task, list_get_nth_item(project->tasks, 4));
-    CuAssertPtrEquals(test, task, list_get_nth_item(project->tasks, 5));
+    CuAssertPtrEquals(test, as6_task, sct_list_get_nth_item(project->tasks, 0));
+    CuAssertPtrEquals(test, s6_task, sct_list_get_nth_item(project->tasks, 1));
+    CuAssertPtrEquals(test, as3_task, sct_list_get_nth_item(project->tasks, 2));
+    CuAssertPtrEquals(test, s3_task, sct_list_get_nth_item(project->tasks, 3));
+    CuAssertPtrEquals(test, a_task, sct_list_get_nth_item(project->tasks, 4));
+    CuAssertPtrEquals(test, task, sct_list_get_nth_item(project->tasks, 5));
 
     _project_sort_tasks(project);
     
     CuAssertIntEquals(test, 3, project_count_tasks(project, false));
     CuAssertIntEquals(test, 3, project_count_tasks(project, true));
-    CuAssertPtrEquals(test, s3_task, list_get_nth_item(project->tasks, 0));
-    CuAssertPtrEquals(test, s6_task, list_get_nth_item(project->tasks, 1));
-    CuAssertPtrEquals(test, task, list_get_nth_item(project->tasks, 2));
-    CuAssertPtrEquals(test, as3_task, list_get_nth_item(project->tasks, 3));
-    CuAssertPtrEquals(test, as6_task, list_get_nth_item(project->tasks, 4));
-    CuAssertPtrEquals(test, a_task, list_get_nth_item(project->tasks, 5));
+    CuAssertPtrEquals(test, s3_task, sct_list_get_nth_item(project->tasks, 0));
+    CuAssertPtrEquals(test, s6_task, sct_list_get_nth_item(project->tasks, 1));
+    CuAssertPtrEquals(test, task, sct_list_get_nth_item(project->tasks, 2));
+    CuAssertPtrEquals(test, as3_task, sct_list_get_nth_item(project->tasks, 3));
+    CuAssertPtrEquals(test, as6_task, sct_list_get_nth_item(project->tasks, 4));
+    CuAssertPtrEquals(test, a_task, sct_list_get_nth_item(project->tasks, 5));
 
 
     secretary_free(secretary);
