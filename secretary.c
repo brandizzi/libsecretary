@@ -61,7 +61,7 @@ Task *secretary_create_task(Secretary *secretary, const char* description) {
 }
 
 int secretary_count_tasks(Secretary *secretary, bool archived) {
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_tasks : 
             secretary->visible_tasks;
     return list_count_items(list);
@@ -120,13 +120,13 @@ void secretary_delete_project(Secretary *secretary, Project *project) {
 }
 
 int secretary_count_inbox_tasks(Secretary *secretary, bool archived) {
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_inbox : secretary->visible_inbox;
     return  list_count_items(list);
 }
 
 Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived) {
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_inbox : secretary->visible_inbox;
     return list_get_nth_item(list, n);
 }
@@ -163,7 +163,7 @@ void secretary_free(Secretary *secretary) {
 }
 
 int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
     return list_count_items(list);
@@ -173,7 +173,7 @@ int secretary_count_tasks_scheduled(Secretary *secretary, bool archived) {
 int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date,
             bool archived) {
     void *params[] = { &archived, &date };
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
     return list_count_items_by_criteria(list,
@@ -213,7 +213,7 @@ void secretary_archive_tasks_scheduled_for_today(Secretary *secretary) {
 
 Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, 
             bool archived) {
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
     return list_get_nth_item(list, n);
@@ -222,7 +222,7 @@ Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n,
 Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, 
         int n, bool archived) {
     void *params[] = { &archived, &date };
-    List *list = archived ? 
+    SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
     return list_get_nth_item_by_criteria(list,
@@ -286,7 +286,7 @@ void _secretary_sort_tasks(Secretary *secretary) {
 void _secretary_update_sublists(Secretary *secretary) {
     _secretary_sort_tasks(secretary);
 
-    List *tasks = secretary->tasks;
+    SctList *tasks = secretary->tasks;
     int first_visible_scheduled_task, first_visible_scheduled_for_today_task,
         last_visible_scheduled_for_today_task, last_visible_scheduled_task,
         first_visible_inbox_task, last_visible_inbox_task, 

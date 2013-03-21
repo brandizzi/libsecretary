@@ -28,7 +28,7 @@
 
 typedef struct Project {
     char *name;
-    List *tasks;
+    SctList *tasks;
     bool archived;
 } Project;
 

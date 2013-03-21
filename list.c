@@ -25,27 +25,27 @@
 
 #define LIST_INITIAL_SPACE 256
 
-static void list_expand(List *list);
+static void list_expand(SctList *list);
 
-List *list_new() {
-    List *list = malloc(sizeof(List));
+SctList *list_new() {
+    SctList *list = malloc(sizeof(SctList));
     list->items = malloc(LIST_INITIAL_SPACE*sizeof(void*));
     list->space = LIST_INITIAL_SPACE;
     list->number_of_items = 0;
     return list;
 }
-int list_count_items(List *list) {
+int list_count_items(SctList *list) {
     return list->number_of_items;
 }
 
-void list_add_item(List *list, void *item) {
+void list_add_item(SctList *list, void *item) {
     if (list->space - list->number_of_items < 4) {
         list_expand(list);
     }
     list->items[list->number_of_items++] = item;
 }
 
-void *list_get_nth_item(List *list, int index) {
+void *list_get_nth_item(SctList *list, int index) {
     if (index < list->number_of_items) {
         return list->items[index];
     } else {
@@ -53,7 +53,7 @@ void *list_get_nth_item(List *list, int index) {
     }
 }
 
-void list_remove_item(List *list, void *item) {
+void list_remove_item(SctList *list, void *item) {
     for (int i = 0; i < list->number_of_items; i++) {   
         if (list->items[i] == item) {
             void **found = list->items+i;
@@ -64,22 +64,22 @@ void list_remove_item(List *list, void *item) {
     }
 }
 
-void list_extend(List *dest_list, List *source_list) {
+void list_extend(SctList *dest_list, SctList *source_list) {
     for (int i = 0; i < list_count_items(source_list); i++) {   
         list_add_item(dest_list, list_get_nth_item(source_list, i));
     }
 }
 
-void list_free(List *list) {
+void list_free(SctList *list) {
     free(list->items);
     free(list);
 }
 
-void list_sort(List *list, UtilComparator comparator) {
+void list_sort(SctList *list, UtilComparator comparator) {
     qsort(list->items, list->number_of_items, sizeof(void*), comparator);
 }
 
-void *list_get_nth_item_by_criteria(List *list, int index, 
+void *list_get_nth_item_by_criteria(SctList *list, int index, 
             ListPredicate predicate, void **params) {
     int counter = 0;
     for (int i = 0; i < list->number_of_items; i++) {
@@ -91,7 +91,7 @@ void *list_get_nth_item_by_criteria(List *list, int index,
     return NULL;
 }
 
-int list_count_items_by_criteria(List *list, ListPredicate predicate,
+int list_count_items_by_criteria(SctList *list, ListPredicate predicate,
         void **params) {
     int counter = 0;
     for (int i = 0; i < list->number_of_items; i++) {
@@ -100,7 +100,7 @@ int list_count_items_by_criteria(List *list, ListPredicate predicate,
     return counter;
 }
 
-int list_get_nth_item_index_by_criteria(List *list, int index,
+int list_get_nth_item_index_by_criteria(SctList *list, int index,
             ListPredicate predicate, void **params, 
             int start_search_from_index) {
     int counter = 0;
@@ -114,8 +114,8 @@ int list_get_nth_item_index_by_criteria(List *list, int index,
 }
 
 
-List *sublist_new(List *superlist, int start, int count) {
-    List *sublist = malloc(sizeof(List));
+SctList *sublist_new(SctList *superlist, int start, int count) {
+    SctList *sublist = malloc(sizeof(SctList));
     sublist->superlist = superlist;
     sublist->items = superlist->items+start;
     sublist->space = 0;
@@ -123,19 +123,19 @@ List *sublist_new(List *superlist, int start, int count) {
     return sublist;
 }
 
-void sublist_update_range(List *sublist, int start, int count) {
+void sublist_update_range(SctList *sublist, int start, int count) {
     sublist->items = sublist->superlist->items+start;
     sublist->number_of_items = count;
 }
 
-void sublist_free(List *sublist) {
+void sublist_free(SctList *sublist) {
     free(sublist);
 }
 
 
 /* PRIVATE FUNCTIONS */
 
-static void list_expand(List *list) {
+static void list_expand(SctList *list) {
     list->space *= 2;
     list->items = realloc(list->items, list->space*sizeof(void*));
     if (!list->items) {

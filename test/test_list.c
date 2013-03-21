@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 static void test_list_create(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     CuAssertTrue(test, list!=NULL);
     CuAssertIntEquals(test, list_count_items(list), 0);
@@ -34,7 +34,7 @@ static void test_list_create(CuTest *test) {
 }
 
 static void test_list_get_invalid_item(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
 
     CuAssertTrue(test, list!=NULL);
@@ -46,7 +46,7 @@ static void test_list_get_invalid_item(CuTest *test) {
 }
 
 static void test_list_add_items(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
     CuAssertIntEquals(test, list_count_items(list), 0);
 
     int i = 4;
@@ -66,7 +66,7 @@ static void test_list_add_items(CuTest *test) {
 }
 
 static void test_list_add_a_lot(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
     CuAssertIntEquals(test, list_count_items(list), 0);
 
     char *name = "Adam";
@@ -84,7 +84,7 @@ static void test_list_add_a_lot(CuTest *test) {
 }
 
 static void test_list_remove_item(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
     CuAssertIntEquals(test, list_count_items(list), 0);
 
     char *item1 = "item 1", *item2 = "item 2", *item3 = "item 3", 
@@ -114,12 +114,11 @@ static void test_list_remove_item(CuTest *test) {
 }
 
 static int intcomp(const void *i1, const void *i2) {
-    int **ppi1 = i1, **ppi2 = i2;
-    return **ppi1 - **ppi2;
+    return **(int**)i1 - **(int**)i2;
 }
 
 static void test_list_sort(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -156,7 +155,7 @@ static int my_task_compare(const void *p1, const void *p2) {
 }
 
 static void test_list_sort_tasks(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     Task *as6_task = task_new("as6_task"),
         *s6_task = task_new("s6_task"),
@@ -238,7 +237,7 @@ static bool is_rest_equal(void *item, void **params) {
 }
 
 static void test_list_get_nth_item_by_criteria(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -273,7 +272,7 @@ static void test_list_get_nth_item_by_criteria(CuTest *test) {
 }
 
 static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -315,7 +314,7 @@ static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
 }
 
 static void test_list_count_items_by_criteria(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -334,7 +333,7 @@ static void test_list_count_items_by_criteria(CuTest *test) {
 
 
 static void test_list_count_items_by_criteria_with_params(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -363,7 +362,7 @@ static void test_list_count_items_by_criteria_with_params(CuTest *test) {
 }
 
 static void test_list_sublist(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -374,7 +373,7 @@ static void test_list_sublist(CuTest *test) {
     list_add_item(list, &i5);
 
 
-    List *sublist = sublist_new(list, 2, 2);
+    SctList *sublist = sublist_new(list, 2, 2);
 
     CuAssertIntEquals(test, 2, list_count_items(sublist));
     int *p = list_get_nth_item(sublist, 0);
@@ -389,7 +388,7 @@ static void test_list_sublist(CuTest *test) {
 }
 
 static void test_list_sublist_update_range(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -400,7 +399,7 @@ static void test_list_sublist_update_range(CuTest *test) {
     list_add_item(list, &i5);
 
 
-    List *sublist = sublist_new(list, 2, 2);
+    SctList *sublist = sublist_new(list, 2, 2);
 
     CuAssertIntEquals(test, 2, list_count_items(sublist));
     int *p = list_get_nth_item(sublist, 0);
@@ -425,7 +424,7 @@ static void test_list_sublist_update_range(CuTest *test) {
 }
 
 static void test_list_get_nth_item_index_by_criteria(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -469,7 +468,7 @@ static void test_list_get_nth_item_index_by_criteria(CuTest *test) {
 }
 
 static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
-    List *list = list_new();
+    SctList *list = list_new();
 
     int i1 = 1, i2 = 2, i3 = 3, i4 = 4, i5 = 5;
 
@@ -515,7 +514,7 @@ static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
 }
 
 static void test_list_extend(CuTest *test) {
-    List *list1 = list_new();
+    SctList *list1 = list_new();
     int i0 = 0, i1 = 1, i2 = 2, i3 = 3, i4 = 4;
 
     list_add_item(list1, &i0);
@@ -531,7 +530,7 @@ static void test_list_extend(CuTest *test) {
     CuAssertPtrEquals(test, &i3, list_get_nth_item(list1, 3));
     CuAssertPtrEquals(test, &i4, list_get_nth_item(list1, 4));
 
-    List *list2 = list_new();
+    SctList *list2 = list_new();
     int i5 = 0, i6 = 1, i7 = 2, i8 = 3, i9 = 4;
 
     list_add_item(list2, &i5);

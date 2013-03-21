@@ -38,7 +38,7 @@ static void test_optimization_requisites_task_set_date_sort_list(CuTest *test) {
     time_t now = time(NULL);
     struct tm date = *localtime(&now);
 
-    List *list = list_new();
+    SctList *list = list_new();
     date.tm_mday = 2;
     secretary_schedule_task(secretary, task1, timegm(&date));
 

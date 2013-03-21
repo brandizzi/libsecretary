@@ -29,28 +29,28 @@
 
 #define LIST_ITEM_NOT_FOUND (-1)
 
-typedef struct List {
+typedef struct SctList {
     int space, number_of_items;
     void **items;
-    struct List *superlist;
-} List;
+    struct SctList *superlist;
+} SctList;
 
-List *list_new();
-int list_count_items(List *list);
+SctList *list_new();
+int list_count_items(SctList *list);
 /**
  * Removes the first occurence of item in the list.
  */
-void list_add_item(List *list, void *item);
-void *list_get_nth_item(List *list, int index);
-void list_remove_item(List *list, void *item);
+void list_add_item(SctList *list, void *item);
+void *list_get_nth_item(SctList *list, int index);
+void list_remove_item(SctList *list, void *item);
 
-void list_extend(List *dest_list, List *source_list);
+void list_extend(SctList *dest_list, SctList *source_list);
 
 /**
  * Frees the memory used by the list. It does not free the memory used by
  * the list items, however.
  */
-void list_free(List *list);
+void list_free(SctList *list);
 
 /**
  * Sorts the list using the comparator function. This function should behave 
@@ -59,26 +59,26 @@ void list_free(List *list);
  * greater than 0 if the second pointed item is respectively smaller than, equal
  * to or greater than the first pointed item.
  */
-void list_sort(List *list, UtilComparator comparator);
+void list_sort(SctList *list, UtilComparator comparator);
 
 /**
  * Returns the nth item which satisfies the predicate function. If there is no
  * such item, returns NULL.
  */
 typedef bool (*ListPredicate)(void *item, void **params);
-void *list_get_nth_item_by_criteria(List *list, int index, 
+void *list_get_nth_item_by_criteria(SctList *list, int index, 
             ListPredicate predicate, void **params);
-int list_count_items_by_criteria(List *list, ListPredicate predicate,
+int list_count_items_by_criteria(SctList *list, ListPredicate predicate,
         void **params);
-int list_get_nth_item_index_by_criteria(List *list, int index,
+int list_get_nth_item_index_by_criteria(SctList *list, int index,
             ListPredicate predicate, void **params, int start_search_from_index);
 
 /**
  * Creates a sublist - a list which just points to a section of another, greater
  * list. This is a read only list - you should not update it.
  */
-List *sublist_new(List *superlist, int start, int count);
-void sublist_update_range(List *sublist, int start, int count);
-void sublist_free(List *sublist);
+SctList *sublist_new(SctList *superlist, int start, int count);
+void sublist_update_range(SctList *sublist, int start, int count);
+void sublist_free(SctList *sublist);
 
 #endif
