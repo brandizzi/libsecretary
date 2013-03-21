@@ -34,79 +34,79 @@
 #define TASK_IS_ARCHIVED 0x8
 
 // Parser implementations
-static Secretary *parser_reader_v1_1(FILE *file) {
-    Secretary *secretary  = secretary_new();
-    int project_count = getw(file);
-    for (int i = 0; i < project_count; i++) {
-        //int project_properties = 
+static SctSecretary *parser_reader_v1_1(FILE *file) {
+    SctSecretary *secretary  = sct_secretary_new();
+    int sct_project_count = getw(file);
+    for (int i = 0; i < sct_project_count; i++) {
+        //int sct_project_properties = 
             getw(file);
-        char *name = util_read_string(file);
-        secretary_create_project(secretary, name);
+        char *name = sct_util_read_string(file);
+        sct_secretary_create_project(secretary, name);
         free(name);
     }
 
-    int task_count = getw(file);
-    for (int i = 0; i < task_count; i++) {
+    int sct_task_count = getw(file);
+    for (int i = 0; i < sct_task_count; i++) {
         int properties = getw(file);
-        char *description = util_read_string(file);
-        Task *task = secretary_create_task(secretary, description);
+        char *description = sct_util_read_string(file);
+        SctTask *task = sct_secretary_create_task(secretary, description);
         free(description);
         if (properties & TASK_HAS_PROJECT) {
-            char *name  = util_read_string(file);
-            Project *project = secretary_get_project(secretary, name);
+            char *name  = sct_util_read_string(file);
+            SctProject *project = sct_secretary_get_project(secretary, name);
             free(name);
-            project_add_task(project, task);
+            sct_project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             if (fread(&date, sizeof(struct tm), 1, file) < 1) goto ERROR;
-            task_schedule(task, mktime(&date));
+            sct_task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
-            task_mark_as_done(task);
+            sct_task_mark_as_done(task);
         }
     }
     _secretary_update_sublists(secretary);
     return secretary;
     ERROR:
-    secretary_free(secretary);
+    sct_secretary_free(secretary);
     return NULL;
 }
 
-static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
+static void parser_writer_v1_1(SctSecretary *secretary, FILE *file) {
     // Saving version
     putc(1, file);
     putc(1, file);
     // Going ahead
-    putw(secretary_count_projects(secretary), file);
-    for (int i = 0; i < secretary_count_projects(secretary); i++) {
-        Project *project = secretary_get_nth_project(secretary, i);
+    putw(sct_secretary_count_projects(secretary), file);
+    for (int i = 0; i < sct_secretary_count_projects(secretary); i++) {
+        SctProject *project = sct_secretary_get_nth_project(secretary, i);
         int mask = 0;
         putw(mask, file);
-        util_write_string(file, project_get_name(project));
+        sct_util_write_string(file, sct_project_get_name(project));
     }
-    putw(secretary_count_all_tasks(secretary), file);
-    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
-        Task *task = secretary_get_nth_task(secretary, i);
+    putw(sct_secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < sct_secretary_count_all_tasks(secretary); i++) {
+        SctTask *task = sct_secretary_get_nth_task(secretary, i);
         int mask = 0;
-        if (task_get_project(task)) {
+        if (sct_task_get_project(task)) {
             mask |= TASK_HAS_PROJECT;
         }
-        if (task_is_scheduled(task)) {
+        if (sct_task_is_scheduled(task)) {
             mask |= TASK_IS_SCHEDULED;
         }
-        if (task_is_done(task)) {
+        if (sct_task_is_done(task)) {
             mask |= TASK_IS_DONE;
         }
         putw(mask, file);
-        util_write_string(file, task_get_description(task));
+        sct_util_write_string(file, sct_task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {
-            util_write_string(file, 
-                    project_get_name(task_get_project(task)));
+            sct_util_write_string(file, 
+                    sct_project_get_name(sct_task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            time_t date = task_get_scheduled_date(task);
+            time_t date = sct_task_get_scheduled_date(task);
             fwrite(gmtime(&date), sizeof(struct tm), 1, file);
         }
     }
@@ -115,45 +115,45 @@ static void parser_writer_v1_1(Secretary *secretary, FILE *file) {
 /**
  * This parser version supports archival.
  */
-static Secretary *parser_reader_v1_2(FILE *file) {
-    Secretary *secretary  = secretary_new();
-    int project_count = getw(file);
-    for (int i = 0; i < project_count; i++) {
-        //int project_properties = 
+static SctSecretary *parser_reader_v1_2(FILE *file) {
+    SctSecretary *secretary  = sct_secretary_new();
+    int sct_project_count = getw(file);
+    for (int i = 0; i < sct_project_count; i++) {
+        //int sct_project_properties = 
             getw(file);
-        char *name = util_read_string(file);
-        secretary_create_project(secretary, name);
+        char *name = sct_util_read_string(file);
+        sct_secretary_create_project(secretary, name);
         free(name);
     }
 
-    int task_count = getw(file);
-    for (int i = 0; i < task_count; i++) {
+    int sct_task_count = getw(file);
+    for (int i = 0; i < sct_task_count; i++) {
         int properties = getw(file);
-        char *description = util_read_string(file);
-        Task *task = secretary_create_task(secretary, description);
+        char *description = sct_util_read_string(file);
+        SctTask *task = sct_secretary_create_task(secretary, description);
         free(description);
         if (properties & TASK_HAS_PROJECT) {
-            char *name  = util_read_string(file);
-            Project *project = secretary_get_project(secretary, name);
+            char *name  = sct_util_read_string(file);
+            SctProject *project = sct_secretary_get_project(secretary, name);
             free(name);
-            project_add_task(project, task);
+            sct_project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
             struct tm date;
             if (fread(&date, sizeof(struct tm), 1, file) < 1) goto ERROR;
-            task_schedule(task, mktime(&date));
+            sct_task_schedule(task, mktime(&date));
         }
         if (properties & TASK_IS_DONE) {
-            task_mark_as_done(task);
+            sct_task_mark_as_done(task);
         }
         if (properties & TASK_IS_ARCHIVED) {
-            task_archive(task);
+            sct_task_archive(task);
         }
     }
     _secretary_update_sublists(secretary);
     return secretary;
     ERROR:
-    secretary_free(secretary);
+    sct_secretary_free(secretary);
     return NULL;
 }
 
@@ -161,44 +161,44 @@ static Secretary *parser_reader_v1_2(FILE *file) {
  * This parser version supports archival.
  */
 
-static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
+static void parser_writer_v1_2(SctSecretary *secretary, FILE *file) {
     // Saving version
     putc(1, file);
     putc(2, file);
     // Going ahead
-    putw(secretary_count_projects(secretary), file);
-    for (int i = 0; i < secretary_count_projects(secretary); i++) {
-        Project *project = secretary_get_nth_project(secretary, i);
+    putw(sct_secretary_count_projects(secretary), file);
+    for (int i = 0; i < sct_secretary_count_projects(secretary); i++) {
+        SctProject *project = sct_secretary_get_nth_project(secretary, i);
         int mask = 0;
         putw(mask, file);
-        util_write_string(file, project_get_name(project));
+        sct_util_write_string(file, sct_project_get_name(project));
     }
-    putw(secretary_count_all_tasks(secretary), file);
-    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
-        Task *task = secretary_get_nth_task(secretary, i);
+    putw(sct_secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < sct_secretary_count_all_tasks(secretary); i++) {
+        SctTask *task = sct_secretary_get_nth_task(secretary, i);
         int mask = 0;
-        if (task_get_project(task)) {
+        if (sct_task_get_project(task)) {
             mask |= TASK_HAS_PROJECT;
         }
-        if (task_is_scheduled(task)) {
+        if (sct_task_is_scheduled(task)) {
             mask |= TASK_IS_SCHEDULED;
         }
-        if (task_is_done(task)) {
+        if (sct_task_is_done(task)) {
             mask |= TASK_IS_DONE;
         }
-        if (task_is_archived(task)) {
+        if (sct_task_is_archived(task)) {
             mask |= TASK_IS_ARCHIVED;
         }
 
         putw(mask, file);
-        util_write_string(file, task_get_description(task));
+        sct_util_write_string(file, sct_task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {
-            util_write_string(file, 
-                    project_get_name(task_get_project(task)));
+            sct_util_write_string(file, 
+                    sct_project_get_name(sct_task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            time_t date = task_get_scheduled_date(task);
+            time_t date = sct_task_get_scheduled_date(task);
             fwrite(gmtime(&date), sizeof(struct tm), 1, file);
         }
     }
@@ -207,49 +207,49 @@ static void parser_writer_v1_2(Secretary *secretary, FILE *file) {
 /**
  * This parser saves time_t instead of struct tm.
  */
-static Secretary *parser_reader_v1_3(FILE *file) {
-    Secretary *secretary  = secretary_new();
-    int project_count = getw(file);
-    for (int i = 0; i < project_count; i++) {
-        //int project_properties = 
+static SctSecretary *parser_reader_v1_3(FILE *file) {
+    SctSecretary *secretary  = sct_secretary_new();
+    int sct_project_count = getw(file);
+    for (int i = 0; i < sct_project_count; i++) {
+        //int sct_project_properties = 
             getw(file);
-        char *name = util_read_string(file);
-        secretary_create_project(secretary, name);
+        char *name = sct_util_read_string(file);
+        sct_secretary_create_project(secretary, name);
         free(name);
     }
 
-    int task_count = getw(file);
-    for (int i = 0; i < task_count; i++) {
+    int sct_task_count = getw(file);
+    for (int i = 0; i < sct_task_count; i++) {
         int properties = getw(file);
         int number = getw(file);
-        time_t creation_date = util_read_number(file, 8);
-        char *description = util_read_string(file);
-        Task *task = task_new(description);
+        time_t creation_date = sct_util_read_number(file, 8);
+        char *description = sct_util_read_string(file);
+        SctTask *task = sct_task_new(description);
         free(description);
         task->number = number;
         task->created_at = creation_date;
         if (properties & TASK_HAS_PROJECT) {
-            char *name  = util_read_string(file);
-            Project *project = secretary_get_project(secretary, name);
+            char *name  = sct_util_read_string(file);
+            SctProject *project = sct_secretary_get_project(secretary, name);
             free(name);
-            project_add_task(project, task);
+            sct_project_add_task(project, task);
         }
         if (properties & TASK_IS_SCHEDULED) {
-            time_t date = util_read_number(file, 8);
-            task_schedule(task, date);
+            time_t date = sct_util_read_number(file, 8);
+            sct_task_schedule(task, date);
         }
         if (properties & TASK_IS_DONE) {
-            task_mark_as_done(task);
+            sct_task_mark_as_done(task);
         }
         if (properties & TASK_IS_ARCHIVED) {
-            task_archive(task);
+            sct_task_archive(task);
         }
         _secretary_add_task(secretary, task);
     }
     _secretary_update_sublists(secretary);
     return secretary;
     ERROR:
-    secretary_free(secretary);
+    sct_secretary_free(secretary);
     return NULL;
 }
 
@@ -257,50 +257,50 @@ static Secretary *parser_reader_v1_3(FILE *file) {
  * This parser saves time_t instead of struct tm.
  */
 
-static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
+static void parser_writer_v1_3(SctSecretary *secretary, FILE *file) {
     // Saving version
     putc(1, file);
     putc(3, file);
     // Going ahead
-    putw(secretary_count_projects(secretary), file);
-    for (int i = 0; i < secretary_count_projects(secretary); i++) {
-        Project *project = secretary_get_nth_project(secretary, i);
+    putw(sct_secretary_count_projects(secretary), file);
+    for (int i = 0; i < sct_secretary_count_projects(secretary); i++) {
+        SctProject *project = sct_secretary_get_nth_project(secretary, i);
         int mask = 0;
         putw(mask, file);
-        util_write_string(file, project_get_name(project));
+        sct_util_write_string(file, sct_project_get_name(project));
     }
-    putw(secretary_count_all_tasks(secretary), file);
-    for (int i = 0; i < secretary_count_all_tasks(secretary); i++) {
-        Task *task = secretary_get_nth_task(secretary, i);
+    putw(sct_secretary_count_all_tasks(secretary), file);
+    for (int i = 0; i < sct_secretary_count_all_tasks(secretary); i++) {
+        SctTask *task = sct_secretary_get_nth_task(secretary, i);
         int mask = 0;
-        if (task_get_project(task)) {
+        if (sct_task_get_project(task)) {
             mask |= TASK_HAS_PROJECT;
         }
-        if (task_is_scheduled(task)) {
+        if (sct_task_is_scheduled(task)) {
             mask |= TASK_IS_SCHEDULED;
         }
-        if (task_is_done(task)) {
+        if (sct_task_is_done(task)) {
             mask |= TASK_IS_DONE;
         }
-        if (task_is_archived(task)) {
+        if (sct_task_is_archived(task)) {
             mask |= TASK_IS_ARCHIVED;
         }
 
         putw(mask, file);
         putw(task->number, file);
-        time_t date = task_get_creation_date(task);
+        time_t date = sct_task_get_creation_date(task);
 
-        util_write_number(file, date, 8);
+        sct_util_write_number(file, date, 8);
 
-        util_write_string(file, task_get_description(task));
+        sct_util_write_string(file, sct_task_get_description(task));
 
         if (mask & TASK_HAS_PROJECT) {
-            util_write_string(file, 
-                    project_get_name(task_get_project(task)));
+            sct_util_write_string(file, 
+                    sct_project_get_name(sct_task_get_project(task)));
         }
         if (mask & TASK_IS_SCHEDULED) {
-            time_t date = task_get_scheduled_date(task);
-            util_write_number(file, date, 8);
+            time_t date = sct_task_get_scheduled_date(task);
+            sct_util_write_number(file, date, 8);
         }
     }
 }
@@ -309,24 +309,24 @@ static void parser_writer_v1_3(Secretary *secretary, FILE *file) {
 typedef struct {
     int major_version;
     int minor_version;
-    ParserReaderFunction reader;
-    ParserWriterFunction writer;
+    SctParserReaderFunction reader;
+    SctParserWriterFunction writer;
 } ParserRow;
 
-#define PARSER_ROW(major_version, minor_version) { \
+#define SCT_PARSER_ROW(major_version, minor_version) { \
     major_version, minor_version, \
     parser_reader_v ## major_version ## _ ## minor_version, \
     parser_writer_v ## major_version ## _ ## minor_version \
 }
 static ParserRow parsers[] = {
-    PARSER_ROW(1, 1),
-    PARSER_ROW(1, 2),
-    PARSER_ROW(1, 3)
+    SCT_PARSER_ROW(1, 1),
+    SCT_PARSER_ROW(1, 2),
+    SCT_PARSER_ROW(1, 3)
 };
 
 // Just one search function, since it is non-trivial code
-#define PARSER_READER 0
-#define PARSER_WRITER 1
+#define SCT_PARSER_READER 0
+#define SCT_PARSER_WRITER 1
 
 static void *parser_get(int major_version, int minor_version, int what) {
 
@@ -334,9 +334,9 @@ static void *parser_get(int major_version, int minor_version, int what) {
         if (parsers[i].major_version == major_version && 
             parsers[i].minor_version == minor_version) {
             switch (what) {
-            case PARSER_READER:
+            case SCT_PARSER_READER:
                 return parsers[i].reader;
-            case PARSER_WRITER:
+            case SCT_PARSER_WRITER:
                 return parsers[i].writer;
             }
         }
@@ -344,13 +344,13 @@ static void *parser_get(int major_version, int minor_version, int what) {
     return NULL;
 }
 
-ParserReaderFunction parser_get_reader(int major_version, int minor_version) {
-    return (ParserReaderFunction) 
-        parser_get(major_version, minor_version, PARSER_READER);
+SctParserReaderFunction parser_get_reader(int major_version, int minor_version) {
+    return (SctParserReaderFunction) 
+        parser_get(major_version, minor_version, SCT_PARSER_READER);
 }
 
-ParserWriterFunction parser_get_writer(int major_version, int minor_version) {
-    return (ParserWriterFunction) 
-        parser_get(major_version, minor_version, PARSER_WRITER);
+SctParserWriterFunction parser_get_writer(int major_version, int minor_version) {
+    return (SctParserWriterFunction) 
+        parser_get(major_version, minor_version, SCT_PARSER_WRITER);
 
 }

@@ -59,7 +59,7 @@ void sct_list_free(SctList *list);
  * greater than 0 if the second pointed item is respectively smaller than, equal
  * to or greater than the first pointed item.
  */
-void sct_list_sort(SctList *list, UtilComparator comparator);
+void sct_list_sort(SctList *list, SctUtilComparator comparator);
 
 /**
  * Returns the nth item which satisfies the predicate function. If there is no

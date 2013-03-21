@@ -19,70 +19,70 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _SECRETARY_H
-# define _SECRETARY_H
+#ifndef _SECRETARY_SECRETARY_H
+# define _SECRETARY_SECRETARY_H
 
 #include <secretary/task.h>
 #include <secretary/project.h>
 #include <secretary/list.h>
 #include <time.h>
 
-typedef struct Secretary {
+typedef struct SctSecretary {
     int acc; // For strange purposes
     SctList *tasks, *projects;
     // Sublists of list of tasks, used for optimization
     SctList *visible_scheduled_tasks, *archived_scheduled_tasks,
          *visible_scheduled_for_today_tasks, *archived_scheduled_for_today_tasks,
          *visible_inbox,  *archived_inbox, *visible_tasks, *archived_tasks;
-} Secretary;
+} SctSecretary;
 
-Secretary *secretary_new();
-Task *secretary_create_task(Secretary *secretary, const char* description);
-int secretary_count_tasks(Secretary *secretary, bool archived);
-int secretary_count_all_tasks(Secretary *secretary);
-Task *secretary_get_task(Secretary *secretary, int number);
-Task *secretary_get_nth_task(Secretary *secretary, int n);
+SctSecretary *sct_secretary_new();
+SctTask *sct_secretary_create_task(SctSecretary *secretary, const char* description);
+int sct_secretary_count_tasks(SctSecretary *secretary, bool archived);
+int sct_secretary_count_all_tasks(SctSecretary *secretary);
+SctTask *sct_secretary_get_task(SctSecretary *secretary, int number);
+SctTask *sct_secretary_get_nth_task(SctSecretary *secretary, int n);
 
-int secretary_count_inbox_tasks(Secretary *secretary, bool archived);
-Task *secretary_get_nth_inbox_task(Secretary *secretary, int n, bool archived);
-void secretary_archive_inbox_tasks(Secretary *secretary);
+int sct_secretary_count_inbox_tasks(SctSecretary *secretary, bool archived);
+SctTask *sct_secretary_get_nth_inbox_task(SctSecretary *secretary, int n, bool archived);
+void sct_secretary_archive_inbox_tasks(SctSecretary *secretary);
 
-Project *secretary_create_project(Secretary *secretary, const char* name);
-int secretary_count_projects(Secretary *secretary);
-Project *secretary_get_project(Secretary *secretary, const char *name);
-Project *secretary_get_nth_project(Secretary *secretary, int n);
-void secretary_archive_project(Secretary *secretary, Project *project);
-
-
-int secretary_count_tasks_scheduled(Secretary *secretary, bool archived);
-int secretary_count_tasks_scheduled_for(Secretary *secretary, time_t date, bool archived);
-int secretary_count_tasks_scheduled_for_today(Secretary *secretary, bool archived);
-Task *secretary_get_nth_task_scheduled(Secretary *secretary, int n, bool archived);
-Task *secretary_get_nth_task_scheduled_for(Secretary *secretary, time_t date, int n, bool archived);
-Task *secretary_get_nth_task_scheduled_for_today(Secretary *secretary, int n, bool archived);
-void secretary_archive_scheduled_tasks(Secretary *secretary);
-void secretary_archive_tasks_scheduled_for(Secretary *secretary, time_t date);
-void secretary_archive_tasks_scheduled_for_today(Secretary *secretary);
-
-int secretary_count_done_tasks(Secretary *secretary, bool archived);
-Task *secretary_get_nth_done_task(Secretary *secretary, int n, bool archived);
-
-void secretary_sort_tasks(Secretary *secretary);
-
-void secretary_delete_task(Secretary *secretary, Task *task);
-void secretary_delete_project(Secretary *secretary, Project *project);
-
-void secretary_schedule_task(Secretary *secretary, Task *task, time_t time);
-void secretary_unschedule_task(Secretary *secretary, Task *task);
-
-void secretary_move_task_to_project(Secretary *secretary, Project *project, 
-        Task *task);
-void secretary_remove_task_from_project(Secretary *secretary, Task *task);
-void secretary_archive_tasks_from_project(Secretary *secretary, Project *project);
-
-void secretary_archive_task(Secretary *secretary, Task *task);
+SctProject *sct_secretary_create_project(SctSecretary *secretary, const char* name);
+int sct_secretary_count_projects(SctSecretary *secretary);
+SctProject *sct_secretary_get_project(SctSecretary *secretary, const char *name);
+SctProject *sct_secretary_get_nth_project(SctSecretary *secretary, int n);
+void sct_secretary_archive_project(SctSecretary *secretary, SctProject *project);
 
 
-void secretary_free(Secretary *secretary);
+int sct_secretary_count_tasks_scheduled(SctSecretary *secretary, bool archived);
+int sct_secretary_count_tasks_scheduled_for(SctSecretary *secretary, time_t date, bool archived);
+int sct_secretary_count_tasks_scheduled_for_today(SctSecretary *secretary, bool archived);
+SctTask *sct_secretary_get_nth_task_scheduled(SctSecretary *secretary, int n, bool archived);
+SctTask *sct_secretary_get_nth_task_scheduled_for(SctSecretary *secretary, time_t date, int n, bool archived);
+SctTask *sct_secretary_get_nth_task_scheduled_for_today(SctSecretary *secretary, int n, bool archived);
+void sct_secretary_archive_scheduled_tasks(SctSecretary *secretary);
+void sct_secretary_archive_tasks_scheduled_for(SctSecretary *secretary, time_t date);
+void sct_secretary_archive_tasks_scheduled_for_today(SctSecretary *secretary);
+
+int sct_secretary_count_done_tasks(SctSecretary *secretary, bool archived);
+SctTask *sct_secretary_get_nth_done_task(SctSecretary *secretary, int n, bool archived);
+
+void sct_secretary_sort_tasks(SctSecretary *secretary);
+
+void sct_secretary_delete_task(SctSecretary *secretary, SctTask *task);
+void sct_secretary_delete_project(SctSecretary *secretary, SctProject *project);
+
+void sct_secretary_schedule_task(SctSecretary *secretary, SctTask *task, time_t time);
+void sct_secretary_unschedule_task(SctSecretary *secretary, SctTask *task);
+
+void sct_secretary_move_task_to_project(SctSecretary *secretary, SctProject *project, 
+        SctTask *task);
+void sct_secretary_remove_task_from_project(SctSecretary *secretary, SctTask *task);
+void sct_secretary_archive_tasks_from_project(SctSecretary *secretary, SctProject *project);
+
+void sct_secretary_archive_task(SctSecretary *secretary, SctTask *task);
+
+
+void sct_secretary_free(SctSecretary *secretary);
 
 #endif

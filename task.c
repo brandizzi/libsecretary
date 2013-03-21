@@ -26,10 +26,10 @@
 
 #define TASK_SCHEDULED_VALUE_FOR_COMPARE(t) ((t)->scheduled_for*(t)->scheduled)
 
-Task *task_new(const char *description) {
-    Task *task = malloc(sizeof(Task));
+SctTask *sct_task_new(const char *description) {
+    SctTask *task = malloc(sizeof(SctTask));
     time(&task->created_at);
-    task->description = util_copy_string(description);
+    task->description = sct_util_copy_string(description);
     task->project = NULL;
     task->scheduled = false;
     task->archived = false;
@@ -38,100 +38,100 @@ Task *task_new(const char *description) {
     return task;
 }
 
-time_t task_get_creation_date(Task *task) {
+time_t sct_task_get_creation_date(SctTask *task) {
     return task->created_at;
 }
 
-const char *task_get_description(Task *task) {
+const char *sct_task_get_description(SctTask *task) {
     return task->description;
 }
 
-void task_set_description(Task *task, const char *description) {
+void sct_task_set_description(SctTask *task, const char *description) {
     free(task->description);
-    task->description = util_copy_string(description);
+    task->description = sct_util_copy_string(description);
 }
 
-Project *task_get_project(Task *task) {
+SctProject *sct_task_get_project(SctTask *task) {
     return task->project;
 }
 
-void task_set_project(Task *task, Project *project) {
-    project_add_task(project, task);
+void sct_task_set_project(SctTask *task, SctProject *project) {
+    sct_project_add_task(project, task);
 }
 
-bool task_has_project(Task *task) {
+bool sct_task_has_project(SctTask *task) {
     return task->project != NULL;
 }
 
-bool task_is_in_project(Task *task, struct Project *project) {
+bool sct_task_is_in_project(SctTask *task, struct SctProject *project) {
     return task->project == project;
 }
 
-void task_unset_project(Task *task) {
+void sct_task_unset_project(SctTask *task) {
     if (task->project == NULL) return;
-    project_remove_task(task->project, task);
+    sct_project_remove_task(task->project, task);
 }
 
-bool task_is_in_inbox(Task *task) {
+bool sct_task_is_in_inbox(SctTask *task) {
     return task->project == NULL && !task->scheduled;
 }
 
-void task_schedule(Task *task, time_t date) {
+void sct_task_schedule(SctTask *task, time_t date) {
     task->scheduled = true;
-    task->scheduled_for = util_beginning_of_day(date);
+    task->scheduled_for = sct_util_beginning_of_day(date);
 }
 
-time_t task_get_scheduled_date(Task *task) {
+time_t sct_task_get_scheduled_date(SctTask *task) {
     return task->scheduled_for;
 }
 
-bool task_is_scheduled(Task *task) {
+bool sct_task_is_scheduled(SctTask *task) {
     return task->scheduled;
 }
 
-bool task_is_scheduled_for(Task *task, time_t date) {
-    return task->scheduled && task->scheduled_for <= util_beginning_of_day(date);
+bool sct_task_is_scheduled_for(SctTask *task, time_t date) {
+    return task->scheduled && task->scheduled_for <= sct_util_beginning_of_day(date);
 }
 
-void task_unschedule(Task *task) {
+void sct_task_unschedule(SctTask *task) {
     task->scheduled = false;
 }
 
-void task_mark_as_done(Task *task) {
+void sct_task_mark_as_done(SctTask *task) {
     task->done = true;
 }
 
-void task_unmark_as_done(Task *task) {
+void sct_task_unmark_as_done(SctTask *task) {
     task->done = false;
     task->archived = false;
 }
 
-void task_switch_done_status(Task *task) {
+void sct_task_switch_done_status(SctTask *task) {
     task->done = !task->done;
 }
 
-bool task_is_done(Task *task) {
+bool sct_task_is_done(SctTask *task) {
     return task->done;
 }
 
-void task_archive(Task *task) {
+void sct_task_archive(SctTask *task) {
     task->archived = task->done && true;
 }
 
-bool task_is_archived(Task *task) {
-    Project *project = task->project;
-    return task->archived || (project != NULL && project_is_archived(project));
+bool sct_task_is_archived(SctTask *task) {
+    SctProject *project = task->project;
+    return task->archived || (project != NULL && sct_project_is_archived(project));
 }
 
-void task_free(Task *task) {
-    if (task_get_project(task) != NULL) {
-        project_remove_task(task_get_project(task), task);
+void sct_task_free(SctTask *task) {
+    if (sct_task_get_project(task) != NULL) {
+        sct_project_remove_task(sct_task_get_project(task), task);
     }
     free(task->description);
     free(task);
 }
 
-int task_compare(const Task *task1, const Task *task2) {
+int sct_task_compare(const SctTask *task1, const SctTask *task2) {
     int result;
     // Archived are greater than non archived
     result = task1->archived - task2->archived;

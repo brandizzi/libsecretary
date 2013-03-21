@@ -23,14 +23,14 @@
 
 #include <string.h>
 
-char *util_copy_string(const char *string) {
+char *sct_util_copy_string(const char *string) {
     size_t size = strlen(string);
     char *new = malloc(sizeof(char)*(size+2));
     strncpy(new, string, size+1);
     return new;
 }
 
-char *util_read_string(FILE *file) {
+char *sct_util_read_string(FILE *file) {
     int length = getw(file);
     char *string = malloc((length+2)*sizeof(char));
     if (fgets(string, length+1, file) == NULL) goto ERROR;
@@ -39,18 +39,18 @@ char *util_read_string(FILE *file) {
     free(string);
     return NULL;
 }
-void util_write_string(FILE *file, const char *string) {
+void sct_util_write_string(FILE *file, const char *string) {
     putw(strlen(string), file);
     fputs(string, file);
 }
 
-time_t util_beginning_of_day(time_t mytime) {
+time_t sct_util_beginning_of_day(time_t mytime) {
     struct tm date = *localtime(&mytime);
     date.tm_hour = date.tm_min = date.tm_sec = 0;
     return mktime(&date);
 }
 
-void util_write_number(FILE *file, uint_least64_t number, size_t size) {
+void sct_util_write_number(FILE *file, uint_least64_t number, size_t size) {
     uint8_t buffer[size];
     memset(buffer, '\0', size);
     for (int i = 0; i < size; i++) {
@@ -59,7 +59,7 @@ void util_write_number(FILE *file, uint_least64_t number, size_t size) {
     }
     fwrite(buffer, sizeof(uint8_t), size, file);
 }
-uint_least64_t util_read_number(FILE *file, size_t size) {
+uint_least64_t sct_util_read_number(FILE *file, size_t size) {
     uint8_t buffer[size];
     memset(buffer, '\0', size);
     uint_least64_t number = 0;

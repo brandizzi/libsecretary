@@ -25,13 +25,13 @@
 #include <secretary/secretary.h>
 #include <stdio.h>
 
-#define PARSER_LATEST_MAJOR_VERSION 1
-#define PARSER_LATEST_MINOR_VERSION 3
+#define SCT_PARSER_LATEST_MAJOR_VERSION 1
+#define SCT_PARSER_LATEST_MINOR_VERSION 3
 
-typedef Secretary* (*ParserReaderFunction)(FILE *file);
-typedef void (*ParserWriterFunction)(Secretary *secretary, FILE *file);
+typedef SctSecretary* (*SctParserReaderFunction)(FILE *file);
+typedef void (*SctParserWriterFunction)(SctSecretary *secretary, FILE *file);
 
-ParserReaderFunction parser_get_reader(int major_version, int minor_version);
-ParserWriterFunction parser_get_writer(int major_version, int minor_version);
+SctParserReaderFunction parser_get_reader(int major_version, int minor_version);
+SctParserWriterFunction parser_get_writer(int major_version, int minor_version);
 
 #endif

@@ -25,75 +25,75 @@
 #include <stdlib.h>
 #include <string.h>
 
-Project *project_new(const char *name) {
-    Project *project = malloc(sizeof(Project));
-    project->name = util_copy_string(name);
+SctProject *sct_project_new(const char *name) {
+    SctProject *project = malloc(sizeof(SctProject));
+    project->name = sct_util_copy_string(name);
     project->tasks = sct_list_new();
     project->archived = false;
     return project;
 }
 
-void project_add_task(Project *project, Task *task) {
-    task_unset_project(task);
+void sct_project_add_task(SctProject *project, SctTask *task) {
+    sct_task_unset_project(task);
     sct_list_add_item(project->tasks, task);
     task->project = project;
     _project_sort_tasks(project);
 }
 
-Task *project_get_task(Project *project, int index) {
+SctTask *sct_project_get_task(SctProject *project, int index) {
     if (index < sct_list_count_items(project->tasks)) 
         return sct_list_get_nth_item(project->tasks, index);
     return NULL;
 }
 
-Task *project_get_nth_task(Project *project, int n, bool archived) {
+SctTask *sct_project_get_nth_task(SctProject *project, int n, bool archived) {
     for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
-        Task *task = sct_list_get_nth_item(project->tasks, i);
-        if (task_is_archived(task) == archived && n-- == 0) {
+        SctTask *task = sct_list_get_nth_item(project->tasks, i);
+        if (sct_task_is_archived(task) == archived && n-- == 0) {
             return task;
         }
     }
     return NULL;
 }
 
-int project_count_tasks(Project *project, bool archived) {
+int sct_project_count_tasks(SctProject *project, bool archived) {
     int counter = 0;
     for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
-        Task *task = sct_list_get_nth_item(project->tasks, i);
-        if (task_is_archived(task) == archived) {
+        SctTask *task = sct_list_get_nth_item(project->tasks, i);
+        if (sct_task_is_archived(task) == archived) {
             counter++;
         }
     }
     return counter;
 }
 
-void project_remove_task(Project *project, Task *task) {
+void sct_project_remove_task(SctProject *project, SctTask *task) {
     sct_list_remove_item(project->tasks, task);
     task->project = NULL;
     _project_sort_tasks(project);
 }
 
-const char* project_get_name(Project *project) {
+const char* sct_project_get_name(SctProject *project) {
     return project->name;
 }
-void project_set_name(Project *project, const char *name) {
+void sct_project_set_name(SctProject *project, const char *name) {
     free(project->name);
-    project->name = util_copy_string(name);
+    project->name = sct_util_copy_string(name);
 }
 
-void project_archive_tasks(Project *project) {
+void sct_project_archive_tasks(SctProject *project) {
    for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
-        Task *task = sct_list_get_nth_item(project->tasks, i);
-        if (task_is_done(task)) {
-            task_archive(task);
+        SctTask *task = sct_list_get_nth_item(project->tasks, i);
+        if (sct_task_is_done(task)) {
+            sct_task_archive(task);
         }
     }
     _project_sort_tasks(project);
 }
 
-void project_free(Project *project) {
+void sct_project_free(SctProject *project) {
     for (int i = 0; i < sct_list_count_items(project->tasks); i++) {
-        Task *task = sct_list_get_nth_item(project->tasks, i);
+        SctTask *task = sct_list_get_nth_item(project->tasks, i);
         task->project = NULL;
     }
     free(project->name);
@@ -101,19 +101,19 @@ void project_free(Project *project) {
 }
 
 
-void project_archive(Project *project) {
+void sct_project_archive(SctProject *project) {
     project->archived = true;
 }
 
-void project_unarchive(Project *project) {
+void sct_project_unarchive(SctProject *project) {
     project->archived = false;
 }
 
-bool project_is_archived(Project *project) {
+bool sct_project_is_archived(SctProject *project) {
     return project->archived;
 }
 
 /** INTERNAL FUNCTIONS */
-void _project_sort_tasks(Project *project) {
+void _project_sort_tasks(SctProject *project) {
     sct_list_sort(project->tasks, _secretary_task_compare);
 }

@@ -29,13 +29,13 @@ typedef struct {
     char *filename;
     int major_version;
     int minor_version;
-    Secretary *secretary;
-} Notebook;
+    SctSecretary *secretary;
+} SctNotebook;
 
-Notebook *notebook_new(const char *filename);
-Secretary *notebook_get_secretary(Notebook *notebook);
-void notebook_save(Notebook *notebook);
-void notebook_free(Notebook *notebook);
+SctNotebook *sct_notebook_new(const char *filename);
+SctSecretary *sct_notebook_get_secretary(SctNotebook *notebook);
+void sct_notebook_save(SctNotebook *notebook);
+void sct_notebook_free(SctNotebook *notebook);
 
 #endif
 

@@ -75,7 +75,7 @@ void sct_list_free(SctList *list) {
     free(list);
 }
 
-void sct_list_sort(SctList *list, UtilComparator comparator) {
+void sct_list_sort(SctList *list, SctUtilComparator comparator) {
     qsort(list->items, list->number_of_items, sizeof(void*), comparator);
 }
 

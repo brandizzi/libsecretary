@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 static void test_util_beginning_of_day(CuTest *test) {
-    time_t now = time(NULL), stripped = util_beginning_of_day(now);
+    time_t now = time(NULL), stripped = sct_util_beginning_of_day(now);
     struct tm tm_now = *localtime(&now), tm_stripped = *localtime(&stripped);
 
     CuAssertIntEquals(test, tm_now.tm_mon, tm_stripped.tm_mon);
@@ -35,7 +35,7 @@ static void test_util_beginning_of_day(CuTest *test) {
 }
 
 static void test_util_beginning_of_day_verify_if_scheduled(CuTest *test) {
-    time_t now = time(NULL), stripped = util_beginning_of_day(now);
+    time_t now = time(NULL), stripped = sct_util_beginning_of_day(now);
     struct tm tm_now = *localtime(&now), tm_stripped = *localtime(&stripped);
 
     CuAssertIntEquals(test, tm_now.tm_mon, tm_stripped.tm_mon);
@@ -49,23 +49,23 @@ static void test_util_beginning_of_day_verify_if_scheduled(CuTest *test) {
 static void test_util_read_write_number(CuTest *test) {
     uint_least64_t value = 0x1122334455667788;
     FILE *file = fopen("myfile", "w");
-    util_write_number(file, value, 8);
+    sct_util_write_number(file, value, 8);
     
     fclose(file);
     file = fopen("myfile", "r");
     
-    value = util_read_number(file, 8);
+    value = sct_util_read_number(file, 8);
     CuAssertIntEquals(test, 0x1122334455667788, value);
     
     fclose(file);
     file = fopen("myfile", "w");
     
-    util_write_number(file, value, 4);    
+    sct_util_write_number(file, value, 4);    
 
     fclose(file);
     file = fopen("myfile", "r");
     
-    value = util_read_number(file, 4);
+    value = sct_util_read_number(file, 4);
     CuAssertIntEquals(test, value, 0x55667788);
     remove("myfile");
 }

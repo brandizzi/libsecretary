@@ -27,7 +27,7 @@
 
 #include <secretary/project.h>
 
-void _project_sort_tasks(Project *project);
+void _project_sort_tasks(SctProject *project);
 
 #endif
     

@@ -149,20 +149,20 @@ static void test_list_sort(CuTest *test) {
 }
 
 static int my_task_compare(const void *p1, const void *p2) {
-    const Task *t1 = *(Task**)p1,
-            *t2 = *(Task**)p2;
-    return task_compare(t1, t2);
+    const SctTask *t1 = *(SctTask**)p1,
+            *t2 = *(SctTask**)p2;
+    return sct_task_compare(t1, t2);
 }
 
 static void test_list_sort_tasks(CuTest *test) {
     SctList *list = sct_list_new();
 
-    Task *as6_task = task_new("as6_task"),
-        *s6_task = task_new("s6_task"),
-        *as3_task = task_new("as3_task"),
-        *s3_task = task_new("s3_task"),
-        *a_task = task_new("a_task"),
-        *task = task_new("task");
+    SctTask *as6_task = sct_task_new("as6_task"),
+        *s6_task = sct_task_new("s6_task"),
+        *as3_task = sct_task_new("as3_task"),
+        *s3_task = sct_task_new("s3_task"),
+        *a_task = sct_task_new("a_task"),
+        *task = sct_task_new("task");
 
     // Setting it up
     s6_task->created_at += 1;
@@ -173,20 +173,20 @@ static void test_list_sort_tasks(CuTest *test) {
     a_task->created_at += 6;
 
     time_t scheduling_date = time(NULL);
-    scheduling_date += UTIL_SECONDS_IN_DAY*3;
-    task_schedule(s3_task, scheduling_date);
-    task_schedule(as3_task, scheduling_date);
+    scheduling_date += SCT_UTIL_SECONDS_IN_DAY*3;
+    sct_task_schedule(s3_task, scheduling_date);
+    sct_task_schedule(as3_task, scheduling_date);
 
-    scheduling_date += UTIL_SECONDS_IN_DAY*3;
-    task_schedule(s6_task, scheduling_date);
-    task_schedule(as6_task, scheduling_date);
+    scheduling_date += SCT_UTIL_SECONDS_IN_DAY*3;
+    sct_task_schedule(s6_task, scheduling_date);
+    sct_task_schedule(as6_task, scheduling_date);
 
-    task_mark_as_done(as6_task); 
-    task_archive(as6_task);
-    task_mark_as_done(as3_task); 
-    task_archive(as3_task);
-    task_mark_as_done(a_task); 
-    task_archive(a_task);
+    sct_task_mark_as_done(as6_task); 
+    sct_task_archive(as6_task);
+    sct_task_mark_as_done(as3_task); 
+    sct_task_archive(as3_task);
+    sct_task_mark_as_done(a_task); 
+    sct_task_archive(a_task);
 
     sct_list_add_item(list, as6_task);
     sct_list_add_item(list, s6_task);

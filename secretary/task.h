@@ -18,59 +18,59 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _TASK_H
-# define _TASK_H
+#ifndef _SECRETARY_TASK_H
+# define _SECRETARY_TASK_H
 
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
 
-struct Project;
-//struct Secretary;
+struct SctProject;
+//struct SctSecretary;
 
 typedef struct {
     int number; // For internal purposes not really that important...
     time_t created_at;
     char *description;
-    struct Project *project;
+    struct SctProject *project;
 
     bool scheduled;
     time_t scheduled_for;
 
     bool done;
     bool archived;
-} Task;
+} SctTask;
 
-Task *task_new(const char *description);
+SctTask *sct_task_new(const char *description);
 
-time_t task_get_creation_date(Task *task);
-const char *task_get_description(Task *task);
-void task_set_description(Task *task, const char *description);
+time_t sct_task_get_creation_date(SctTask *task);
+const char *sct_task_get_description(SctTask *task);
+void sct_task_set_description(SctTask *task, const char *description);
 
-struct Project *task_get_project(Task *task);
-void task_set_project(Task *task, struct Project *project);
-void task_unset_project(Task *task);
-bool task_has_project(Task *task);
-bool task_is_in_project(Task *task, struct Project *project);
+struct SctProject *sct_task_get_project(SctTask *task);
+void sct_task_set_project(SctTask *task, struct SctProject *project);
+void sct_task_unset_project(SctTask *task);
+bool sct_task_has_project(SctTask *task);
+bool sct_task_is_in_project(SctTask *task, struct SctProject *project);
 
-bool task_is_in_inbox(Task *task);
+bool sct_task_is_in_inbox(SctTask *task);
 
-void task_schedule(Task *task, time_t date);
-time_t task_get_scheduled_date(Task *task);
-void task_unschedule(Task *task);
-bool task_is_scheduled(Task *task);
-bool task_is_scheduled_for(Task *task, time_t date);
+void sct_task_schedule(SctTask *task, time_t date);
+time_t sct_task_get_scheduled_date(SctTask *task);
+void sct_task_unschedule(SctTask *task);
+bool sct_task_is_scheduled(SctTask *task);
+bool sct_task_is_scheduled_for(SctTask *task, time_t date);
 
-void task_mark_as_done(Task *task);
-void task_unmark_as_done(Task *task);
-void task_switch_done_status(Task *task);
-bool task_is_done(Task *task);
+void sct_task_mark_as_done(SctTask *task);
+void sct_task_unmark_as_done(SctTask *task);
+void sct_task_switch_done_status(SctTask *task);
+bool sct_task_is_done(SctTask *task);
 
-void task_archive(Task *task);
-bool task_is_archived(Task *task);
+void sct_task_archive(SctTask *task);
+bool sct_task_is_archived(SctTask *task);
 
-int task_compare(const Task *task1, const Task *task2);
+int sct_task_compare(const SctTask *task1, const SctTask *task2);
 
-void task_free(Task *task);
+void sct_task_free(SctTask *task);
 
 #endif

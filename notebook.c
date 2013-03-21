@@ -31,40 +31,40 @@
 #define TASK_IS_SCHEDULED 0x2
 #define TASK_IS_DONE 0x4
 
-Notebook *notebook_new(const char *filename) {
-    Notebook *notebook = malloc(sizeof(Notebook));
-    notebook->filename = util_copy_string(filename);
+SctNotebook *sct_notebook_new(const char *filename) {
+    SctNotebook *notebook = malloc(sizeof(SctNotebook));
+    notebook->filename = sct_util_copy_string(filename);
 
     FILE *file = fopen(filename, "r");
     if (file) {
         notebook->major_version = getc(file);
         notebook->minor_version = getc(file);
-        ParserReaderFunction reader = parser_get_reader(
+        SctParserReaderFunction reader = parser_get_reader(
                 notebook->major_version, notebook->minor_version);
         notebook->secretary = reader(file);
     } else {
-        notebook->secretary = secretary_new();
+        notebook->secretary = sct_secretary_new();
 
     }
-    notebook->major_version = PARSER_LATEST_MAJOR_VERSION;
-    notebook->minor_version = PARSER_LATEST_MINOR_VERSION;
+    notebook->major_version = SCT_PARSER_LATEST_MAJOR_VERSION;
+    notebook->minor_version = SCT_PARSER_LATEST_MINOR_VERSION;
     return notebook;
 }
 
-Secretary *notebook_get_secretary (Notebook *notebook) {
+SctSecretary *sct_notebook_get_secretary (SctNotebook *notebook) {
     return notebook->secretary;
 }
 
-void notebook_save(Notebook *notebook) {
+void sct_notebook_save(SctNotebook *notebook) {
     FILE *file = fopen(notebook->filename, "w");
-    ParserWriterFunction writer = parser_get_writer(
+    SctParserWriterFunction writer = parser_get_writer(
             notebook->major_version, notebook->minor_version);
     writer(notebook->secretary, file);
     fclose(file);
 }
 
-void notebook_free(Notebook *notebook) {
-    secretary_free(notebook_get_secretary(notebook));
+void sct_notebook_free(SctNotebook *notebook) {
+    sct_secretary_free(sct_notebook_get_secretary(notebook));
     free(notebook->filename);
     free(notebook);
 }

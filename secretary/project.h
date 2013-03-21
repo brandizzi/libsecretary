@@ -18,37 +18,37 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _PROJECT_H
-# define _PROJECT_H
+#ifndef _SECRETARY_PROJECT_H
+# define _SECRETARY_PROJECT_H
 
 #include <secretary/task.h>
 #include <secretary/list.h>
 
 #include <stdlib.h>
 
-typedef struct Project {
+typedef struct SctProject {
     char *name;
     SctList *tasks;
     bool archived;
-} Project;
+} SctProject;
 
-Project *project_new(const char *name);
-void project_add_task(Project *project, Task *task);
-void project_remove_task(Project *project, Task *task);
+SctProject *sct_project_new(const char *name);
+void sct_project_add_task(SctProject *project, SctTask *task);
+void sct_project_remove_task(SctProject *project, SctTask *task);
 
-const char* project_get_name (Project *project);
-void project_set_name(Project *project, const char *name);
+const char* sct_project_get_name (SctProject *project);
+void sct_project_set_name(SctProject *project, const char *name);
 
-int project_count_tasks (Project *project, bool archived);
-Task *project_get_task(Project *project, int number);
-Task *project_get_nth_task(Project *project, int n, bool archived);
+int sct_project_count_tasks (SctProject *project, bool archived);
+SctTask *sct_project_get_task(SctProject *project, int number);
+SctTask *sct_project_get_nth_task(SctProject *project, int n, bool archived);
 
-void project_archive_tasks(Project *project);
+void sct_project_archive_tasks(SctProject *project);
 
-void project_archive(Project *project);
-void project_unarchive(Project *project);
-bool project_is_archived(Project *project);
+void sct_project_archive(SctProject *project);
+void sct_project_unarchive(SctProject *project);
+bool sct_project_is_archived(SctProject *project);
 
-void project_free(Project *project);
+void sct_project_free(SctProject *project);
 
 #endif

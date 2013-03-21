@@ -19,30 +19,30 @@
  * You can get the latest version of this file at 
  * http://bitbucket.org/brandizzi/libsecretary/
  */
-#ifndef _UTIL_H
-# define _UTIL_H
+#ifndef _SECRETARY_UTIL_H
+# define _SECRETARY_UTIL_H
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <stdint.h>
 
-#define UTIL_SECONDS_IN_DAY (60*60*24)
+#define SCT_UTIL_SECONDS_IN_DAY (60*60*24)
 
-typedef int (*UtilComparator)(const void *item1, const void *item2);
+typedef int (*SctUtilComparator)(const void *item1, const void *item2);
 
-char *util_copy_string(const char *string);
-char *util_read_string(FILE *file);
-void util_write_string(FILE *file, const char *string);
-void util_write_time_t(FILE *file, time_t date);
-time_t util_beginning_of_day(time_t time);
-void util_write_number(FILE *file, uint_least64_t number, size_t size);
-uint_least64_t util_read_number(FILE *file, size_t size);
+char *sct_util_copy_string(const char *string);
+char *sct_util_read_string(FILE *file);
+void sct_util_write_string(FILE *file, const char *string);
+void sct_util_write_time_t(FILE *file, time_t date);
+time_t sct_util_beginning_of_day(time_t time);
+void sct_util_write_number(FILE *file, uint_least64_t number, size_t size);
+uint_least64_t sct_util_read_number(FILE *file, size_t size);
 
 #ifdef DEBUG
-#  define util_log(message) printf(message)
+#  define sct_util_log(message) printf(message)
 #else
-#  define util_log(message)
+#  define sct_util_log(message)
 #endif
 
 #endif
