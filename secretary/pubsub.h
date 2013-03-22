@@ -24,15 +24,18 @@
 #ifndef _SECRETARY_PUBSUB_H
 # define _SECRETARY_PUBSUB_H
 
-typedef void (*SctPublisherCallback)(const char *event_name, void *params);
+#include "secretary/list.h"
+
+typedef void (*SctPublisherCallback)(const char *event_name, void **params);
 
 typedef struct SctPublisher {
+    SctList *events;
 } SctPublisher;
 
 
 SctPublisher *sct_publisher_new();
 void sct_publisher_add_event(SctPublisher *publisher, const char *event_name, 
-        SctPublisherCallback callback, void *params);
+        SctPublisherCallback callback, void **params);
 void sct_publisher_trigger(SctPublisher *publisher, const char *event_name);
 void sct_publisher_free(SctPublisher *publisher);
 

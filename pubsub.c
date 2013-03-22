@@ -22,14 +22,44 @@
 
 #include <string.h>
 
+typedef struct SctPublisherEvent {
+    const char *event_name;
+    SctPublisherCallback callback;
+    void **params;
+} SctPublisherEvent;
+
 SctPublisher *sct_publisher_new() {
-    return NULL;
+    SctPublisher *publisher = malloc(sizeof(SctPublisher));
+    publisher->events = sct_list_new();
+    return publisher;
 }
 
+static bool has_event_name(void *item, void **params);
+
 void sct_publisher_add_event(SctPublisher *publisher, const char *event_name, 
-        SctPublisherCallback callback, void *params) { }
+        SctPublisherCallback callback, void **params) {
+    SctPublisherEvent *event = malloc(sizeof(SctPublisherEvent));
+    event->event_name = event_name;
+    event->callback = callback;
+    event->params = params;
+    sct_list_add_item(publisher->events, event);
+}
         
 void sct_publisher_trigger(SctPublisher *publisher, const char *event_name) {
+    void *names[] = { event_name };
+    SctPublisherEvent *event =  sct_list_get_nth_item_by_criteria(
+        publisher->events, 0, has_event_name, names);
+    if (event) {
+        SctPublisherCallback callback = event->callback;
+        callback(event->event_name, event->params);
+    }
+    
 }
 void sct_publisher_free(SctPublisher *publisher) { }
+
+static bool has_event_name(void *item, void **params) {
+    SctPublisherEvent *event = item;
+    const char *event_name = params[0];
+    return strcmp(event->event_name, event_name) == 0;
+}
 
