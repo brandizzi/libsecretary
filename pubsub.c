@@ -55,7 +55,15 @@ void sct_publisher_trigger(SctPublisher *publisher, const char *event_name) {
     }
     
 }
-void sct_publisher_free(SctPublisher *publisher) { }
+void sct_publisher_free(SctPublisher *publisher) {
+    SctList *events = publisher->events;
+    for (int i = 0; i < sct_list_count_items(events); i++) {
+        SctPublisherEvent *event = sct_list_get_nth_item(events, i);
+        free(event);
+    }
+    sct_list_free(events);
+    free(publisher);
+}
 
 static bool has_event_name(void *item, void **params) {
     SctPublisherEvent *event = item;
