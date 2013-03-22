@@ -28,6 +28,7 @@
 #include <secretary/test/project.h>
 #include <secretary/test/util.h>
 #include <secretary/test/list.h>
+#include <secretary/test/pubsub.h>
 #include <secretary/test/parser.h>
 #include <secretary/test/optimization_requisites.h>
 
@@ -44,6 +45,7 @@ int RunAllTests(void)
     CuSuiteAddSuite(suite, test_secretary_suite());
     CuSuiteAddSuite(suite, test_notebook_suite());    
     CuSuiteAddSuite(suite, test_list_suite());
+    CuSuiteAddSuite(suite, test_pubsub_suite());
     CuSuiteAddSuite(suite, test_util_suite());
     CuSuiteAddSuite(suite, test_parser_suite());
     CuSuiteAddSuite(suite, test_optimization_requisites_suite());
