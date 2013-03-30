@@ -50,7 +50,7 @@ bool _secretary_predicate_inbox_task_is_done(void *task, SctList *params);
 
 bool _secretary_project_is_not_archived(void *project, SctList *params);
 
-void _secretary_on_task_change(const char *event_name, void **params);
-void _secretary_on_project_change(const char *event_name, void **params);
+void _secretary_on_task_change(const char *event_name, SctList *params);
+void _secretary_on_project_change(const char *event_name, SctList *params);
 
 #endif

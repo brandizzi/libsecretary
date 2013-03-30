@@ -76,7 +76,7 @@ bool sct_task_is_archived(SctTask *task);
 int sct_task_compare(const SctTask *task1, const SctTask *task2);
 
 void sct_task_set_project_change_event_callback(SctTask *task, 
-            SctPublisherCallback callback, void **params);
+            SctPublisherCallback callback, SctList *params);
 
 void sct_task_free(SctTask *task);
 

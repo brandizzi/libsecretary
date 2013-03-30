@@ -132,7 +132,7 @@ bool sct_project_is_archived(SctProject *project) {
 }
 
 void sct_project_set_change_event_callback(SctProject *project, 
-        SctPublisherCallback callback, void **params) {
+        SctPublisherCallback callback, SctList *params) {
     sct_publisher_add_event(project->publisher, SCT_PROJECT_CHANGE_EVENT,
         callback, params);    
 }

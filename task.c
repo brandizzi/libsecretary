@@ -137,7 +137,7 @@ void sct_task_free(SctTask *task) {
 }
 
 void sct_task_set_project_change_event_callback(SctTask *task, 
-            SctPublisherCallback callback, void **params) {
+            SctPublisherCallback callback, SctList *params) {
     sct_publisher_add_event(task->publisher, SCT_TASK_PROJECT_CHANGE_EVENT, 
             callback, params);
 }
