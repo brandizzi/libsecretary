@@ -65,6 +65,23 @@ static void test_list_add_items(CuTest *test) {
     sct_list_free(list);
 }
 
+static void test_list_new_with(CuTest *test) {
+    int i = 4;
+    int *ipointer = &i;
+    char *name = "Adam";
+    void *null = NULL;
+
+    // Using counter mostly because we need a first parameter
+    SctList *list = sct_list_new_with(3, ipointer, name, null);
+    CuAssertIntEquals(test, sct_list_count_items(list), 3);
+    
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 0), ipointer);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 1), name);
+    CuAssertPtrEquals(test, sct_list_get_nth_item(list, 2), null);
+
+    sct_list_free(list);
+}
+
 static void test_list_add_a_lot(CuTest *test) {
     SctList *list = sct_list_new();
     CuAssertIntEquals(test, sct_list_count_items(list), 0);
@@ -567,6 +584,7 @@ static void test_list_extend(CuTest *test) {
 CuSuite *test_list_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_list_create);
+    SUITE_ADD_TEST(suite, test_list_new_with);
     SUITE_ADD_TEST(suite, test_list_get_invalid_item);
     SUITE_ADD_TEST(suite, test_list_add_items);
     SUITE_ADD_TEST(suite, test_list_add_a_lot);

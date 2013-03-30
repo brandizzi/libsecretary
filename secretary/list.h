@@ -36,6 +36,7 @@ typedef struct SctList {
 } SctList;
 
 SctList *sct_list_new();
+SctList *sct_list_new_with(int count, ...);
 int sct_list_count_items(SctList *list);
 /**
  * Removes the first occurence of item in the list.

@@ -22,6 +22,7 @@
 #include <secretary/util.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #define SCT_LIST_INITIAL_SPACE 256
 
@@ -34,6 +35,20 @@ SctList *sct_list_new() {
     list->number_of_items = 0;
     return list;
 }
+
+SctList *sct_list_new_with(int count, ...) {
+    va_list items;
+    SctList *list = sct_list_new();
+
+    va_start(items, count); 
+    for (int i = 0; i < count; i++) {
+        sct_list_add_item(list, va_arg(items, void*));
+    }
+    va_end(items);
+
+    return list;
+}
+
 int sct_list_count_items(SctList *list) {
     return list->number_of_items;
 }
