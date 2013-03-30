@@ -235,20 +235,20 @@ static void test_list_sort_tasks(CuTest *test) {
     sct_list_free(list);
 }
 
-static bool is_even(void *p, void **params) {
+static bool is_even(void *p, SctList *params) {
     int *pi = p;
     return *pi % 2 == 0;
 }
 
-static bool is_odd(void *p, void **params) {
+static bool is_odd(void *p, SctList *params) {
     int *pi = p;
     return *pi % 2;
 }
 
-static bool is_rest_equal(void *item, void **params) {
+static bool is_rest_equal(void *item, SctList *params) {
     int *pi = item,
-        *pq = params[0], // First parameter: quotient
-        *pr = params[1]; // Scnd  parameter: rest
+        *pq = sct_list_get_nth_item(params, 0), // First parameter: quotient
+        *pr = sct_list_get_nth_item(params, 1); // Scnd  parameter: rest
     
     return *pi % *pq == *pr;
 }
@@ -301,7 +301,7 @@ static void test_list_get_nth_item_by_criteria_with_params(CuTest *test) {
 
 
     int quotient, rest;
-    void *params[] = { &quotient, &rest };
+    SctList *params = sct_list_new_with(2, &quotient, &rest);
 
     quotient = 3;
     rest = 2;
@@ -361,7 +361,7 @@ static void test_list_count_items_by_criteria_with_params(CuTest *test) {
     sct_list_add_item(list, &i5);
 
     int quotient, rest;
-    void *params[] = { &quotient, &rest };
+    SctList *params = sct_list_new_with(2, &quotient, &rest);
 
     quotient = 3;
     rest = 2;
@@ -453,7 +453,7 @@ static void test_list_get_nth_item_index_by_criteria(CuTest *test) {
 
 
     int quotient, rest;
-    void *params[] = { &quotient, &rest };
+    SctList *params = sct_list_new_with(2, &quotient, &rest);
 
     quotient = 3;
     rest = 2;
@@ -497,7 +497,7 @@ static void test_list_get_nth_item_index_by_criteria_start(CuTest *test) {
 
 
     int quotient, rest;
-    void *params[] = { &quotient, &rest };
+    SctList *params = sct_list_new_with(2, &quotient, &rest);
 
     quotient = 3;
     rest = 2;

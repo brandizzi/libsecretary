@@ -34,20 +34,20 @@ void _secretary_update_sublists(SctSecretary *secretary);
 
 void _secretary_add_task(SctSecretary *secretary, SctTask *task);
 
-bool _secretary_predicate_project_is_named(void *project, void **params);
+bool _secretary_predicate_project_is_named(void *project, SctList *params);
 
-bool _secretary_predicate_task_is_in_inbox(void *task, void **params);
-bool _secretary_predicate_task_archival_is(void *task, void **params);
-bool _secretary_predicate_task_is_done(void *task, void **params);
+bool _secretary_predicate_task_is_in_inbox(void *task, SctList *params);
+bool _secretary_predicate_task_archival_is(void *task, SctList *params);
+bool _secretary_predicate_task_is_done(void *task, SctList *params);
 
-bool _secretary_predicate_task_is_scheduled(void *task, void **params);
-bool _secretary_predicate_task_is_scheduled_for(void *task, void **params);
-bool _secretary_predicate_done_scheduled_task(void *task, void **params);
-bool _secretary_predicate_done_task_scheduled_for(void *task, void **params);
+bool _secretary_predicate_task_is_scheduled(void *task, SctList *params);
+bool _secretary_predicate_task_is_scheduled_for(void *task, SctList *params);
+bool _secretary_predicate_done_scheduled_task(void *task, SctList *params);
+bool _secretary_predicate_done_task_scheduled_for(void *task, SctList *params);
 bool _secretary_predicate_task_is_not_scheduled_for_today(void *task, 
-        void **param);
-bool _secretary_predicate_inbox_task_is_done(void *task, void **params);
+        SctList *params);
+bool _secretary_predicate_inbox_task_is_done(void *task, SctList *params);
 
-bool _secretary_project_is_not_archived(void *project, void **params);
+bool _secretary_project_is_not_archived(void *project, SctList *params);
 
 #endif

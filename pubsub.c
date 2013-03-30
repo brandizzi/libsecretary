@@ -25,7 +25,7 @@
 typedef struct SctPublisherEvent {
     const char *event_name;
     SctPublisherCallback callback;
-    void **params;
+    SctList *params;
 } SctPublisherEvent;
 
 SctPublisher *sct_publisher_new() {
@@ -34,10 +34,10 @@ SctPublisher *sct_publisher_new() {
     return publisher;
 }
 
-static bool has_event_name(void *item, void **params);
+static bool has_event_name(void *item, SctList *params);
 
 void sct_publisher_add_event(SctPublisher *publisher, const char *event_name, 
-        SctPublisherCallback callback, void **params) {
+        SctPublisherCallback callback, SctList *params) {
     SctPublisherEvent *event = malloc(sizeof(SctPublisherEvent));
     event->event_name = event_name;
     event->callback = callback;
@@ -46,7 +46,7 @@ void sct_publisher_add_event(SctPublisher *publisher, const char *event_name,
 }
         
 void sct_publisher_trigger(SctPublisher *publisher, const char *event_name) {
-    void *names[] = { event_name };
+    SctList *names = sct_list_new_with(1, event_name);
     SctPublisherEvent *event =  sct_list_get_nth_item_by_criteria(
         publisher->events, 0, has_event_name, names);
     if (event) {
@@ -65,9 +65,9 @@ void sct_publisher_free(SctPublisher *publisher) {
     free(publisher);
 }
 
-static bool has_event_name(void *item, void **params) {
+static bool has_event_name(void *item, SctList *params) {
     SctPublisherEvent *event = item;
-    const char *event_name = params[0];
+    const char *event_name =  sct_list_get_nth_item(params, 0);
     return strcmp(event->event_name, event_name) == 0;
 }
 

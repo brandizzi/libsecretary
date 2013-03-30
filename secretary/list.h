@@ -66,13 +66,13 @@ void sct_list_sort(SctList *list, SctUtilComparator comparator);
  * Returns the nth item which satisfies the predicate function. If there is no
  * such item, returns NULL.
  */
-typedef bool (*SctListPredicate)(void *item, void **params);
+typedef bool (*SctListPredicate)(void *item, SctList *params);
 void *sct_list_get_nth_item_by_criteria(SctList *list, int index, 
-            SctListPredicate predicate, void **params);
+            SctListPredicate predicate, SctList *params);
 int sct_list_count_items_by_criteria(SctList *list, SctListPredicate predicate,
-        void **params);
+        SctList *params);
 int sct_list_get_nth_item_index_by_criteria(SctList *list, int index,
-            SctListPredicate predicate, void **params, int start_search_from_index);
+            SctListPredicate predicate, SctList *params, int start_search_from_index);
 
 /**
  * Creates a sublist - a list which just points to a section of another, greater
