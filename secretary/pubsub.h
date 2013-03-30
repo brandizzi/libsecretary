@@ -26,7 +26,7 @@
 
 #include "secretary/list.h"
 
-typedef void (*SctPublisherCallback)(const char *event_name, void **params);
+typedef void (*SctPublisherCallback)(const char *event_name, SctList *params);
 
 typedef struct SctPublisher {
     SctList *events;
@@ -35,7 +35,7 @@ typedef struct SctPublisher {
 
 SctPublisher *sct_publisher_new();
 void sct_publisher_add_event(SctPublisher *publisher, const char *event_name, 
-        SctPublisherCallback callback, void **params);
+        SctPublisherCallback callback, SctList *params);
 void sct_publisher_trigger(SctPublisher *publisher, const char *event_name);
 void sct_publisher_free(SctPublisher *publisher);
 

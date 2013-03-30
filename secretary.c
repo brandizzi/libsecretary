@@ -87,7 +87,7 @@ int sct_secretary_count_projects(SctSecretary *secretary) {
 }
 
 SctProject *sct_secretary_get_project(SctSecretary *secretary, const char *name) {
-    void *params[] = { (void*) name };
+    SctList *params = sct_list_new_with(1, (void*)name);
     return sct_list_get_nth_item_by_criteria(secretary->projects, 0,
             _secretary_predicate_project_is_named, params);
 }
@@ -133,7 +133,7 @@ SctTask *sct_secretary_get_nth_inbox_task(SctSecretary *secretary, int n, bool a
 
 void sct_secretary_archive_inbox_tasks(SctSecretary *secretary) {
     bool archived = false;
-    void *params[] = { &archived };
+    SctList *params = sct_list_new_with(1, &archived);
     int done_count = sct_list_count_items_by_criteria(secretary->tasks,
                 _secretary_predicate_inbox_task_is_done, params);
     for (int i = 0; i < done_count; i++) {
@@ -172,7 +172,7 @@ int sct_secretary_count_tasks_scheduled(SctSecretary *secretary, bool archived) 
 
 int sct_secretary_count_tasks_scheduled_for(SctSecretary *secretary, time_t date,
             bool archived) {
-    void *params[] = { &archived, &date };
+    SctList *params = sct_list_new_with(2, &archived, &date);
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
@@ -196,7 +196,7 @@ void sct_secretary_archive_scheduled_tasks(SctSecretary *secretary) {
     _secretary_update_sublists(secretary);
 }
 void sct_secretary_archive_tasks_scheduled_for(SctSecretary *secretary, time_t date) {
-    void *params[] = { &date };
+    SctList *params = sct_list_new_with(1, &date);
     int scheduled_count = sct_list_count_items_by_criteria(secretary->tasks, 
             _secretary_predicate_done_task_scheduled_for, params);
     for (int i = 0; i < scheduled_count; i++) {
@@ -221,7 +221,7 @@ SctTask *sct_secretary_get_nth_task_scheduled(SctSecretary *secretary, int n,
 
 SctTask *sct_secretary_get_nth_task_scheduled_for(SctSecretary *secretary, time_t date, 
         int n, bool archived) {
-    void *params[] = { &archived, &date };
+    SctList *params = sct_list_new_with(2, &archived, &date);
     SctList *list = archived ? 
             secretary->archived_scheduled_tasks : 
             secretary->visible_scheduled_tasks;
@@ -235,13 +235,13 @@ SctTask *sct_secretary_get_nth_task_scheduled_for_today(SctSecretary *secretary,
 
 // WHY ON EARTH HAS IT AN archived ARGUMENT!?!?!?!
 int sct_secretary_count_done_tasks(SctSecretary *secretary, bool archived) {
-    void *params[] = { &archived };
+    SctList *params = sct_list_new_with(1, &archived);
     return sct_list_count_items_by_criteria(secretary->tasks,
             _secretary_predicate_task_is_done, params);
 }
 
 SctTask *sct_secretary_get_nth_done_task(SctSecretary *secretary, int n, bool archived) {
-    void *params[] = { &archived };
+    SctList *params = sct_list_new_with(1, &archived);
     return sct_list_get_nth_item_by_criteria(secretary->tasks, n,
             _secretary_predicate_task_is_done, params);
 }
@@ -392,7 +392,7 @@ void _secretary_update_sublists(SctSecretary *secretary) {
     if (first_visible_task != SCT_LIST_ITEM_NOT_FOUND) {
         if (last_visible_task == SCT_LIST_ITEM_NOT_FOUND) {
             bool archival = false;
-            void *params[] = {&archival};
+            SctList *params = sct_list_new_with(1, &archival);
             last_visible_task = sct_list_count_items_by_criteria(secretary->tasks,
                 _secretary_predicate_task_archival_is, params);
         }
@@ -501,40 +501,40 @@ int _secretary_task_compare(const void *p1, const void *p2) {
 }
 
 /* Predicates */
-bool _secretary_predicate_task_is_in_inbox(void *task, void **params) {
-    bool archived = *(bool*)params[0];
+bool _secretary_predicate_task_is_in_inbox(void *task, SctList *params) {
+    bool archived = *(bool*) sct_list_get_nth_item(params, 0);
     return sct_task_is_in_inbox(task) && sct_task_is_archived(task) == archived;
 }
 
-bool _secretary_predicate_task_archival_is(void *task, void **params) {
-    bool archived = *(bool*)params[0];
+bool _secretary_predicate_task_archival_is(void *task, SctList *params) {
+    bool archived = *(bool*) sct_list_get_nth_item(params, 0);
     return sct_task_is_archived(task) == archived;
 }
 
-bool _secretary_predicate_project_is_named(void *project, void **params) {
-    const char *name = (const char*)params[0];
+bool _secretary_predicate_project_is_named(void *project, SctList *params) {
+    const char *name = (const char*) sct_list_get_nth_item(params, 0);
     return strcmp(sct_project_get_name(project), name) == 0;
 }
 
-bool _secretary_predicate_task_is_done(void *task, void **params) {
-    bool archived = params ? *(bool*)params[0] : false;
+bool _secretary_predicate_task_is_done(void *task, SctList *params) {
+    bool archived = params ? *(bool*) sct_list_get_nth_item(params, 0) : false;
     return sct_task_is_done(task) && sct_task_is_archived(task) == archived;
 }
 
-bool _secretary_predicate_task_is_scheduled(void *task, void **params) {
-    bool archived = *(bool*)params[0];
+bool _secretary_predicate_task_is_scheduled(void *task, SctList *params) {
+    bool archived = *(bool*) sct_list_get_nth_item(params, 0);
     return sct_task_is_scheduled(task) && sct_task_is_archived(task) == archived;
 }
 
-bool _secretary_predicate_task_is_scheduled_for(void *task, void **params) {
-    bool archived = *(bool*)params[0];
-    time_t date = *(time_t*)params[1];
+bool _secretary_predicate_task_is_scheduled_for(void *task, SctList *params) {
+    bool archived = *(bool*) sct_list_get_nth_item(params, 0);
+    time_t date = *(time_t*) sct_list_get_nth_item(params, 1);
     return sct_task_is_scheduled_for(task, date) && sct_task_is_archived(task) == archived;
 }
 
 bool _secretary_predicate_task_is_not_scheduled_for_today(void *task, 
-        void **params) {
-    bool archived = *(bool*)params[0];
+        SctList *params) {
+    bool archived = *(bool*) sct_list_get_nth_item(params, 0);
     time_t today = sct_util_beginning_of_day(time(NULL));
     bool not_scheduled = !sct_task_is_scheduled(task);
     bool scheduled_after_today = sct_task_is_scheduled(task) 
@@ -544,20 +544,21 @@ bool _secretary_predicate_task_is_not_scheduled_for_today(void *task,
 }
 
 
-bool _secretary_predicate_done_scheduled_task(void *task, void **params) {
+bool _secretary_predicate_done_scheduled_task(void *task, SctList *params) {
     return sct_task_is_done(task) && sct_task_is_scheduled(task);
 }
 
-bool _secretary_predicate_done_task_scheduled_for(void *task, void **params) {
-    time_t date = *(time_t*)params[0];
+bool _secretary_predicate_done_task_scheduled_for(void *task, SctList *params) {
+    time_t date = *(time_t*)  sct_list_get_nth_item(params, 0);
     return sct_task_is_done(task) && sct_task_is_scheduled_for(task, date);
 }
 
-bool _secretary_predicate_inbox_task_is_done(void *task, void **params) {
-    bool archived = params ? *(bool*)params[0] : false;
+bool _secretary_predicate_inbox_task_is_done(void *task, SctList *params) {
+    // TODO pass bool instead of bool*
+    bool archived = params ? *(bool*)sct_list_get_nth_item(params, 0) : false;
     return sct_task_is_in_inbox(task) && sct_task_is_done(task) && sct_task_is_archived(task) == archived;
 }
 
-bool _secretary_project_is_not_archived(void *project, void **params) {
+bool _secretary_project_is_not_archived(void *project, SctList *params) {
     return ! sct_project_is_archived(project);
 }

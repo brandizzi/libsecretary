@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-static void nop_callback(const char *event_name, void **params) {}
+static void nop_callback(const char *event_name, SctList *params) {}
 
 static void test_pubsub_exists(CuTest *test) {
     SctPublisher *publisher = sct_publisher_new();
@@ -13,9 +13,9 @@ static void test_pubsub_exists(CuTest *test) {
 }
 
 static int var_to_set = 0;
-static void setter_callback(const char *event_name, void *  *params) {
-    int *p = *(int**) params;
-    var_to_set = *p;
+static void setter_callback(const char *event_name, SctList *params) {
+    int i = *(int*) sct_list_get_nth_item(params, 0);
+    var_to_set = i;
 }
 
 static void test_pubsub_execute(CuTest *test) {
@@ -23,7 +23,7 @@ static void test_pubsub_execute(CuTest *test) {
 
     var_to_set = 0;
     int i = 4;
-    void *params[] = { &i };
+    SctList *params = sct_list_new_with(1, &i);
     sct_publisher_add_event(publisher, "set-var", setter_callback, params);
     CuAssertIntEquals(test, 0, var_to_set);
 

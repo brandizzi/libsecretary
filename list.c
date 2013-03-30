@@ -95,7 +95,7 @@ void sct_list_sort(SctList *list, SctUtilComparator comparator) {
 }
 
 void *sct_list_get_nth_item_by_criteria(SctList *list, int index, 
-            SctListPredicate predicate, void **params) {
+            SctListPredicate predicate, SctList *params) {
     int counter = 0;
     for (int i = 0; i < list->number_of_items; i++) {
         if (predicate(list->items[i], params)) {
@@ -107,7 +107,7 @@ void *sct_list_get_nth_item_by_criteria(SctList *list, int index,
 }
 
 int sct_list_count_items_by_criteria(SctList *list, SctListPredicate predicate,
-        void **params) {
+        SctList *params) {
     int counter = 0;
     for (int i = 0; i < list->number_of_items; i++) {
         if (predicate(list->items[i], params)) counter++;
@@ -116,7 +116,7 @@ int sct_list_count_items_by_criteria(SctList *list, SctListPredicate predicate,
 }
 
 int sct_list_get_nth_item_index_by_criteria(SctList *list, int index,
-            SctListPredicate predicate, void **params, 
+            SctListPredicate predicate, SctList *params, 
             int start_search_from_index) {
     int counter = 0;
     for (int i = start_search_from_index; i < list->number_of_items; i++) {
