@@ -25,6 +25,9 @@
 #include <time.h>
 #include <stdbool.h>
 
+#include <secretary/pubsub.h>
+
+
 struct SctProject;
 //struct SctSecretary;
 
@@ -39,6 +42,7 @@ typedef struct {
 
     bool done;
     bool archived;
+    SctPublisher *publisher;
 } SctTask;
 
 SctTask *sct_task_new(const char *description);
@@ -70,6 +74,9 @@ void sct_task_archive(SctTask *task);
 bool sct_task_is_archived(SctTask *task);
 
 int sct_task_compare(const SctTask *task1, const SctTask *task2);
+
+void sct_task_set_project_change_event_callback(SctTask *task, 
+            SctPublisherCallback callback, void **params);
 
 void sct_task_free(SctTask *task);
 
