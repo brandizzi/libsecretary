@@ -411,6 +411,7 @@ void test_secretary_schedule_only_day_is_relevant(CuTest *test) {
     CuAssertIntEquals(test, 3, sct_secretary_count_tasks(secretary, false));
     CuAssertIntEquals(test, 0, sct_secretary_count_inbox_tasks(secretary, false));
 
+#   warning "It fails for problems with timezones. Repair it"
     CuAssertIntEquals(test, 3, sct_secretary_count_tasks_scheduled_for(secretary, today, false));
     CuAssertIntEquals(test, 3, sct_secretary_count_tasks_scheduled_for_today(secretary, false));
 
