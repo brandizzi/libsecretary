@@ -26,6 +26,8 @@
 
 #define TASK_SCHEDULED_VALUE_FOR_COMPARE(t) ((t)->scheduled_for*(t)->scheduled)
 
+#define SCT_TASK_PROJECT_CHANGE_EVENT "task-project-change"
+
 SctTask *sct_task_new(const char *description) {
     SctTask *task = malloc(sizeof(SctTask));
     time(&task->created_at);
@@ -35,6 +37,7 @@ SctTask *sct_task_new(const char *description) {
     task->archived = false;
     task->done = false;
     task->number = 0;
+    task->publisher = sct_publisher_new();
     return task;
 }
 
@@ -57,6 +60,7 @@ SctProject *sct_task_get_project(SctTask *task) {
 
 void sct_task_set_project(SctTask *task, SctProject *project) {
     sct_project_add_task(project, task);
+    sct_publisher_trigger(task->publisher, SCT_TASK_PROJECT_CHANGE_EVENT);
 }
 
 bool sct_task_has_project(SctTask *task) {
@@ -127,8 +131,15 @@ void sct_task_free(SctTask *task) {
     if (sct_task_get_project(task) != NULL) {
         sct_project_remove_task(sct_task_get_project(task), task);
     }
+    sct_publisher_free(task->publisher);
     free(task->description);
     free(task);
+}
+
+void sct_task_set_project_change_event_callback(SctTask *task, 
+            SctPublisherCallback callback, void **params) {
+    sct_publisher_add_event(task->publisher, SCT_TASK_PROJECT_CHANGE_EVENT, 
+            callback, params);
 }
 
 int sct_task_compare(const SctTask *task1, const SctTask *task2) {

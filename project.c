@@ -25,11 +25,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SCT_PROJECT_CHANGE_EVENT "sct-project-change"
+
 SctProject *sct_project_new(const char *name) {
     SctProject *project = malloc(sizeof(SctProject));
+
     project->name = sct_util_copy_string(name);
     project->tasks = sct_list_new();
     project->archived = false;
+    project->publisher = sct_publisher_new();
+
     return project;
 }
 
@@ -38,6 +43,8 @@ void sct_project_add_task(SctProject *project, SctTask *task) {
     sct_list_add_item(project->tasks, task);
     task->project = project;
     _project_sort_tasks(project);
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 SctTask *sct_project_get_task(SctProject *project, int index) {
@@ -71,6 +78,8 @@ void sct_project_remove_task(SctProject *project, SctTask *task) {
     sct_list_remove_item(project->tasks, task);
     task->project = NULL;
     _project_sort_tasks(project);
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 const char* sct_project_get_name(SctProject *project) {
@@ -79,6 +88,8 @@ const char* sct_project_get_name(SctProject *project) {
 void sct_project_set_name(SctProject *project, const char *name) {
     free(project->name);
     project->name = sct_util_copy_string(name);
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 void sct_project_archive_tasks(SctProject *project) {
@@ -89,6 +100,8 @@ void sct_project_archive_tasks(SctProject *project) {
         }
     }
     _project_sort_tasks(project);
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 void sct_project_free(SctProject *project) {
@@ -96,6 +109,7 @@ void sct_project_free(SctProject *project) {
         SctTask *task = sct_list_get_nth_item(project->tasks, i);
         task->project = NULL;
     }
+    sct_publisher_free(project->publisher);
     free(project->name);
     free(project);
 }
@@ -103,14 +117,24 @@ void sct_project_free(SctProject *project) {
 
 void sct_project_archive(SctProject *project) {
     project->archived = true;
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 void sct_project_unarchive(SctProject *project) {
     project->archived = false;
+    
+    sct_publisher_trigger(project->publisher, SCT_PROJECT_CHANGE_EVENT);
 }
 
 bool sct_project_is_archived(SctProject *project) {
     return project->archived;
+}
+
+void sct_project_set_change_event_callback(SctProject *project, 
+        SctPublisherCallback callback, void **params) {
+    sct_publisher_add_event(project->publisher, SCT_PROJECT_CHANGE_EVENT,
+        callback, params);    
 }
 
 /** INTERNAL FUNCTIONS */

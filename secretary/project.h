@@ -21,8 +21,9 @@
 #ifndef _SECRETARY_PROJECT_H
 # define _SECRETARY_PROJECT_H
 
-#include <secretary/task.h>
-#include <secretary/list.h>
+#include "secretary/task.h"
+#include "secretary/list.h"
+#include "secretary/pubsub.h"
 
 #include <stdlib.h>
 
@@ -30,6 +31,7 @@ typedef struct SctProject {
     char *name;
     SctList *tasks;
     bool archived;
+    SctPublisher *publisher;
 } SctProject;
 
 SctProject *sct_project_new(const char *name);
