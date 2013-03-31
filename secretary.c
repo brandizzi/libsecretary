@@ -53,10 +53,12 @@ SctSecretary *sct_secretary_new() {
 
 SctTask *sct_secretary_create_task(SctSecretary *secretary, const char* description) {
     SctTask *task = sct_task_new(description);
-    //task->secretary = secretary;
+
     task->number = ++secretary->acc;
     sct_list_add_item(secretary->tasks, task);
+    
     _secretary_update_sublists(secretary);
+
     return task;
 }
 
@@ -77,7 +79,12 @@ SctTask *sct_secretary_get_nth_task(SctSecretary *secretary, int n) {
 
 SctProject *sct_secretary_create_project(SctSecretary *secretary, const char* name) {
     SctProject *project = sct_project_new(name);
+    
     sct_list_add_item(secretary->projects, project);
+        void *params[] = { secretary };
+    sct_project_set_change_event_callback(project, 
+            _secretary_on_project_change, params);
+    
     return project;
 }
 
@@ -259,12 +266,12 @@ void sct_secretary_unschedule_task(SctSecretary *secretary, SctTask *task) {
 void sct_secretary_move_task_to_project(SctSecretary *secretary, SctProject *project, 
         SctTask *task) {
     sct_project_add_task(project, task);
-    _secretary_update_sublists(secretary);
+    //_secretary_update_sublists(secretary);
 }
 
 void sct_secretary_remove_task_from_project(SctSecretary *secretary, SctTask *task) {
     sct_project_remove_task(task->project, task);
-    _secretary_update_sublists(secretary);
+    //_secretary_update_sublists(secretary);
 }
 
 void sct_secretary_archive_tasks_from_project(SctSecretary *secretary, SctProject *project) {
@@ -561,4 +568,14 @@ bool _secretary_predicate_inbox_task_is_done(void *task, SctList *params) {
 
 bool _secretary_project_is_not_archived(void *project, SctList *params) {
     return ! sct_project_is_archived(project);
+}
+
+void _secretary_on_task_change(const char *event_name, void **params) {
+    SctSecretary *secretary = params[0];
+    _secretary_update_sublists(secretary);
+}
+
+void _secretary_on_project_change(const char *event_name, void **params) {
+    SctSecretary *secretary = params[0];
+    _secretary_update_sublists(secretary);
 }
