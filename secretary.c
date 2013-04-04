@@ -83,7 +83,7 @@ SctProject *sct_secretary_create_project(SctSecretary *secretary, const char* na
     sct_list_add_item(secretary->projects, project);
    SctList *params = sct_list_new_with(1, secretary);;
     sct_project_set_change_event_callback(project, 
-            _secretary_on_project_change, params);
+            _secretary_sort, params);
     
     return project;
 }
@@ -570,12 +570,8 @@ bool _secretary_project_is_not_archived(void *project, SctList *params) {
     return ! sct_project_is_archived(project);
 }
 
-void _secretary_on_task_change(const char *event_name, SctList *params) {
-    SctSecretary *secretary =  sct_list_get_nth_item(params, 0);
-    _secretary_update_sublists(secretary);
-}
-
-void _secretary_on_project_change(const char *event_name, SctList *params) {
+void _secretary_sort(SctPublisher *publisher,
+        const char *event_name, SctList *params) {
     SctSecretary *secretary =  sct_list_get_nth_item(params, 0);
     _secretary_update_sublists(secretary);
 }

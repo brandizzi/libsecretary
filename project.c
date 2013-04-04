@@ -33,7 +33,7 @@ SctProject *sct_project_new(const char *name) {
     project->name = sct_util_copy_string(name);
     project->tasks = sct_list_new();
     project->archived = false;
-    project->publisher = sct_publisher_new();
+    project->publisher = sct_publisher_new(project);
 
     return project;
 }
