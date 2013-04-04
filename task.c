@@ -26,7 +26,13 @@
 
 #define TASK_SCHEDULED_VALUE_FOR_COMPARE(t) ((t)->scheduled_for*(t)->scheduled)
 
+#define SCT_TASK_DESCRIPTION_CHANGE_EVENT "task-description-change"
 #define SCT_TASK_PROJECT_CHANGE_EVENT "task-project-change"
+#define SCT_TASK_SCHEDULE_CHANGE_EVENT "task-project-change"
+#define SCT_TASK_DONE_CHANGE_EVENT "task-done-change"
+#define SCT_TASK_ARCHIVED_CHANGE_EVENT "task-archived-change"
+#define SCT_TASK_FREE_EVENT "task-free"
+#define SCT_TASK_CHANGE_EVENT "task-change"
 
 SctTask *sct_task_new(const char *description) {
     SctTask *task = malloc(sizeof(SctTask));
@@ -37,7 +43,7 @@ SctTask *sct_task_new(const char *description) {
     task->archived = false;
     task->done = false;
     task->number = 0;
-    task->publisher = sct_publisher_new();
+    task->publisher = sct_publisher_new(task);
     return task;
 }
 

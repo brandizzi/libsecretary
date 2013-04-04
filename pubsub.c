@@ -28,10 +28,16 @@ typedef struct SctPublisherEvent {
     SctList *params;
 } SctPublisherEvent;
 
-SctPublisher *sct_publisher_new() {
+SctPublisher *sct_publisher_new(void *subject) {
     SctPublisher *publisher = malloc(sizeof(SctPublisher));
     publisher->events = sct_list_new();
+    publisher->subject = subject;
+
     return publisher;
+}
+
+void *sct_publisher_get_subject(SctPublisher *publisher) {
+    return publisher->subject;
 }
 
 static bool has_event_name(void *item, SctList *params);
@@ -51,7 +57,7 @@ void sct_publisher_trigger(SctPublisher *publisher, const char *event_name) {
         publisher->events, 0, has_event_name, names);
     if (event) {
         SctPublisherCallback callback = event->callback;
-        callback(event->event_name, event->params);
+        callback(publisher, event->event_name, event->params);
     }
     
 }

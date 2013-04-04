@@ -3,23 +3,25 @@
 
 #include <stdlib.h>
 
-static void nop_callback(const char *event_name, SctList *params) {}
+static void nop_callback(SctPublisher *publisher, const char *event_name, 
+        SctList *params) {}
 
 static void test_pubsub_exists(CuTest *test) {
-    SctPublisher *publisher = sct_publisher_new();
+    SctPublisher *publisher = sct_publisher_new(NULL);
     sct_publisher_add_event(publisher, "nop", nop_callback, NULL);
     sct_publisher_trigger(publisher, "nop");
     sct_publisher_free(publisher);
 }
 
 static int var_to_set = 0;
-static void setter_callback(const char *event_name, SctList *params) {
+static void setter_callback(SctPublisher *publisher,
+        const char *event_name, SctList *params) {
     int i = *(int*) sct_list_get_nth_item(params, 0);
     var_to_set = i;
 }
 
 static void test_pubsub_execute(CuTest *test) {
-    SctPublisher *publisher = sct_publisher_new();
+    SctPublisher *publisher = sct_publisher_new(NULL);
 
     var_to_set = 0;
     int i = 4;
@@ -33,9 +35,18 @@ static void test_pubsub_execute(CuTest *test) {
     sct_publisher_free(publisher);
 }
 
+static void test_pubsub_get_subject(CuTest *test) {
+    char *message = "subject";
+    SctPublisher *publisher = sct_publisher_new(message);
+    CuAssertPtrEquals(test, message, sct_publisher_get_subject(publisher));
+    
+    sct_publisher_free(publisher);
+}
+
 CuSuite *test_pubsub_suite() {
     CuSuite *suite  = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_pubsub_exists);
-        SUITE_ADD_TEST(suite, test_pubsub_execute);
+    SUITE_ADD_TEST(suite, test_pubsub_execute);
+    SUITE_ADD_TEST(suite, test_pubsub_get_subject);
     return suite;
 }
